@@ -103,7 +103,7 @@ const predeterminadosPoly = {
 };
 
 export function poly(plist: number[][], args: ArgsPoly) {
-  const { xof, yof, fil, str, wid } = { ...args, ...predeterminadosPoly };
+  const { xof, yof, fil, str, wid } = { ...predeterminadosPoly, ...args };
 
   let canv = "<polyline points='";
   for (let i = 0; i < plist.length; i++) {

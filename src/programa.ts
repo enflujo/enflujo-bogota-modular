@@ -2,6 +2,7 @@ import { arch02, boat01 } from './componentes/Arch';
 import { distMount, flatMount, mountain } from './componentes/Mount';
 import { btnHoverCol, present, reloadWSeed, toggleText, toggleVisible } from './componentes/UI';
 import './scss/estilos.scss';
+import type { Chunk } from './tipos';
 import { water } from './utilidades/cosas';
 import { download } from './utilidades/downloader';
 import { noise } from './utilidades/Perlin';
@@ -21,9 +22,12 @@ const SOURCE_BTN = document.getElementById('SOURCE_BTN') as HTMLDivElement;
 const L = document.getElementById('L') as HTMLDivElement;
 const R = document.getElementById('R') as HTMLDivElement;
 const SVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+let canv = '';
+const chunks: Chunk[] = [];
+const planmtx: number[] = [];
+
 const MEM = {
-  canv: '',
-  chunks: [],
   xmin: 0,
   xmax: 0,
   cwid: 512,
@@ -31,13 +35,13 @@ const MEM = {
   lasttick: 0,
   windx: 3000,
   windy: 800,
-  planmtx: [],
 };
 
 SVG.setAttribute('style', 'mix-blend-mode:multiply;');
 const GRUPO = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 GRUPO.setAttribute('transform', `translate(0,0)`);
 SVG.appendChild(GRUPO);
+BG.appendChild(SVG);
 
 GENERATE.onclick = () => reloadWSeed(INP_SEED.value);
 VIEW_LEFT.onclick = () => xcroll(-parseFloat(INC_STEP.value));
@@ -46,7 +50,7 @@ AUTO_SCROLL.onchange = () => autoxcroll(parseFloat(INC_STEP.value));
 dwnbtn.onclick = () => download('' + Math.random() + '.svg', BG.innerHTML);
 SOURCE_BTN.onmouseover = () => (SOURCE_BTN.style.backgroundColor = btnHoverCol);
 SOURCE_BTN.onmouseout = () => (SOURCE_BTN.style.backgroundColor = 'rgba(0,0,0,0)');
-SOURCE_BTN.onclick = () => (window.location = 'https://github.com/LingDong-/shan-shui-inf');
+// SOURCE_BTN.onclick = () => (window.location = 'https://github.com/LingDong-/shan-shui-inf');
 L.onmouseover = () => rstyle('L', true);
 L.onmouseout = () => rstyle('L', false);
 L.onclick = () => xcroll(-200);
@@ -71,13 +75,16 @@ SET_BTN.onclick = () => {
 };
 
 function parseArgs(key2f) {
-  const par = window.location.href.split('?')[1];
+  let par = window.location.href.split('?')[1];
+
   if (par == undefined) {
     return;
   }
-  par = par.split('&');
-  for (let i = 0; i < par.length; i++) {
-    var e = par[i].split('=');
+
+  const partes = par.split('&');
+
+  for (let i = 0; i < partes.length; i++) {
+    const e = partes[i].split('=');
     try {
       key2f[e[0]](e[1]);
     } catch (e) {
@@ -87,21 +94,18 @@ function parseArgs(key2f) {
 }
 
 let SEED = '' + new Date().getTime();
+
 parseArgs({
   seed: (x: string) => {
     SEED = x == '' ? SEED : x;
   },
 });
 
-// Math.seed(SEED);
-// console.log(Prng.seed);
-
 MEM.lasttick = new Date().getTime();
 INP_SEED.value = SEED;
 BG.setAttribute('style', 'width:' + MEM.windx + 'px');
 update();
 document.body.scrollTo(0, 0);
-console.log(['SCROLLX', window.scrollX]);
 present();
 //draw();
 
@@ -131,7 +135,7 @@ for (let i = 0; i < reso / 2 + 1; i++) {
 }
 
 const img = canvas.toDataURL('image/png');
-BG.style.backgroundImage = 'url(' + img + ')';
+// BG.style.backgroundImage = 'url(' + img + ')';
 document.getElementsByTagName('body')[0].style.backgroundImage = 'url(' + img + ')';
 
 document.addEventListener('mousemove', onMouseUpdate, false);
@@ -173,53 +177,52 @@ function update() {
   SVG.setAttribute('height', `${MEM.windy}`);
   SVG.setAttribute('viewBox', `${calcViewBox()}`);
 
-  GRUPO.innerHTML = MEM.canv;
-  console.log(GRUPO);
+  GRUPO.innerHTML = canv;
 }
 
-function chunkrender(xmin, xmax) {
-  MEM.canv = '';
+function chunkrender(xmin: number, xmax: number) {
+  canv = '';
 
-  for (var i = 0; i < MEM.chunks.length; i++) {
-    if (xmin - MEM.cwid < MEM.chunks[i].x && MEM.chunks[i].x < xmax + MEM.cwid) {
-      MEM.canv += MEM.chunks[i].canv;
+  for (let i = 0; i < chunks.length; i++) {
+    if (xmin - MEM.cwid < chunks[i].x && chunks[i].x < xmax + MEM.cwid) {
+      canv += chunks[i].canv;
     }
   }
 }
 
 function chunkloader(xmin: number, xmax: number) {
-  const add = (nch) => {
+  const add = (nch: Chunk) => {
     if (nch.canv.includes('NaN')) {
       console.log('gotcha:');
       console.log(nch.tag);
-      nch.canv = nch.canv.replace(/NaN/g, -1000);
+      nch.canv = nch.canv.replace(/NaN/g, '-1000');
     }
-    if (MEM.chunks.length == 0) {
-      MEM.chunks.push(nch);
+    if (chunks.length == 0) {
+      chunks.push(nch);
       return;
     } else {
-      if (nch.y <= MEM.chunks[0].y) {
-        MEM.chunks.unshift(nch);
+      if (nch.y <= chunks[0].y) {
+        chunks.unshift(nch);
         return;
-      } else if (nch.y >= MEM.chunks[MEM.chunks.length - 1].y) {
-        MEM.chunks.push(nch);
+      } else if (nch.y >= chunks[chunks.length - 1].y) {
+        chunks.push(nch);
         return;
       } else {
-        for (var j = 0; j < MEM.chunks.length - 1; j++) {
-          if (MEM.chunks[j].y <= nch.y && nch.y <= MEM.chunks[j + 1].y) {
-            MEM.chunks.splice(j + 1, 0, nch);
+        for (let j = 0; j < chunks.length - 1; j++) {
+          if (chunks[j].y <= nch.y && nch.y <= chunks[j + 1].y) {
+            chunks.splice(j + 1, 0, nch);
             return;
           }
         }
       }
     }
     console.log('EH?WTF!');
-    console.log(MEM.chunks);
+    console.log(chunks);
     console.log(nch);
   };
 
   while (xmax > MEM.xmax - MEM.cwid || xmin < MEM.xmin + MEM.cwid) {
-    console.log('generating new chunk...');
+    // console.log('generating new chunk...');
 
     let plan;
 
@@ -231,7 +234,7 @@ function chunkloader(xmin: number, xmax: number) {
       MEM.xmin = MEM.xmin - MEM.cwid;
     }
 
-    for (var i = 0; i < plan.length; i++) {
+    for (let i = 0; i < plan.length; i++) {
       if (plan[i].tag == 'mount') {
         add({
           tag: plan[i].tag,
@@ -240,6 +243,7 @@ function chunkloader(xmin: number, xmax: number) {
           canv: mountain(plan[i].x, plan[i].y, i * 2 * Math.random()),
           //{col:function(x){return "rgba(100,100,100,"+(0.5*Math.random()*plan[i].y/MEM.windy)+")"}}),
         });
+
         add({
           tag: plan[i].tag,
           x: plan[i].x,
@@ -321,12 +325,12 @@ export function mountplanner(xmin: number, xmax: number) {
         return false;
       }
     }
-    console.log('+');
+    // console.log('+');
     reg.push(r);
     return true;
   }
 
-  const reg: { x: number; y: number; tag: string }[] = [];
+  const reg: { x: number; y: number; tag?: string }[] = [];
   const samp = 0.03;
   const ns = (x: number) => Math.max(noise(x * samp) - 0.55, 0) * 2;
   const nns = (x: number) => 1 - noise(x * samp);
@@ -336,7 +340,7 @@ export function mountplanner(xmin: number, xmax: number) {
   const mwid = 200;
   for (let i = xmin; i < xmax; i += xstep) {
     const i1 = Math.floor(i / xstep);
-    MEM.planmtx[i1] = MEM.planmtx[i1] || 0;
+    planmtx[i1] = planmtx[i1] || 0;
   }
 
   for (let i = xmin; i < xmax; i += xstep) {
@@ -348,7 +352,7 @@ export function mountplanner(xmin: number, xmax: number) {
         const res = chadd(r);
         if (res) {
           for (let k = Math.floor((xof - mwid) / xstep); k < (xof + mwid) / xstep; k++) {
-            MEM.planmtx[k] += 1;
+            planmtx[k] += 1;
           }
         }
       }
@@ -364,9 +368,9 @@ export function mountplanner(xmin: number, xmax: number) {
       chadd(r);
     }
   }
-  console.log([xmin, xmax]);
+  // console.log([xmin, xmax]);
   for (let i = xmin; i < xmax; i += xstep) {
-    if (MEM.planmtx[Math.floor(i / xstep)] == 0) {
+    if (planmtx[Math.floor(i / xstep)] == 0) {
       //var r = {tag:"redcirc",x:i,y:700}
       //console.log(i)
       if (Math.random() < 0.01) {
@@ -398,12 +402,12 @@ export function mountplanner(xmin: number, xmax: number) {
 
 function dummyloader(xmin: number, xmax: number) {
   for (var i = xmin; i < xmax; i += 200) {
-    //MEM.chunks.push({tag:"?",x:i,y:100,canv:Tree.tree08(i,500,i)})
-    //MEM.chunks.push({tag:"?",x:i,y:100,canv:Man.man(i,500)})
-    //MEM.chunks.push({tag:"?",x:i,y:100,canv:Arch.arch01(i,500)})
-    //MEM.chunks.push({tag:"?",x:i,y:100,canv:Arch.boat01(i,500)})
-    //MEM.chunks.push({tag:"?",x:i,y:100,canv:Arch.transmissionTower01(i,500)})
-    MEM.chunks.push({
+    //chunks.push({tag:"?",x:i,y:100,canv:Tree.tree08(i,500,i)})
+    //chunks.push({tag:"?",x:i,y:100,canv:Man.man(i,500)})
+    //chunks.push({tag:"?",x:i,y:100,canv:Arch.arch01(i,500)})
+    //chunks.push({tag:"?",x:i,y:100,canv:Arch.boat01(i,500)})
+    //chunks.push({tag:"?",x:i,y:100,canv:Arch.transmissionTower01(i,500)})
+    chunks.push({
       tag: '?',
       x: i,
       y: 100,

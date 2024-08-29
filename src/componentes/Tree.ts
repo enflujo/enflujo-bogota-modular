@@ -391,9 +391,7 @@ function barkify(x, y, trlist) {
       rglist[i][j][1] += (noise(i, j * 0.1, 2) - 0.5) * (15 + 5 * randGaussian());
     }
     canv += stroke(
-      rglist[i].map(function (v) {
-        return [v[0] + x, v[1] + y];
-      }),
+      rglist[i].map((v) => [v[0] + x, v[1] + y]),
       { wid: 1.5, col: 'rgba(100,100,100,0.7)', out: 0 }
     );
   }
@@ -458,15 +456,11 @@ export function tree04(x, y, args) {
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
   canv += stroke(
-    trmlist.map(function (v) {
-      return [v[0] + x, v[1] + y];
-    }),
+    trmlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
       wid: 2.5,
-      fun: function (x) {
-        return Math.sin(1);
-      },
+      fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,
     }
@@ -543,15 +537,11 @@ export function tree05(x, y, args) {
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
   canv += stroke(
-    trmlist.map(function (v) {
-      return [v[0] + x, v[1] + y];
-    }),
+    trmlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
       wid: 2.5,
-      fun: function (x) {
-        return Math.sin(1);
-      },
+      fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,
     }
@@ -645,15 +635,11 @@ export function tree06(x, y, args) {
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
   canv += stroke(
-    trmlist.map(function (v) {
-      return [v[0] + x, v[1] + y];
-    }),
+    trmlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
       wid: 2.5,
-      fun: function (x) {
-        return Math.sin(1);
-      },
+      fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,
     }
@@ -858,15 +844,11 @@ export function tree08(x, y, args) {
   canv += poly(trlist, { xof: x, yof: y, fil: 'white', str: col, wid: 0 });
 
   canv += stroke(
-    trlist.map(function (v) {
-      return [v[0] + x, v[1] + y];
-    }),
+    trlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.6 + Math.random() * 0.1).toFixed(3) + ')',
       wid: 2.5,
-      fun: function (x) {
-        return Math.sin(1);
-      },
+      fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,
     }

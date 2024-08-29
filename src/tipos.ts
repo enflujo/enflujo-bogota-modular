@@ -78,3 +78,10 @@ export interface ArgsMountain {
   ret: number;
   col: number;
 }
+
+export interface Chunk {
+  x: number;
+  y: number;
+  canv: string;
+  tag: string;
+}

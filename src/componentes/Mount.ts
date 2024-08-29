@@ -59,9 +59,7 @@ var foot = function (ptlist, args) {
   }
   for (var j = 0; j < ftlist.length; j++) {
     canv += stroke(
-      ftlist[j].map(function (x) {
-        return [x[0] + xof, x[1] + yof];
-      }),
+      ftlist[j].map((x) => [x[0] + xof, x[1] + yof]),
       {
         col: 'rgba(100,100,100,' + (0.1 + Math.random() * 0.1).toFixed(3) + ')',
         wid: 1,
@@ -101,8 +99,13 @@ export function mountain(xoff: number, yoff: number, seed: number = 0, args?: Ar
     }
   }
 
-  function vegetate(treeFunc, growthRule, proofRule) {
+  function vegetate(
+    treeFunc: (x: number, y: number) => string,
+    growthRule: (i: number, j: number) => boolean,
+    proofRule: (veglist: number[][], i: number) => boolean
+  ) {
     const veglist = [];
+
     for (let i = 0; i < ptlist.length; i += 1) {
       for (let j = 0; j < ptlist[i].length; j += 1) {
         if (growthRule(i, j)) {
@@ -110,6 +113,7 @@ export function mountain(xoff: number, yoff: number, seed: number = 0, args?: Ar
         }
       }
     }
+
     for (let i = 0; i < veglist.length; i++) {
       if (proofRule(veglist, i)) {
         canv += treeFunc(veglist[i][0], veglist[i][1]);
@@ -142,9 +146,7 @@ export function mountain(xoff: number, yoff: number, seed: number = 0, args?: Ar
   });
   //OUTLINE
   canv += stroke(
-    ptlist[0].map(function (x) {
-      return [x[0] + xoff, x[1] + yoff];
-    }),
+    ptlist[0].map((x) => [x[0] + xoff, x[1] + yoff]),
     { col: 'rgba(100,100,100,0.3)', noi: 1, wid: 3 }
   );
 
@@ -186,7 +188,7 @@ export function mountain(xoff: number, yoff: number, seed: number = 0, args?: Ar
 
       (i: number, j: number) => {
         const ns = noise(i * 0.2, j * 0.05, seed);
-        return j % 2 && ns * ns * ns * ns < 0.012 && Math.abs(ptlist[i][j][1]) / h < 0.3;
+        return !!(j % 2 && ns * ns * ns * ns < 0.012 && Math.abs(ptlist[i][j][1]) / h < 0.3);
       },
 
       (veglist: number[][], i: number) => {
@@ -208,7 +210,7 @@ export function mountain(xoff: number, yoff: number, seed: number = 0, args?: Ar
 
     //BOTTOM
     vegetate(
-      function (x: number, y: number) {
+      (x: number, y: number) => {
         let ht = ((h + y) / h) * 120;
         ht = ht * 0.5 + Math.random() * ht * 0.5;
         const bc = Math.random() * 0.1;
@@ -271,30 +273,24 @@ export function mountain(xoff: number, yoff: number, seed: number = 0, args?: Ar
   //TRANSM
   vegetate(
     (x: number, y: number) => transmissionTower01(x + xoff, y + yoff, seed),
-    function (i, j) {
-      var ns = noise(i * 0.2, j * 0.05, seed + 20 * Math.PI);
+    (i: number, j: number) => {
+      const ns = noise(i * 0.2, j * 0.05, seed + 20 * Math.PI);
       return i % 2 == 0 && (j == 1 || j == ptlist[i].length - 2) && ns * ns * ns * ns < 0.002;
     },
-    function (veglist, i) {
-      return true;
-    }
+    (veglist, i) => true
   );
 
   //BOTT ROCK
   vegetate(
-    function (x, y) {
+    (x: number, y: number) => {
       return rock(x + xoff, y + yoff, seed, {
         wid: 20 + Math.random() * 20,
         hei: 20 + Math.random() * 20,
         sha: 2,
       });
     },
-    function (i, j) {
-      return (j == 0 || j == ptlist[i].length - 1) && Math.random() < 0.1;
-    },
-    function (veglist, i) {
-      return true;
-    }
+    (i: number, j: number) => (j == 0 || j == ptlist[i].length - 1) && Math.random() < 0.1,
+    (veglist, i) => true
   );
 
   if (ret == 0) {
@@ -323,6 +319,7 @@ export function flatMount(xoff, yoff, seed, args) {
     hoff += (Math.random() * yoff) / 100;
     ptlist.push([]);
     flat.push([]);
+
     for (var i = 0; i < reso[1]; i++) {
       var x = (i / reso[1] - 0.5) * Math.PI;
       var y = Math.cos(x * 2) + 1;
@@ -355,9 +352,7 @@ export function flatMount(xoff, yoff, seed, args) {
   });
   //OUTLINE
   canv += stroke(
-    ptlist[0].map(function (x) {
-      return [x[0] + xoff, x[1] + yoff];
-    }),
+    ptlist[0].map((x) => [x[0] + xoff, x[1] + yoff]),
     { col: 'rgba(100,100,100,0.3)', noi: 1, wid: 3 }
   );
 
@@ -685,9 +680,7 @@ export function rock(xoff, yoff, seed, args) {
   });
   //OUTLINE
   canv += stroke(
-    ptlist[0].map(function (x) {
-      return [x[0] + xoff, x[1] + yoff];
-    }),
+    ptlist[0].map((x) => [x[0] + xoff, x[1] + yoff]),
     { col: 'rgba(100,100,100,0.3)', noi: 1, wid: 3 }
   );
   canv += texture(ptlist, {
@@ -696,10 +689,8 @@ export function rock(xoff, yoff, seed, args) {
     tex: tex,
     wid: 3,
     sha: sha,
-    col: function (x) {
-      return 'rgba(180,180,180,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')';
-    },
-    dis: function () {
+    col: (x) => 'rgba(180,180,180,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
+    dis: () => {
       if (Math.random() > 0.5) {
         return 0.15 + 0.15 * Math.random();
       } else {
@@ -708,7 +699,7 @@ export function rock(xoff, yoff, seed, args) {
     },
   });
 
-  for (var i = 0; i < reso[0]; i++) {
+  for (let i = 0; i < reso[0]; i++) {
     //canv += poly(ptlist[i],{xof:xoff,yof:yoff,fil:"none",str:"red",wid:2})
   }
   return canv;

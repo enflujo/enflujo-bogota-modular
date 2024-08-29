@@ -207,11 +207,9 @@ export function water(xoff: number, yoff: number, seed, args) {
     }
   }
 
-  for (var j = 1; j < ptlist.length; j += 1) {
+  for (let j = 1; j < ptlist.length; j += 1) {
     canv += stroke(
-      ptlist[j].map(function (x) {
-        return [x[0] + xoff, x[1] + yoff];
-      }),
+      ptlist[j].map((x) => [x[0] + xoff, x[1] + yoff]),
       {
         col: 'rgba(100,100,100,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
         wid: 1,

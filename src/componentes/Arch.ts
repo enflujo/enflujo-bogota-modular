@@ -8,7 +8,7 @@ const flip = (ptlist: number[][][], axis = 0) => {
   for (let i = 0; i < ptlist.length; i++) {
     if (ptlist[i].length > 0) {
       if (typeof ptlist[i][0] == 'object') {
-        for (var j = 0; j < ptlist[i].length; j++) {
+        for (let j = 0; j < ptlist[i].length; j++) {
           ptlist[i][j][0] = axis - (ptlist[i][j][0] - axis);
         }
       } else {
@@ -203,18 +203,14 @@ var box = function (xoff, yoff, args) {
     });
   }
 
-  for (var i = 0; i < ptlist.length; i++) {
+  for (let i = 0; i < ptlist.length; i++) {
     canv += stroke(
-      ptlist[i].map(function (x) {
-        return [x[0] + xoff, x[1] + yoff];
-      }),
+      ptlist[i].map((x) => [x[0] + xoff, x[1] + yoff]),
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
         wid: wei,
-        fun: function (x) {
-          return 1;
-        },
+        fun: (x: number) => 1,
       }
     );
   }
@@ -413,18 +409,14 @@ var rail = function (xoff, yoff, seed, args) {
     }
   }
 
-  for (var i = 0; i < ptlist.length; i++) {
+  for (let i = 0; i < ptlist.length; i++) {
     canv += stroke(
-      ptlist[i].map(function (x) {
-        return [x[0] + xoff, x[1] + yoff];
-      }),
+      ptlist[i].map((x) => [x[0] + xoff, x[1] + yoff]),
       {
         col: 'rgba(100,100,100,0.5)',
         noi: 0.5,
         wid: wei,
-        fun: function (x) {
-          return 1;
-        },
+        fun: (x: number) => 1,
       }
     );
   }
@@ -526,18 +518,14 @@ var roof = function (xoff, yoff, args) {
   ]);
   canv += poly(polist, { xof: xoff, yof: yoff, str: 'none', fil: 'white' });
 
-  for (var i = 0; i < ptlist.length; i++) {
+  for (let i = 0; i < ptlist.length; i++) {
     canv += stroke(
-      ptlist[i].map(function (x) {
-        return [x[0] + xoff, x[1] + yoff];
-      }),
+      ptlist[i].map((x) => [x[0] + xoff, x[1] + yoff]),
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
         wid: wei,
-        fun: function (x) {
-          return 1;
-        },
+        fun: (x) => 1,
       }
     );
   }
@@ -600,18 +588,14 @@ var pagroof = function (xoff, yoff, args) {
   }
 
   canv += poly(polist, { xof: xoff, yof: yoff, str: 'none', fil: 'white' });
-  for (var i = 0; i < ptlist.length; i++) {
+  for (let i = 0; i < ptlist.length; i++) {
     canv += stroke(
-      div(ptlist[i], 5).map(function (x) {
-        return [x[0] + xoff, x[1] + yoff];
-      }),
+      div(ptlist[i], 5).map((x) => [x[0] + xoff, x[1] + yoff]),
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
         wid: wei,
-        fun: function (x) {
-          return 1;
-        },
+        fun: (x) => 1,
       }
     );
   }
@@ -862,9 +846,7 @@ export function boat01(xoff, yoff, seed, args) {
     plist.map((v) => [xoff + v[0], yoff + v[1]]),
     {
       wid: 1,
-      fun: function (x) {
-        return Math.sin(x * Math.PI * 2);
-      },
+      fun: (x) => Math.sin(x * Math.PI * 2),
       col: 'rgba(100,100,100,0.4)',
     }
   );
