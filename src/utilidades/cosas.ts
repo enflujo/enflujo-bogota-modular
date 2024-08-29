@@ -83,6 +83,7 @@ export function blob(x: number, y: number, args: ArgsBolb) {
 
   loopNoise(nslist);
   const plist = [];
+
   for (let i = 0; i < lalist.length; i++) {
     const ns = nslist[i] * noi + (1 - noi);
     const nx = x + Math.cos(lalist[i][1] + ang) * lalist[i][0] * ns;
@@ -97,7 +98,7 @@ export function blob(x: number, y: number, args: ArgsBolb) {
   }
 }
 
-export function div(plist: Punto[], reso) {
+export function div(plist: Punto[], reso: number) {
   const tl = (plist.length - 1) * reso;
   let lx = 0;
   let ly = 0;
@@ -132,7 +133,7 @@ export function texture(ptlist: Punto[], args: ArgsTexture) {
     sha: 0,
     ret: 0,
     noi: (x: number) => 30 / x,
-    col: (x: number) => 'rgba(100,100,100,' + (Math.random() * 0.3).toFixed(3) + ')',
+    col: () => 'rgba(100,100,100,' + (Math.random() * 0.3).toFixed(3) + ')',
     dis: () => {
       if (Math.random() > 0.5) {
         return (1 / 3) * Math.random();
@@ -143,7 +144,7 @@ export function texture(ptlist: Punto[], args: ArgsTexture) {
   };
   const { xof, yof, tex, wid, len, sha, ret, noi, col, dis } = { ...predeterminados, ...args };
   const reso = [ptlist.length, ptlist[0].length];
-  const texlist: number[][][] = [];
+  const texlist: Punto[][] = [];
 
   for (let i = 0; i < tex; i++) {
     const mid = (dis() * reso[1]) | 0;
@@ -171,12 +172,12 @@ export function texture(ptlist: Punto[], args: ArgsTexture) {
     for (let j = 0; j < texlist.length; j += 1 + +(sha != 0)) {
       canv += stroke(
         texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
-        { col: 'rgba(100,100,100,0.1)', wid: sha }
+        { col: 'rgba(100,100,100,0.1)', wid: +sha }
       );
     }
   }
   //TEXTURE
-  for (let j = 0 + sha; j < texlist.length; j += 1 + sha) {
+  for (let j = 0 + +sha; j < texlist.length; j += 1 + +sha) {
     canv += stroke(
       texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
       { col: col(j / texlist.length), wid: wid }

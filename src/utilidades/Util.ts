@@ -1,14 +1,13 @@
 import type { ArgsPoly, Punto } from '../tipos';
 import { midPt } from './Polytools';
 
-export function unNan(plist) {
+export function unNan(plist: Punto[]) {
   if (typeof plist != 'object' || plist == null) {
     return plist || 0;
   } else {
     return plist.map(unNan);
   }
 }
-//console.log(unNan([[undefined,[NaN,NaN],null],false,1]))
 
 export function distance(p0: number[], p1: number[]) {
   return Math.sqrt(Math.pow(p0[0] - p1[0], 2) + Math.pow(p0[1] - p1[1], 2));
@@ -94,16 +93,16 @@ export function bezmh(puntos: Punto[], w: number = 1) {
   return plist;
 }
 
-const predeterminadosPoly = {
-  xof: 0,
-  yof: 0,
-  fil: 'rgba(0,0,0,0)',
-  str: 'rgba(0,0,0,0)',
-  wid: 0,
-};
-
 export function poly(plist: number[][], args: ArgsPoly) {
-  const { xof, yof, fil, str, wid } = { ...predeterminadosPoly, ...args };
+  const predeterminados = {
+    xof: 0,
+    yof: 0,
+    fil: 'rgba(0,0,0,0)',
+    str: 'rgba(0,0,0,0)',
+    wid: 0,
+  };
+
+  const { xof, yof, fil, str, wid } = { ...predeterminados, ...args };
 
   let canv = "<polyline points='";
   for (let i = 0; i < plist.length; i++) {
