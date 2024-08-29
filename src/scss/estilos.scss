@@ -1,0 +1,58 @@
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+::selection {
+  background-color: #30cac073;
+  color: #130808;
+}
+
+#SETTING {
+  position: fixed;
+  z-index: 1000;
+  left: 40px;
+  top: 3px;
+}
+
+#MENU {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+#SET_BTN {
+  width: 32px;
+  height: 32px;
+  color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  text-align: center;
+  display: table;
+  cursor: pointer;
+}
+
+#SOURCE_BTN {
+  position: fixed;
+  z-index: 1000;
+  left: 77px;
+  top: 3px;
+  width: 32px;
+  height: 32px;
+  color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  text-align: center;
+  display: table;
+  cursor: pointer;
+}

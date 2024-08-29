@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/sitio.webmanifest" />
+    <!-- <link rel="canonical" href="https://enflujo.com" /> -->
+
+    <title>..:: EnFlujo ::..</title>
+    <!-- <meta name="description" content="Descripción del sitio...." /> -->
+
+    <!-- OpenGraph -->
+    <meta property="og:locale" content="es_CO" />
+    <!-- <meta property="og:site_name" content="EnFlujo" /> -->
+    <meta property="og:type" content="website" />
+    <!-- <meta property="og:url" content="https://enflujo.com" /> -->
+    <!-- <meta property="og:title" content="Titulo ..." /> -->
+    <!-- <meta property="og:description" content="Descripción ..." /> -->
+    <!-- <meta property="og:image" content="https://xxxxxx.jpg" /> -->
+    <!-- <meta property="og:image:alt" content="Texto que describe la imagen" /> -->
+    <!-- <meta property="og:image:width" content="1200" /> -->
+    <!-- <meta property="og:image:height" content="630" /> -->
+
+    <!-- Twitter -->
+    <!-- <meta name="twitter:card" content="summary_large_image" /> -->
+    <!-- <meta name="twitter:site" content="@labenflujo" /> -->
+    <!-- <meta name="twitter:creator" content="@labenflujo" /> -->
+    <!-- <meta name="twitter:url" content="https://enflujo.com" /> -->
+    <!-- <meta name="twitter:title" content="Titulo ..." /> -->
+    <!-- <meta name="twitter:description" content="Descripción ..." /> -->
+    <!-- <meta name="twitter:image" content="https://xxxxxx.jpg" /> -->
+    <!-- <meta name="twitter:image:alt" content="Texto que describe la imagen" /> -->
+  </head>
+  <body>
+    <div id="SETTING">
+      <div id="SET_BTN" title="Settings">
+        <div style="display: table-cell; vertical-align: middle">
+          <font id="SET_BTN.t" size="4px"> &#x2630; </font>
+        </div>
+      </div>
+
+      <div style="height: 4px"></div>
+
+      <div id="MENU">
+        <table>
+          <tr>
+            <td><pre>SEED</pre></td>
+          </tr>
+          <tr>
+            <td>
+              <input title="random seed" id="INP_SEED" />
+              <button id="GENERATE">Generate</button>
+            </td>
+          </tr>
+          <tr>
+            <td><pre>VIEW</pre></td>
+          </tr>
+          <tr>
+            <td>
+              <button title="view left" id="VIEW_LEFT"></button>
+              <input title="increment step" id="INC_STEP" type="number" value="200" min="0" max="10000" step="20" />
+              <button title="view right" id="VIEW_RIGHT">></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <pre><input id="AUTO_SCROLL" type="checkbox">Auto-scroll</pre>
+            </td>
+
+            <td></td>
+          </tr>
+
+          <tr>
+            <td><pre>SAVE</pre></td>
+          </tr>
+          <tr>
+            <td>
+              <button title="WARNING: This may take a while..." type="button" id="dwn-btn" value="Download as SVG">
+                Download as .SVG
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div id="SOURCE_BTN" title="Fork me on Github!">
+      <div style="display: table-cell; vertical-align: middle">
+        <font id="SET_BTN.t" size="4px"> &lt;/&gt; </font>
+      </div>
+    </div>
+
+    <table style="border-bottom: 1px solid rgba(0, 0, 0, 0.1)">
+      <tr>
+        <td>
+          <div id="L">
+            <div id="L.t"><font size="6px">&#x3008;</font></div>
+          </div>
+        </td>
+
+        <td>
+          <div id="BG"></div>
+        </td>
+
+        <td>
+          <div id="R">
+            <div id="R.t"><font size="6px">&#x3009;</font></div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <canvas id="bgcanv" width="512" height="512" hidden> </canvas>
+    <script type="module" src="/src/programa.ts"></script>
+  </body>
+</html>
