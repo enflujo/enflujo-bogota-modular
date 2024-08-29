@@ -1,3 +1,4 @@
+import agua from './componentes/agua';
 import barco from './componentes/barco';
 import montaña from './componentes/montaña';
 import montaña2 from './componentes/montaña2';
@@ -6,7 +7,6 @@ import { btnHoverCol, present, reloadWSeed, toggleText, toggleVisible } from './
 import './scss/estilos.scss';
 import type { Chunk } from './tipos';
 import { calcViewBox, parseArgs } from './utilidades/ayudas';
-import { water } from './utilidades/cosas';
 import { download } from './utilidades/downloader';
 import { noise } from './utilidades/Perlin';
 import { randChoice } from './utilidades/Util';
@@ -223,7 +223,7 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y - 10000,
-          canv: water(plan[i].x, plan[i].y),
+          canv: agua(plan[i].x, plan[i].y),
         });
       } else if (plan[i].tag == 'flatmount') {
         add({
