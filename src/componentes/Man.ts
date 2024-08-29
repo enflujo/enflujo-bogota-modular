@@ -1,12 +1,11 @@
+import type { Punto } from '../tipos';
 import { div, stroke } from '../utilidades/cosas';
 import { noise } from '../utilidades/Perlin';
 import { bezmh, distance, normRand, poly } from '../utilidades/Util';
 
-const expand = (ptlist, wfun) => {
+const expand = (ptlist: Punto[], wfun: (x: number) => number) => {
   const vtxlist0 = [];
   const vtxlist1 = [];
-  const vtxlist = [];
-  const n0 = Math.random() * 10;
 
   for (let i = 1; i < ptlist.length - 1; i++) {
     const w = wfun(i / ptlist.length);
@@ -31,37 +30,27 @@ const expand = (ptlist, wfun) => {
   return [vtxlist0, vtxlist1];
 };
 
-var tranpoly = function (p0, p1, ptlist) {
-  var plist = ptlist.map(function (v) {
-    return [-v[0], v[1]];
-  });
-  var ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]) - Math.PI / 2;
-  var scl = distance(p0, p1);
-  var qlist = plist.map(function (v) {
-    var d = distance(v, [0, 0]);
-    var a = Math.atan2(v[1], v[0]);
+const tranpoly = (p0: Punto, p1: Punto, ptlist: Punto[]) => {
+  const plist = ptlist.map((v) => [-v[0], v[1]]);
+  const ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]) - Math.PI / 2;
+  const scl = distance(p0, p1);
+  const qlist = plist.map((v) => {
+    const d = distance(v, [0, 0]);
+    const a = Math.atan2(v[1], v[0]);
     return [p0[0] + d * scl * Math.cos(ang + a), p0[1] + d * scl * Math.sin(ang + a)];
   });
   return qlist;
 };
-var flipper = function (plist) {
-  return plist.map(function (v) {
-    return [-v[0], v[1]];
-  });
-};
 
-function hat01(p0, p1, args) {
-  var args = args != undefined ? args : {};
-  var fli = args.fli != undefined ? args.fli : false;
+const flipper = (plist: Punto[]) => plist.map((v) => [-v[0], v[1]]);
 
-  var canv = '';
-  var seed = Math.random();
-  var f = fli
-    ? flipper
-    : function (x) {
-        return x;
-      };
-  //var plist = [[-0.5,0.5],[0.5,0.5],[0.5,1],[-0.5,2]]
+function hat01(p0: Punto, p1: Punto, args?: { fli?: boolean }) {
+  const predeterminados = { fli: false };
+  const { fli } = { ...predeterminados, ...args };
+  let canv = '';
+  const seed = Math.random();
+  const f = fli ? flipper : (x: Punto) => x;
+
   canv += poly(
     tranpoly(
       p0,
@@ -91,21 +80,12 @@ function hat01(p0, p1, args) {
   return canv;
 }
 
-export function hat02(p0, p1, args) {
+export function hat02(p0: Punto, p1: Punto, args) {
   var args = args != undefined ? args : {};
   var fli = args.fli != undefined ? args.fli : false;
-
   var canv = '';
-  var seed = Math.random();
+  var f = fli ? flipper : (x: number) => x;
 
-  var f = fli
-    ? flipper
-    : function (x) {
-        return x;
-      };
-  // canv += poly(tranpoly(p0,p1,[
-  //   [-0.3,0.6],[-0.15,1.0],[0,1.1],[0.15,1.0],[0.3,0.6]
-  //   ]),{fil:"white",str:"rgba(130,130,130,0.8)",wid:1})
   canv += poly(
     tranpoly(
       p0,
@@ -128,17 +108,13 @@ export function hat02(p0, p1, args) {
   return canv;
 }
 
-export function stick01(p0, p1, args) {
+export function stick01(p0: Punto, p1: Punto, args) {
   var args = args != undefined ? args : {};
   var fli = args.fli != undefined ? args.fli : false;
 
   var canv = '';
   var seed = Math.random();
-  var f = fli
-    ? flipper
-    : function (x) {
-        return x;
-      };
+  var f = fli ? flipper : (x) => x;
 
   var qlist1 = [];
   var l = 12;
@@ -160,7 +136,7 @@ export function stick01(p0, p1, args) {
 //      /3
 //     4
 
-export function man(xoff, yoff, args) {
+export function man(x: number, y: number, args) {
   var args = args != undefined ? args : {};
   var sca = args.sca != undefined ? args.sca : 0.5;
   var hat = args.hat != undefined ? args.hat : hat01;
@@ -192,57 +168,56 @@ export function man(xoff, yoff, args) {
   var sct = {
     0: { 1: { 2: {}, 5: { 6: {} }, 7: { 8: {} } }, 3: { 4: {} } },
   };
-  var toGlobal = function (v) {
-    return [(fli ? -1 : 1) * v[0] + xoff, v[1] + yoff];
-  };
+  const toGlobal = (v: Punto): Punto => [(fli ? -1 : 1) * v[0] + x, v[1] + y];
 
   function gpar(sct, ind) {
-    var keys = Object.keys(sct);
-    for (var i = 0; i < keys.length; i++) {
+    const keys = Object.keys(sct);
+
+    for (let i = 0; i < keys.length; i++) {
       if (keys[i] == ind) {
         return [ind];
       } else {
-        var r = gpar(sct[keys[i]], ind);
-        if (r != false) {
-          return [parseFloat(keys[i])].concat(r);
-        }
+        const r = gpar(sct[keys[i]], ind);
+        if (r != false) return [parseFloat(keys[i])].concat(r);
       }
     }
     return false;
   }
+
   function grot(sct, ind) {
-    var par = gpar(sct, ind);
-    var rot = 0;
-    for (var i = 0; i < par.length; i++) {
+    const par = gpar(sct, ind);
+    let rot = 0;
+    for (let i = 0; i < par.length; i++) {
       rot += ang[par[i]];
     }
     return rot;
   }
+
   function gpos(sct, ind) {
-    var par = gpar(sct, ind);
-    var pos = [0, 0];
-    for (var i = 0; i < par.length; i++) {
-      var a = grot(sct, par[i]);
+    const par = gpar(sct, ind);
+    const pos: Punto = [0, 0];
+    for (let i = 0; i < par.length; i++) {
+      const a = grot(sct, par[i]);
       pos[0] += len[par[i]] * Math.cos(a);
       pos[1] += len[par[i]] * Math.sin(a);
     }
     return pos;
   }
 
-  var pts = [];
-  for (var i = 0; i < ang.length; i++) {
+  const pts: Punto[] = [];
+  for (let i = 0; i < ang.length; i++) {
     pts.push(gpos(sct, i));
   }
-  yoff -= pts[4][1];
+  y -= pts[4][1];
 
-  for (var i = 1; i < pts.length; i++) {
-    var par = gpar(sct, i);
-    var p0 = gpos(sct, par[par.length - 2]);
-    var s = div([p0, pts[i]], 10);
-    //canv += stroke(s.map(toGlobal))
+  for (let i = 1; i < pts.length; i++) {
+    const par = gpar(sct, i);
+    const p0 = gpos(sct, par[par.length - 2]);
+    const s = div([p0, pts[i]], 10);
+    canv += stroke(s.map(toGlobal));
   }
 
-  var cloth = function (plist, fun) {
+  var cloth = function (plist: Punto[], fun) {
     var canv = '';
     var tlist = bezmh(plist, 2);
     var [tlist1, tlist2] = expand(tlist, fun);
@@ -261,25 +236,20 @@ export function man(xoff, yoff, args) {
     return canv;
   };
 
-  var fsleeve = function (x) {
-    return sca * 8 * (Math.sin(0.5 * x * Math.PI) * Math.pow(Math.sin(x * Math.PI), 0.1) + (1 - x) * 0.4);
-  };
-  var fbody = function (x) {
-    return sca * 11 * (Math.sin(0.5 * x * Math.PI) * Math.pow(Math.sin(x * Math.PI), 0.1) + (1 - x) * 0.5);
-  };
-  var fhead = function (x) {
-    return sca * 7 * Math.pow(0.25 - Math.pow(x - 0.5, 2), 0.3);
-  };
+  const fsleeve = (x: number) =>
+    sca * 8 * (Math.sin(0.5 * x * Math.PI) * Math.pow(Math.sin(x * Math.PI), 0.1) + (1 - x) * 0.4);
+  const fbody = (x: number) =>
+    sca * 11 * (Math.sin(0.5 * x * Math.PI) * Math.pow(Math.sin(x * Math.PI), 0.1) + (1 - x) * 0.5);
+  const fhead = (x: number) => sca * 7 * Math.pow(0.25 - Math.pow(x - 0.5, 2), 0.3);
 
   canv += ite(toGlobal(pts[8]), toGlobal(pts[6]), { fli: fli });
-
   canv += cloth([pts[1], pts[7], pts[8]], fsleeve);
   canv += cloth([pts[1], pts[0], pts[3], pts[4]], fbody);
   canv += cloth([pts[1], pts[5], pts[6]], fsleeve);
   canv += cloth([pts[1], pts[2]], fhead);
 
-  var hlist = bezmh([pts[1], pts[2]], 2);
-  var [hlist1, hlist2] = expand(hlist, fhead);
+  const hlist = bezmh([pts[1], pts[2]], 2);
+  const [hlist1, hlist2] = expand(hlist, fhead);
   hlist1.splice(0, Math.floor(hlist1.length * 0.1));
   hlist2.splice(0, Math.floor(hlist2.length * 0.95));
   canv += poly(hlist1.concat(hlist2.reverse()).map(toGlobal), {

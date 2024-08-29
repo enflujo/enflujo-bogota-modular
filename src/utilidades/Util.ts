@@ -1,4 +1,4 @@
-import type { ArgsPoly } from '../tipos';
+import type { ArgsPoly, Punto } from '../tipos';
 import { midPt } from './Polytools';
 
 export function unNan(plist) {
@@ -33,7 +33,7 @@ export function loopNoise(nslist: number[]) {
   }
 }
 
-export function randChoice(arr: number[]) {
+export function randChoice(arr: (number | boolean | ((x: number) => number))[]) {
   return arr[Math.floor(arr.length * Math.random())];
 }
 
@@ -56,33 +56,33 @@ export function randGaussian() {
   return wtrand((x) => Math.pow(Math.E, -24 * Math.pow(x - 0.5, 2))) * 2 - 1;
 }
 
-export function bezmh(P: number[][], w: number = 1) {
-  if (P.length == 2) {
-    P = [P[0], midPt(P[0], P[1]), P[1]];
+export function bezmh(puntos: Punto[], w: number = 1) {
+  if (puntos.length == 2) {
+    puntos = [puntos[0], midPt(puntos[0], puntos[1]), puntos[1]];
   }
 
-  const plist = [];
+  const plist: Punto[] = [];
 
-  for (let j = 0; j < P.length - 2; j++) {
+  for (let j = 0; j < puntos.length - 2; j++) {
     let p0;
     let p1;
     let p2;
 
     if (j == 0) {
-      p0 = P[j];
+      p0 = puntos[j];
     } else {
-      p0 = midPt(P[j], P[j + 1]);
+      p0 = midPt(puntos[j], puntos[j + 1]);
     }
-    p1 = P[j + 1];
-    if (j == P.length - 3) {
-      p2 = P[j + 2];
+    p1 = puntos[j + 1];
+    if (j == puntos.length - 3) {
+      p2 = puntos[j + 2];
     } else {
-      p2 = midPt(P[j + 1], P[j + 2]);
+      p2 = midPt(puntos[j + 1], puntos[j + 2]);
     }
 
     const pl = 20;
 
-    for (let i = 0; i < pl + +(j == P.length - 3); i += 1) {
+    for (let i = 0; i < pl + +(j == puntos.length - 3); i += 1) {
       const t = i / pl;
       const u = Math.pow(1 - t, 2) + 2 * t * (1 - t) * w + t * t;
       plist.push([

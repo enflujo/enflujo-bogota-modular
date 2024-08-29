@@ -1,8 +1,11 @@
-import { arch02, boat01 } from './componentes/Arch';
-import { distMount, flatMount, mountain } from './componentes/Mount';
+import barco from './componentes/barco';
+import montaña from './componentes/montaña';
+import montaña2 from './componentes/montaña2';
+import { flatMount } from './componentes/Mount';
 import { btnHoverCol, present, reloadWSeed, toggleText, toggleVisible } from './componentes/UI';
 import './scss/estilos.scss';
 import type { Chunk } from './tipos';
+import { calcViewBox, parseArgs } from './utilidades/ayudas';
 import { water } from './utilidades/cosas';
 import { download } from './utilidades/downloader';
 import { noise } from './utilidades/Perlin';
@@ -74,26 +77,7 @@ SET_BTN.onclick = () => {
   toggleText('SET_BTN.t', '&#x2630;', '&#x2715;');
 };
 
-function parseArgs(key2f) {
-  let par = window.location.href.split('?')[1];
-
-  if (par == undefined) {
-    return;
-  }
-
-  const partes = par.split('&');
-
-  for (let i = 0; i < partes.length; i++) {
-    const e = partes[i].split('=');
-    try {
-      key2f[e[0]](e[1]);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-}
-
-let SEED = '' + new Date().getTime();
+let SEED = `${new Date().getTime()}`;
 
 parseArgs({
   seed: (x: string) => {
@@ -103,11 +87,10 @@ parseArgs({
 
 MEM.lasttick = new Date().getTime();
 INP_SEED.value = SEED;
-BG.setAttribute('style', 'width:' + MEM.windx + 'px');
+BG.setAttribute('style', `width:${MEM.windx}px`);
 update();
 document.body.scrollTo(0, 0);
 present();
-//draw();
 
 window.addEventListener('scroll', () => {
   SETTING.style.left = `${Math.max(4, 40 - window.scrollX)}`;
@@ -135,9 +118,7 @@ for (let i = 0; i < reso / 2 + 1; i++) {
 }
 
 const img = canvas.toDataURL('image/png');
-// BG.style.backgroundImage = 'url(' + img + ')';
 document.getElementsByTagName('body')[0].style.backgroundImage = 'url(' + img + ')';
-
 document.addEventListener('mousemove', onMouseUpdate, false);
 document.addEventListener('mouseenter', onMouseUpdate, false);
 let mouseX = 0;
@@ -148,14 +129,9 @@ function onMouseUpdate(e: MouseEvent) {
   mouseY = e.pageY;
 }
 
-function calcViewBox() {
-  const zoom = 1.142;
-  return '' + MEM.cursx + ' 0 ' + MEM.windx / zoom + ' ' + MEM.windy / zoom;
-}
-
 function viewupdate() {
   try {
-    SVG.setAttribute('viewBox', calcViewBox());
+    SVG.setAttribute('viewBox', calcViewBox(MEM.cursx, MEM.windx, MEM.windy));
   } catch (e) {
     console.log('not possible');
   }
@@ -175,7 +151,7 @@ function update() {
   chunkrender(MEM.cursx, MEM.cursx + MEM.windx);
   SVG.setAttribute('width', `${MEM.windx}`);
   SVG.setAttribute('height', `${MEM.windy}`);
-  SVG.setAttribute('viewBox', `${calcViewBox()}`);
+  SVG.setAttribute('viewBox', `${calcViewBox(MEM.cursx, MEM.windx, MEM.windy)}`);
 
   GRUPO.innerHTML = canv;
 }
@@ -240,15 +216,14 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: mountain(plan[i].x, plan[i].y, i * 2 * Math.random()),
-          //{col:function(x){return "rgba(100,100,100,"+(0.5*Math.random()*plan[i].y/MEM.windy)+")"}}),
+          canv: montaña(plan[i].x, plan[i].y, i * 2 * Math.random()),
         });
 
         add({
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y - 10000,
-          canv: water(plan[i].x, plan[i].y, i * 2),
+          canv: water(plan[i].x, plan[i].y),
         });
       } else if (plan[i].tag == 'flatmount') {
         add({
@@ -266,9 +241,9 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: distMount(plan[i].x, plan[i].y, Math.random() * 100, {
+          canv: montaña2(plan[i].x, plan[i].y, Math.random() * 100, {
             hei: 150,
-            len: randChoice([500, 1000, 1500]),
+            len: +randChoice([500, 1000, 1500]),
           }),
         });
       } else if (plan[i].tag == 'boat') {
@@ -276,9 +251,9 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: boat01(plan[i].x, plan[i].y, Math.random(), {
+          canv: barco(plan[i].x, plan[i].y, {
             sca: plan[i].y / 800,
-            fli: randChoice([true, false]),
+            fli: !!randChoice([true, false]),
           }),
         });
       } else if (plan[i].tag == 'redcirc') {
@@ -286,26 +261,21 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: "<circle cx='" + plan[i].x + "' cy='" + plan[i].y + "' r='20' stroke='black' fill='red' />",
+          canv: `<circle cx="${plan[i].x}" cy="${plan[i].y}" r='20' stroke='black' fill='red' />`,
         });
       } else if (plan[i].tag == 'greencirc') {
         add({
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: "<circle cx='" + plan[i].x + "' cy='" + plan[i].y + "' r='20' stroke='black' fill='green' />",
+          canv: `<circle cx="${plan[i].x}" cy="${plan[i].y}" r='20' stroke='black' fill='green' />`,
         });
       }
-      // add ({
-      //   x: plan[i].x,
-      //   y: plan[i].y,
-      //   canv:"<circle cx='"+plan[i].x+"' cy='"+plan[i].y+"' r='20' stroke='black' fill='red' />"
-      // })
     }
   }
 }
 
-export function mountplanner(xmin: number, xmax: number) {
+function mountplanner(xmin: number, xmax: number) {
   function locmax(x: number, y: number, f: (x: number, y: number) => number, r: number) {
     const z0 = f(x, y);
 
@@ -325,16 +295,15 @@ export function mountplanner(xmin: number, xmax: number) {
         return false;
       }
     }
-    // console.log('+');
     reg.push(r);
     return true;
   }
 
-  const reg: { x: number; y: number; tag?: string }[] = [];
+  const reg: { x: number; y: number; tag: string }[] = [];
   const samp = 0.03;
   const ns = (x: number) => Math.max(noise(x * samp) - 0.55, 0) * 2;
-  const nns = (x: number) => 1 - noise(x * samp);
-  const nnns = (x: number, y: number) => Math.max(noise(x * samp * 2, 2) - 0.55, 0) * 2;
+  // const nns = (x: number) => 1 - noise(x * samp);
+  // const nnns = (x: number, y: number) => Math.max(noise(x * samp * 2, 2) - 0.55, 0) * 2;
   const yr = (x: number) => noise(x * 0.01, Math.PI);
   const xstep = 5;
   const mwid = 200;
@@ -368,11 +337,9 @@ export function mountplanner(xmin: number, xmax: number) {
       chadd(r);
     }
   }
-  // console.log([xmin, xmax]);
+
   for (let i = xmin; i < xmax; i += xstep) {
     if (planmtx[Math.floor(i / xstep)] == 0) {
-      //var r = {tag:"redcirc",x:i,y:700}
-      //console.log(i)
       if (Math.random() < 0.01) {
         for (let j = 0; j < 4 * Math.random(); j++) {
           const r = {
@@ -384,9 +351,6 @@ export function mountplanner(xmin: number, xmax: number) {
           chadd(r);
         }
       }
-    } else {
-      // var r = {tag:"greencirc",x:i,y:700}
-      // chadd(r)
     }
   }
 
@@ -400,24 +364,9 @@ export function mountplanner(xmin: number, xmax: number) {
   return reg;
 }
 
-function dummyloader(xmin: number, xmax: number) {
-  for (var i = xmin; i < xmax; i += 200) {
-    //chunks.push({tag:"?",x:i,y:100,canv:Tree.tree08(i,500,i)})
-    //chunks.push({tag:"?",x:i,y:100,canv:Man.man(i,500)})
-    //chunks.push({tag:"?",x:i,y:100,canv:Arch.arch01(i,500)})
-    //chunks.push({tag:"?",x:i,y:100,canv:Arch.boat01(i,500)})
-    //chunks.push({tag:"?",x:i,y:100,canv:Arch.transmissionTower01(i,500)})
-    chunks.push({
-      tag: '?',
-      x: i,
-      y: 100,
-      canv: arch02(i, 500, 0, { sto: 1, rot: Math.random() }),
-    });
-  }
-}
-
 function xcroll(v: number) {
   MEM.cursx += v;
+
   if (needupdate()) {
     update();
   } else {
@@ -458,9 +407,5 @@ function rstyle(id: string, b: boolean) {
       'px'
   );
 
-  document.getElementById(id + '.t')?.setAttribute(
-    'style',
-    'vertical-align:middle; display:table-cell'
-    //"position:absolute; top:"+(MEM.windy/2-20)+"px; left:"+(MEM.windx+20)+"px;"
-  );
+  document.getElementById(id + '.t')?.setAttribute('style', 'vertical-align:middle; display:table-cell');
 }

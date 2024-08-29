@@ -63,14 +63,14 @@ export interface ArgsTexture {
   tex?: number;
   wid?: number;
   len?: number;
-  sha?: number;
+  sha?: number | boolean;
   ret?: number;
   noi?: (x: number) => number;
   col?: (x: number) => string;
   dis?: () => number;
 }
 
-export interface ArgsMountain {
+export interface OpcionesMontaña {
   hei: number;
   wid: number;
   tex: number;
@@ -85,3 +85,5 @@ export interface Chunk {
   canv: string;
   tag: string;
 }
+
+export type Punto = [x: number, y: number];

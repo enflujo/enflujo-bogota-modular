@@ -1,10 +1,10 @@
-import type { ArgsBolb, ArgsStroke, ArgsTexture } from '../tipos';
+import type { ArgsBolb, ArgsStroke, ArgsTexture, Punto } from '../tipos';
 import { noise } from './Perlin';
 import { loopNoise, poly } from './Util';
 
 console.log('************************************************');
 
-export function stroke(ptlist: number[][], args: ArgsStroke) {
+export function stroke(ptlist: Punto[], args?: ArgsStroke) {
   const predeterminados = {
     xof: 0,
     yof: 0,
@@ -19,8 +19,8 @@ export function stroke(ptlist: number[][], args: ArgsStroke) {
 
   if (ptlist.length == 0) return '';
 
-  const vtxlist0 = [];
-  const vtxlist1 = [];
+  const vtxlist0: Punto[] = [];
+  const vtxlist1: Punto[] = [];
   let vtxlist = [];
 
   const n0 = Math.random() * 10;
@@ -97,11 +97,11 @@ export function blob(x: number, y: number, args: ArgsBolb) {
   }
 }
 
-export function div(plist, reso) {
+export function div(plist: Punto[], reso) {
   const tl = (plist.length - 1) * reso;
   let lx = 0;
   let ly = 0;
-  const rlist = [];
+  const rlist: Punto[] = [];
 
   for (let i = 0; i < tl; i += 1) {
     const lastp = plist[Math.floor(i / reso)];
@@ -109,8 +109,6 @@ export function div(plist, reso) {
     const p = (i % reso) / reso;
     const nx = lastp[0] * (1 - p) + nextp[0] * p;
     const ny = lastp[1] * (1 - p) + nextp[1] * p;
-
-    const ang = Math.atan2(ny - ly, nx - lx);
 
     rlist.push([nx, ny]);
     lx = nx;
@@ -124,7 +122,7 @@ export function div(plist, reso) {
   return rlist;
 }
 
-export function texture(ptlist: number[][][], args: ArgsTexture) {
+export function texture(ptlist: Punto[], args: ArgsTexture) {
   const predeterminados = {
     xof: 0,
     yof: 0,
@@ -187,22 +185,21 @@ export function texture(ptlist: number[][][], args: ArgsTexture) {
   return ret ? texlist : canv;
 }
 
-export function water(xoff: number, yoff: number, seed, args) {
-  var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 2;
-  var len = args.len != undefined ? args.len : 800;
-  var clu = args.clu != undefined ? args.clu : 10;
-  var canv = '';
+export function water(xoff: number, yoff: number, args?: { hei?: number; len?: number; clu?: number }) {
+  const predeterminados = { hei: 2, len: 800, clu: 10 };
+  const { hei, len, clu } = { ...predeterminados, ...args };
+  let canv = '';
+  const ptlist: number[][][] = [];
+  let yk = 0;
 
-  var ptlist: number[][][] = [];
-  var yk = 0;
-  for (var i = 0; i < clu; i++) {
+  for (let i = 0; i < clu; i++) {
     ptlist.push([]);
-    var xk = (Math.random() - 0.5) * (len / 8);
+    const xk = (Math.random() - 0.5) * (len / 8);
     yk += Math.random() * 5;
-    var lk = len / 4 + Math.random() * (len / 4);
-    var reso = 5;
-    for (var j = -lk; j < lk; j += reso) {
+    const lk = len / 4 + Math.random() * (len / 4);
+    const reso = 5;
+
+    for (let j = -lk; j < lk; j += reso) {
       ptlist[ptlist.length - 1].push([j + xk, Math.sin(j * 0.2) * hei * noise(j * 0.1) - 20 + yk]);
     }
   }
@@ -211,7 +208,7 @@ export function water(xoff: number, yoff: number, seed, args) {
     canv += stroke(
       ptlist[j].map((x) => [x[0] + xoff, x[1] + yoff]),
       {
-        col: 'rgba(100,100,100,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
+        col: `rgba(100,100,100,${(0.3 + Math.random() * 0.3).toFixed(3)})`,
         wid: 1,
       }
     );

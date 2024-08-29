@@ -1,18 +1,18 @@
-import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsBranch, ArgsTwig } from '../tipos';
+import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsTwig } from '../tipos';
 import { blob, div, stroke } from '../utilidades/cosas';
 import { noise } from '../utilidades/Perlin';
 import { midPt, triangulate } from '../utilidades/Polytools';
 import { distance, loopNoise, normRand, poly, randChoice, randGaussian } from '../utilidades/Util';
 
 export function tree01(x: number, y: number, args: ArgsArbol1) {
-  const predeterminadoArbol1 = {
+  const predeterminados = {
     hei: 50,
     wid: 3,
     col: 'rgba(100,100,100,0.5)',
     noi: 0.5,
   };
 
-  const { hei, wid, col, noi } = { ...predeterminadoArbol1, ...args };
+  const { hei, wid, col } = { ...predeterminados, ...args };
 
   let reso = 10;
   const nslist = [];
@@ -39,20 +39,12 @@ export function tree01(x: number, y: number, args: ArgsArbol1) {
 
     if (i >= reso / 4) {
       for (let j = 0; j < (reso - i) / 5; j++) {
+        const [r, g, b] = leafcol;
         canv += blob(nx + (Math.random() - 0.5) * wid * 1.2 * (reso - i), ny + (Math.random() - 0.5) * wid, {
           len: Math.random() * 20 * (reso - i) * 0.2 + 10,
           wid: Math.random() * 6 + 3,
           ang: ((Math.random() - 0.5) * Math.PI) / 6,
-          col:
-            'rgba(' +
-            leafcol[0] +
-            ',' +
-            leafcol[1] +
-            ',' +
-            leafcol[2] +
-            ',' +
-            (Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(1) +
-            ')',
+          col: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(1)})`,
         });
       }
     }
@@ -63,8 +55,8 @@ export function tree01(x: number, y: number, args: ArgsArbol1) {
   return canv;
 }
 
-export function tree02(x: number, y: number, args: ArgsArbol2) {
-  const predeterminadoArbol2 = {
+export function tree02(x: number, y: number, args?: ArgsArbol2) {
+  const predeterminados = {
     hei: 16,
     wid: 8,
     clu: 5,
@@ -72,7 +64,7 @@ export function tree02(x: number, y: number, args: ArgsArbol2) {
     noi: 0.5,
   };
 
-  const { hei, wid, clu, col, noi } = { ...predeterminadoArbol2, ...args };
+  const { hei, wid, clu, col } = { ...predeterminados, ...args };
 
   let leafcol;
 
@@ -97,19 +89,20 @@ export function tree02(x: number, y: number, args: ArgsArbol2) {
       col,
     });
   }
+
   return canv;
 }
 
 export function tree03(x: number, y: number, args: ArgsArbol3) {
-  const predeterminadoArbol3 = {
+  const predeterminados = {
     hei: 50,
     wid: 5,
-    ben: (x: number) => 0,
+    ben: () => 0,
     col: 'rgba(100,100,100,0.5)',
     noi: 0.5,
   };
 
-  const { hei, wid, ben, col, noi } = { ...predeterminadoArbol3, ...args };
+  const { hei, wid, ben, col } = { ...predeterminados, ...args };
 
   const reso = 10;
   const nslist = [];
@@ -127,6 +120,7 @@ export function tree03(x: number, y: number, args: ArgsArbol3) {
   let blobs = '';
   const line1 = [];
   const line2 = [];
+
   for (let i = 0; i < reso; i++) {
     const nx = x + ben(i / reso) * 100;
     const ny = y - (i * hei) / reso;
@@ -134,21 +128,13 @@ export function tree03(x: number, y: number, args: ArgsArbol3) {
       for (let j = 0; j < (reso - i) * 2; j++) {
         const shape = (x: number) => Math.log(50 * x + 1) / 3.95;
         const ox = Math.random() * wid * 2 * shape((reso - i) / reso);
+        const [r, g, b] = leafcol;
 
-        blobs += blob(nx + ox * randChoice([-1, 1]), ny + (Math.random() - 0.5) * wid * 2, {
+        blobs += blob(nx + ox * +randChoice([-1, 1]), ny + (Math.random() - 0.5) * wid * 2, {
           len: ox * 2,
           wid: Math.random() * 6 + 3,
           ang: ((Math.random() - 0.5) * Math.PI) / 6,
-          col:
-            'rgba(' +
-            leafcol[0] +
-            ',' +
-            leafcol[1] +
-            ',' +
-            leafcol[2] +
-            ',' +
-            (Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(3) +
-            ')',
+          col: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(3)})`,
         });
       }
     }
@@ -179,7 +165,7 @@ function branch(args: ArgsArbol1) {
   const g = 3;
 
   for (let i = 0; i < g; i++) {
-    a0 += (ben / 2 + (Math.random() * ben) / 2) * randChoice([-1, 1]);
+    a0 += (ben / 2 + (Math.random() * ben) / 2) * +randChoice([-1, 1]);
     nx += (Math.cos(a0) * hei) / g;
     ny -= (Math.sin(a0) * hei) / g;
     tlist.push([nx, ny]);
@@ -259,7 +245,7 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
         ang: ang,
         sca: sca * 0.8,
         wid: wid,
-        dir: dir * randChoice([-1, 1]),
+        dir: dir * +randChoice([-1, 1]),
         lea: lea,
       });
     }

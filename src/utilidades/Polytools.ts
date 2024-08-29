@@ -1,3 +1,5 @@
+import { Punto } from '../tipos';
+
 type ArgsTriangulacion = {
   area: number;
   convex: boolean;
@@ -20,19 +22,19 @@ export function midPt() {
 }
 
 export function triangulate(
-  plist: number[][],
+  plist: Punto[],
   args: ArgsTriangulacion = { area: 100, convex: false, optimize: true }
 ): number[][][] {
   const { area, convex, optimize } = args;
 
-  function lineExpr(pt0: number[], pt1: number[]) {
+  function lineExpr(pt0: Punto, pt1: Punto) {
     const den = pt1[0] - pt0[0];
     const m = den == 0 ? Infinity : (pt1[1] - pt0[1]) / den;
     const k = pt0[1] - m * pt0[0];
     return [m, k];
   }
 
-  function intersect(ln0: number[][], ln1: number[][]) {
+  function intersect(ln0: Punto[], ln1: Punto[]) {
     const le0 = lineExpr(...ln0);
     const le1 = lineExpr(...ln1);
     const den = le0[0] - le1[0];
@@ -42,7 +44,7 @@ export function triangulate(
     var x = (le1[1] - le0[1]) / den;
     var y = le0[0] * x + le0[1];
 
-    function onSeg(p: number[], ln: number[][]) {
+    function onSeg(p: Punto, ln: Punto[]) {
       //non-inclusive
       return (
         Math.min(ln[0][0], ln[1][0]) <= p[0] &&
@@ -58,7 +60,7 @@ export function triangulate(
     return false;
   }
 
-  function ptInPoly(pt: number[], plist: number[][]) {
+  function ptInPoly(pt: Punto, plist: Punto[]) {
     let scount = 0;
 
     for (let i = 0; i < plist.length; i++) {
@@ -99,7 +101,7 @@ export function triangulate(
     return true;
   }
 
-  function sidesOf(plist: number[][]) {
+  function sidesOf(plist: Punto[]) {
     const slist = [];
 
     for (let i = 0; i < plist.length; i++) {
@@ -111,7 +113,7 @@ export function triangulate(
     return slist;
   }
 
-  function areaOf(plist: number[][]) {
+  function areaOf(plist: Punto[]) {
     const slist = sidesOf(plist);
     const a = slist[0];
     const b = slist[1];
@@ -120,7 +122,7 @@ export function triangulate(
     return Math.sqrt(s * (s - a) * (s - b) * (s - c));
   }
 
-  function sliverRatio(plist: number[][]) {
+  function sliverRatio(plist: Punto[]) {
     const A = areaOf(plist);
     const P = sidesOf(plist).reduce(function (m, n) {
       return m + n;
@@ -129,7 +131,7 @@ export function triangulate(
     return A / P;
   }
 
-  function bestEar(plist: number[][]) {
+  function bestEar(plist: Punto[]) {
     const cuts = [];
 
     for (var i = 0; i < plist.length; i++) {
@@ -159,7 +161,7 @@ export function triangulate(
     return best;
   }
 
-  function shatter(plist: number[][], a: number): number[][][] {
+  function shatter(plist: Punto[], a: number) {
     if (plist.length == 0) return [];
 
     if (areaOf(plist) < a) {

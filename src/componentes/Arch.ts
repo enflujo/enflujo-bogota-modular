@@ -1,10 +1,11 @@
+import { Punto } from '../tipos';
 import { div, stroke, texture } from '../utilidades/cosas';
 import { noise } from '../utilidades/Perlin';
 import { midPt } from '../utilidades/Polytools';
 import { normRand, poly, randChoice, wtrand } from '../utilidades/Util';
-import { hat02, man, stick01 } from './Man';
+import { man } from './Man';
 
-const flip = (ptlist: number[][][], axis = 0) => {
+const flip = (ptlist: number[][] | number[][][], axis = 0) => {
   for (let i = 0; i < ptlist.length; i++) {
     if (ptlist[i].length > 0) {
       if (typeof ptlist[i][0] == 'object') {
@@ -19,31 +20,32 @@ const flip = (ptlist: number[][][], axis = 0) => {
   return ptlist;
 };
 
-const hut = (xoff: number, yoff: number, args) => {
-  var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 40;
-  var wid = args.wid != undefined ? args.wid : 180;
-  var tex = args.tex != undefined ? args.tex : 300;
-
-  var reso = [10, 10];
-  var ptlist: number[][][] = [];
+const hut = (xoff: number, yoff: number, args: { hei: number; wid: number; tex: number }) => {
+  const predeterminados = { hei: 40, wid: 180, tex: 300 };
+  const { hei, wid, tex } = { ...predeterminados, ...args };
+  const reso = [10, 10];
+  const ptlist: number[][][] = [];
 
   for (let i = 0; i < reso[0]; i++) {
     ptlist.push([]);
-    var heir = hei + hei * 0.2 * Math.random();
-    for (var j = 0; j < reso[1]; j++) {
-      var nx = wid * (i / (reso[0] - 1) - 0.5) * Math.pow(j / (reso[1] - 1), 0.7);
-      var ny = heir * (j / (reso[1] - 1));
+    const heir = hei + hei * 0.2 * Math.random();
+
+    for (let j = 0; j < reso[1]; j++) {
+      const nx = wid * (i / (reso[0] - 1) - 0.5) * Math.pow(j / (reso[1] - 1), 0.7);
+      const ny = heir * (j / (reso[1] - 1));
       ptlist[ptlist.length - 1].push([nx, ny]);
     }
   }
-  var canv = '';
+
+  let canv = '';
+
   canv += poly(ptlist[0].slice(0, -1).concat(ptlist[ptlist.length - 1].slice(0, -1).reverse()), {
     xof: xoff,
     yof: yoff,
     fil: 'white',
     str: 'none',
   });
+
   canv += poly(ptlist[0], {
     xof: xoff,
     yof: yoff,
@@ -51,6 +53,7 @@ const hut = (xoff: number, yoff: number, args) => {
     str: 'rgba(100,100,100,0.3)',
     wid: 2,
   });
+
   canv += poly(ptlist[ptlist.length - 1], {
     xof: xoff,
     yof: yoff,
@@ -70,9 +73,10 @@ const hut = (xoff: number, yoff: number, args) => {
     noi: () => 5,
   });
 
-  for (let i = 0; i < reso[0]; i++) {
-    //canv += poly(ptlist[i],{xof:xoff,yof:yoff,fil:"none",str:"red",wid:2})
-  }
+  /** Marcar techo de casitas con líneas rojas */
+  // for (let i = 0; i < reso[0]; i++) {
+  // canv += poly(ptlist[i], { xof: xoff, yof: yoff, fil: 'none', str: 'red', wid: 2 });
+  // }
 
   return canv;
 };
@@ -86,16 +90,11 @@ var box = function (xoff, yoff, args) {
   var tra = args.tra != undefined ? args.tra : true;
   var bot = args.bot != undefined ? args.bot : true;
   var wei = args.wei != undefined ? args.wei : 3;
-  var dec =
-    args.dec != undefined
-      ? args.dec
-      : function (a) {
-          return [];
-        };
+  var dec = args.dec != undefined ? args.dec : () => [];
 
-  var mid = -wid * 0.5 + wid * rot;
-  var bmid = -wid * 0.5 + wid * (1 - rot);
-  var ptlist = [];
+  const mid = -wid * 0.5 + wid * rot;
+  const bmid = -wid * 0.5 + wid * (1 - rot);
+  let ptlist = [];
   ptlist.push(
     div(
       [
@@ -175,7 +174,7 @@ var box = function (xoff, yoff, args) {
     );
   }
 
-  var surf = (rot < 0.5) * 2 - 1;
+  const surf = (rot < 0.5) * 2 - 1;
   ptlist = ptlist.concat(
     dec({
       pul: [surf * wid * 0.5, -hei],
@@ -185,7 +184,7 @@ var box = function (xoff, yoff, args) {
     })
   );
 
-  var polist = [
+  const polist = [
     [-wid * 0.5, -hei],
     [wid * 0.5, -hei],
     [wid * 0.5, 0],
@@ -193,7 +192,7 @@ var box = function (xoff, yoff, args) {
     [-wid * 0.5, 0],
   ];
 
-  var canv = '';
+  let canv = '';
   if (!tra) {
     canv += poly(polist, {
       xof: xoff,
@@ -433,13 +432,8 @@ var roof = function (xoff, yoff, args) {
   var wei = args.wei != undefined ? args.wei : 3;
   var pla = args.pla != undefined ? args.pla : [0, ''];
 
-  var opf = function (ptlist) {
-    if (rot < 0.5) {
-      return flip(ptlist);
-    } else {
-      return ptlist;
-    }
-  };
+  const opf = (ptlist) => (rot < 0.5 ? flip(ptlist) : ptlist);
+
   var rrot = rot < 0.5 ? 1 - rot : rot;
 
   var mid = -wid * 0.5 + wid * rrot;
@@ -525,37 +519,27 @@ var roof = function (xoff, yoff, args) {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
         wid: wei,
-        fun: (x) => 1,
+        fun: () => 1,
       }
     );
   }
 
   if (pla[0] == 1) {
-    var pp = opf([
+    let pp: Punto[] = opf([
       [mid + quat / 2, -hei / 2 + per / 2],
       [-wid * 0.5 + quat * 0.5, -hei / 2 - per / 4],
     ]);
+
     if (pp[0][0] > pp[1][0]) {
       pp = [pp[1], pp[0]];
     }
-    var mp = midPt(pp);
-    var a = Math.atan2(pp[1][1] - pp[0][1], pp[1][0] - pp[0][0]);
-    var adeg = (a * 180) / Math.PI;
-    canv +=
-      "<text font-size='" +
-      hei * 0.6 +
-      "' font-family='Verdana'" +
-      " style='fill:rgba(100,100,100,0.9)'" +
-      " text-anchor='middle' transform='translate(" +
-      (mp[0] + xoff) +
-      ',' +
-      (mp[1] + yoff) +
-      ') rotate(' +
-      adeg +
-      ")'>" +
-      pla[1] +
-      '</text>';
+
+    const mp = midPt(pp);
+    const a = Math.atan2(pp[1][1] - pp[0][1], pp[1][0] - pp[0][0]);
+    const adeg = (a * 180) / Math.PI;
+    canv += `<text font-size='${hei * 0.6}' font-family='Verdana' style='fill:rgba(100,100,100,0.9)' text-anchor='middle' transform='translate(${mp[0] + xoff},${mp[1] + yoff}) rotate(${adeg})'>${pla[1]}</text>`;
   }
+
   return canv;
 };
 
@@ -809,117 +793,5 @@ export function arch04(xoff, yoff, seed, args) {
     });
     hoff += hei * 1.2;
   }
-  return canv;
-}
-
-export function boat01(xoff, yoff, seed, args) {
-  var args = args != undefined ? args : {};
-  var len = args.len != undefined ? args.len : 120;
-  var sca = args.sca != undefined ? args.sca : 1;
-  var fli = args.fli != undefined ? args.fli : false;
-  var canv = '';
-
-  var dir = fli ? -1 : 1;
-  canv += man(xoff + 20 * sca * dir, yoff, {
-    ite: stick01,
-    hat: hat02,
-    sca: 0.5 * sca,
-    fli: !fli,
-    len: [0, 30, 20, 30, 10, 30, 30, 30, 30],
-  });
-
-  var plist1 = [];
-  var plist2 = [];
-  var fun1 = function (x) {
-    return Math.pow(Math.sin(x * Math.PI), 0.5) * 7 * sca;
-  };
-  var fun2 = function (x) {
-    return Math.pow(Math.sin(x * Math.PI), 0.5) * 10 * sca;
-  };
-  for (var i = 0; i < len * sca; i += 5 * sca) {
-    plist1.push([i * dir, fun1(i / len)]);
-    plist2.push([i * dir, fun2(i / len)]);
-  }
-  var plist = plist1.concat(plist2.reverse());
-  canv += poly(plist, { xof: xoff, yof: yoff, fil: 'white' });
-  canv += stroke(
-    plist.map((v) => [xoff + v[0], yoff + v[1]]),
-    {
-      wid: 1,
-      fun: (x) => Math.sin(x * Math.PI * 2),
-      col: 'rgba(100,100,100,0.4)',
-    }
-  );
-
-  return canv;
-}
-
-export function transmissionTower01(xoff: number, yoff: number, seed: number, args?: { hei?: number; wid?: number }) {
-  const predeterminados = { hei: 100, wid: 20 };
-  const { hei, wid } = { ...predeterminados, ...args };
-
-  let canv = '';
-  const toGlobal = (v: number[]) => [v[0] + xoff, v[1] + yoff];
-
-  const quickstroke = (pl: number[][]) => {
-    return stroke(div(pl, 5).map(toGlobal), {
-      wid: 1,
-      fun: (x: number) => 0.5,
-      col: 'rgba(100,100,100,0.4)',
-    });
-  };
-
-  const p00 = [-wid * 0.05, -hei];
-  const p01 = [wid * 0.05, -hei];
-  const p10 = [-wid * 0.1, -hei * 0.9];
-  const p11 = [wid * 0.1, -hei * 0.9];
-  const p20 = [-wid * 0.2, -hei * 0.5];
-  const p21 = [wid * 0.2, -hei * 0.5];
-  const p30 = [-wid * 0.5, 0];
-  const p31 = [wid * 0.5, 0];
-  const bch = [
-    [0.7, -0.85],
-    [1, -0.675],
-    [0.7, -0.5],
-  ];
-
-  for (let i = 0; i < bch.length; i++) {
-    canv += quickstroke([
-      [-bch[i][0] * wid, bch[i][1] * hei],
-      [bch[i][0] * wid, bch[i][1] * hei],
-    ]);
-    canv += quickstroke([
-      [-bch[i][0] * wid, bch[i][1] * hei],
-      [0, (bch[i][1] - 0.05) * hei],
-    ]);
-    canv += quickstroke([
-      [bch[i][0] * wid, bch[i][1] * hei],
-      [0, (bch[i][1] - 0.05) * hei],
-    ]);
-
-    canv += quickstroke([
-      [-bch[i][0] * wid, bch[i][1] * hei],
-      [-bch[i][0] * wid, (bch[i][1] + 0.1) * hei],
-    ]);
-    canv += quickstroke([
-      [bch[i][0] * wid, bch[i][1] * hei],
-      [bch[i][0] * wid, (bch[i][1] + 0.1) * hei],
-    ]);
-  }
-
-  const l10 = div([p00, p10, p20, p30], 5);
-  const l11 = div([p01, p11, p21, p31], 5);
-
-  for (let i = 0; i < l10.length - 1; i++) {
-    canv += quickstroke([l10[i], l11[i + 1]]);
-    canv += quickstroke([l11[i], l10[i + 1]]);
-  }
-
-  canv += quickstroke([p00, p01]);
-  canv += quickstroke([p10, p11]);
-  canv += quickstroke([p20, p21]);
-  canv += quickstroke([p00, p10, p20, p30]);
-  canv += quickstroke([p01, p11, p21, p31]);
-
   return canv;
 }
