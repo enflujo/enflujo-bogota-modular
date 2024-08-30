@@ -16,7 +16,7 @@ export function centro(puntos: Punto[]) {
 export function triangulate(
   plist: Punto[],
   args: ArgsTriangulacion = { area: 100, convex: false, optimize: true }
-): number[][][] {
+): Punto[][] {
   const { area, convex, optimize } = args;
 
   function lineExpr(punto0: Punto, punto1: Punto) {

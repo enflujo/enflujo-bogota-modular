@@ -1,4 +1,4 @@
-import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsTwig } from '@/tipos';
+import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsTwig, Punto } from '@/tipos';
 import { blob, div, stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 import { centro, triangulate } from '@/utilidades/Polytools';
@@ -30,8 +30,8 @@ export function tree01(x: number, y: number, args: ArgsArbol1) {
   }
 
   let canv = '';
-  const line1 = [];
-  const line2 = [];
+  const line1: Punto[] = [];
+  const line2: Punto[] = [];
 
   for (let i = 0; i < reso; i++) {
     const nx = x;
@@ -130,7 +130,7 @@ export function tree03(x: number, y: number, args: ArgsArbol3) {
         const ox = Math.random() * ancho * 2 * shape((reso - i) / reso);
         const [r, g, b] = leafcol;
 
-        blobs += blob(nx + ox * +randChoice([-1, 1]), ny + (Math.random() - 0.5) * ancho * 2, {
+        blobs += blob(nx + ox * randChoice<number>([-1, 1]), ny + (Math.random() - 0.5) * ancho * 2, {
           len: ox * 2,
           ancho: Math.random() * 6 + 3,
           ang: ((Math.random() - 0.5) * Math.PI) / 6,
@@ -165,7 +165,7 @@ function branch(args: ArgsArbol1) {
   const g = 3;
 
   for (let i = 0; i < g; i++) {
-    a0 += (ben / 2 + (Math.random() * ben) / 2) * +randChoice([-1, 1]);
+    a0 += (ben / 2 + (Math.random() * ben) / 2) * randChoice<number>([-1, 1]);
     nx += (Math.cos(a0) * alto) / g;
     ny -= (Math.sin(a0) * alto) / g;
     tlist.push([nx, ny]);
@@ -245,7 +245,7 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
         ang: ang,
         sca: sca * 0.8,
         ancho: ancho,
-        dir: dir * +randChoice([-1, 1]),
+        dir: dir * randChoice<number>([-1, 1]),
         lea: lea,
       });
     }
@@ -441,7 +441,7 @@ export function tree04(x, y, args) {
       trmlist.push(trlist[i]);
     }
   }
-  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
+  canv += poly(trmlist, { x, y, fil: 'white', str: col, ancho: 0 });
 
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
@@ -522,7 +522,7 @@ export function tree05(x, y, args) {
     }
   }
 
-  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
+  canv += poly(trmlist, { x, y, fil: 'white', str: col, ancho: 0 });
 
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
@@ -620,7 +620,7 @@ export function tree06(x, y, args) {
     ben: 0,
   });
 
-  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
+  canv += poly(trmlist, { x, y, fil: 'white', str: col, ancho: 0 });
 
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
@@ -727,12 +727,11 @@ export function tree07(x, y, args) {
   return canv;
 }
 
-export function tree08(x, y, args) {
+export function tree08(x: number, y: number, args) {
   var args = args != undefined ? args : {};
   var alto = args.alto != undefined ? args.alto : 80;
   var ancho = args.ancho != undefined ? args.ancho : 1;
   var col = args.col != undefined ? args.col : 'rgba(100,100,100,0.5)';
-  var noi = args.noi != undefined ? args.noi : 0.5;
 
   var canv = '';
   var txcanv = '';
@@ -757,23 +756,16 @@ export function tree08(x, y, args) {
     var len = args.len != undefined ? args.len : 15;
     var ben = args.ben != undefined ? args.ben : 0;
 
-    var fun =
-      dep == 0
-        ? function (x) {
-            return Math.cos(0.5 * Math.PI * x);
-          }
-        : function (x) {
-            return 1;
-          };
+    const fun = dep == 0 ? (x: number) => Math.cos(0.5 * Math.PI * x) : () => 1;
     var spt = [xoff, yoff];
     var ept = [xoff + Math.cos(ang) * len, yoff + Math.sin(ang) * len];
 
-    let trmlist = [
+    let trmlist: Punto[] = [
       [xoff, yoff],
       [xoff + len, yoff],
     ];
 
-    const bfun = randChoice([(x: number) => Math.sin(x * Math.PI), (x) => -Math.sin(x * Math.PI)]);
+    const bfun = randChoice<(x: number) => number>([(x) => Math.sin(x * Math.PI), (x) => -Math.sin(x * Math.PI)]);
 
     trmlist = div(trmlist, 10);
 
@@ -794,15 +786,15 @@ export function tree08(x, y, args) {
       col: 'rgba(100,100,100,0.5)',
     });
     if (dep != 0) {
-      var nben = ben + randChoice([-1, 1]) * Math.PI * 0.001 * dep * dep;
+      var nben = ben + randChoice<number>([-1, 1]) * Math.PI * 0.001 * dep * dep;
       if (Math.random() < 0.5) {
         tcanv += fracTree(ept[0], ept[1], dep - 1, {
-          ang: ang + ben + Math.PI * randChoice([normRand(-1, 0.5), normRand(0.5, 1)]) * 0.2,
+          ang: ang + ben + Math.PI * randChoice<number>([normRand(-1, 0.5), normRand(0.5, 1)]) * 0.2,
           len: len * normRand(0.8, 0.9),
           ben: nben,
         });
         tcanv += fracTree(ept[0], ept[1], dep - 1, {
-          ang: ang + ben + Math.PI * randChoice([normRand(-1, -0.5), normRand(0.5, 1)]) * 0.2,
+          ang: ang + ben + Math.PI * randChoice<number>([normRand(-1, -0.5), normRand(0.5, 1)]) * 0.2,
           len: len * normRand(0.8, 0.9),
           ben: nben,
         });
@@ -831,7 +823,7 @@ export function tree08(x, y, args) {
     }
   }
 
-  canv += poly(trlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
+  canv += poly(trlist, { x, y, fil: 'white', str: col, ancho: 0 });
 
   canv += stroke(
     trlist.map((v) => [v[0] + x, v[1] + y]),

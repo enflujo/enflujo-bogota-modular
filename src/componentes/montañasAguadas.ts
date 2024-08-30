@@ -1,30 +1,31 @@
+import type { Punto } from '@/tipos';
 import { noise } from '@/utilidades/Perlin';
 import { centro, triangulate } from '@/utilidades/Polytools';
 import { poly } from '@/utilidades/Util';
 
-export default (xoff: number, yoff: number, seed = 0, args?: { alto?: number; len?: number; seg?: number }) => {
+export default (x: number, y: number, seed = 0, args?: { alto?: number; len?: number; seg?: number }) => {
   const predeterminados = { alto: 300, len: 2000, seg: 5 };
   const { alto, len, seg } = { ...predeterminados, ...args };
   let canv = '';
   const span = 10;
-  const ptlist: number[][][] = [];
+  const ptlist: Punto[][] = [];
 
   for (let i = 0; i < len / span / seg; i++) {
     ptlist.push([]);
 
     for (let j = 0; j < seg + 1; j++) {
-      const tran = (k: number) => [
-        xoff + k * span,
-        yoff - alto * noise(k * 0.05, seed) * Math.pow(Math.sin((Math.PI * k) / (len / span)), 0.5),
+      const tran = (k: number): Punto => [
+        x + k * span,
+        y - alto * noise(k * 0.05, seed) * Math.pow(Math.sin((Math.PI * k) / (len / span)), 0.5),
       ];
 
       ptlist[ptlist.length - 1].push(tran(i * seg + j));
     }
 
     for (let j = 0; j < seg / 2 + 1; j++) {
-      const tran = (k: number) => [
-        xoff + k * span,
-        yoff + 24 * noise(k * 0.05, 2, seed) * Math.pow(Math.sin((Math.PI * k) / (len / span)), 1),
+      const tran = (k: number): Punto => [
+        x + k * span,
+        y + 24 * noise(k * 0.05, 2, seed) * Math.pow(Math.sin((Math.PI * k) / (len / span)), 1),
       ];
 
       ptlist[ptlist.length - 1].unshift(tran(i * seg + j * 2));
@@ -32,7 +33,7 @@ export default (xoff: number, yoff: number, seed = 0, args?: { alto?: number; le
   }
   for (let i = 0; i < ptlist.length; i++) {
     const getCol = (x: number, y: number) => {
-      const c = (noise(x * 0.02, y * 0.02, yoff) * 55 + 200) | 0;
+      const c = (noise(x * 0.02, y * 0.02, y) * 55 + 200) | 0;
       return `rgb(${c},${c},${c})`;
     };
 

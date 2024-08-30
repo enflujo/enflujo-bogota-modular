@@ -24,16 +24,16 @@ export default (x: number, y: number, args: ArgsChoza) => {
 
   /** Fondo para que el techo no sea transparente */
   svg += poly(puntos[0].slice(0, -1).concat(puntos[puntos.length - 1].slice(0, -1).reverse()), {
-    xof: x,
-    yof: y,
+    x,
+    y,
     fil: 'white',
     str: 'none',
   });
 
   /** Contorno del techo, lado izquierdo */
   svg += poly(puntos[0], {
-    xof: x,
-    yof: y,
+    x,
+    y,
     fil: 'none',
     str: 'rgba(100,100,100,0.3)',
     ancho: 2,
@@ -41,8 +41,8 @@ export default (x: number, y: number, args: ArgsChoza) => {
 
   /** Contorno del techo, lado derecho */
   svg += poly(puntos[puntos.length - 1], {
-    xof: x,
-    yof: y,
+    x,
+    y,
     fil: 'none',
     str: 'rgba(100,100,100,0.3)',
     ancho: 2,
@@ -64,7 +64,7 @@ export default (x: number, y: number, args: ArgsChoza) => {
 
   /** Marcar techo con líneas rojas */
   // for (let i = 0; i < reso[0]; i++) {
-  //   svg += poly(ptlist[i], { xof: xoff, yof: yoff, fil: 'none', str: 'red', ancho: 2 });
+  //   svg += poly(ptlist[i], { x: xoff, y: yoff, fil: 'none', str: 'red', ancho: 2 });
   // }
 
   return svg;

@@ -82,7 +82,7 @@ export function blob(x: number, y: number, args: ArgsBolb) {
   }
 
   loopNoise(nslist);
-  const plist = [];
+  const plist: Punto[] = [];
 
   for (let i = 0; i < lalist.length; i++) {
     const ns = nslist[i] * noi + (1 - noi);

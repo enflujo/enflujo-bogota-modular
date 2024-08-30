@@ -58,8 +58,8 @@ export function flatMount(
 
   //WHITE BG
   canv += poly(puntos[0].concat([[0, reso[0] * 4]]), {
-    xof: xoff,
-    yof: yoff,
+    x: xoff,
+    y: yoff,
     fil: 'white',
     str: 'none',
   });
@@ -129,8 +129,8 @@ export function flatMount(
       }
  */
   canv += poly(grlist, {
-    xof: xoff,
-    yof: yoff,
+    x: xoff,
+    y: yoff,
     str: 'none',
     fil: 'white',
     ancho: 2,
@@ -184,9 +184,7 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
     );
   }
 
-  if (canv.includes('NaN')) console.log(canv);
-
-  for (let j = 0; j < +randChoice([0, 0, 1, 2]); j++) {
+  for (let j = 0; j < randChoice<number>([0, 0, 1, 2]); j++) {
     const xr = xoff + normRand(grbd.xmin, grbd.xmax);
     const yr = yoff + (grbd.ymin + grbd.ymax) / 2 + normRand(-5, 5) + 20;
 
@@ -196,7 +194,7 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
       });
     }
   }
-  if (canv.includes('NaN')) console.log(canv);
+
   if (tt == 0) {
     for (let j = 0; j < Math.random() * 3; j++) {
       canv += roca(
@@ -211,7 +209,7 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
       );
     }
   }
-  if (canv.includes('NaN')) console.log(canv);
+
   if (tt == 1) {
     const pmin = Math.random() * 0.5;
     const pmax = Math.random() * 0.5 + 0.5;
@@ -223,7 +221,7 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
         alto: 100 + Math.random() * 200,
       });
     }
-    if (canv.includes('NaN')) console.log(canv);
+
     for (let j = 0; j < Math.random() * 4; j++) {
       canv += roca(
         xoff + normRand(grbd.xmin, grbd.xmax),
@@ -236,13 +234,12 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
         }
       );
     }
-    if (canv.includes('NaN')) console.log(canv);
   } else if (tt == 2) {
-    for (let i = 0; i < +randChoice([1, 1, 1, 1, 2, 2, 3]); i++) {
+    for (let i = 0; i < randChoice<number>([1, 1, 1, 1, 2, 2, 3]); i++) {
       const xr = normRand(grbd.xmin, grbd.xmax);
       const yr = (grbd.ymin + grbd.ymax) / 2;
       canv += tree04(xoff + xr, yoff + yr + 20, {});
-      if (canv.includes('NaN')) console.log(canv);
+
       for (let j = 0; j < Math.random() * 2; j++) {
         canv += roca(
           xoff + Math.max(grbd.xmin, Math.min(grbd.xmax, xr + normRand(-50, 50))),
@@ -256,14 +253,12 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
         );
       }
     }
-    if (canv.includes('NaN')) console.log(canv);
   } else if (tt == 3) {
-    for (let i = 0; i < +randChoice([1, 1, 1, 1, 2, 2, 3]); i++) {
+    for (let i = 0; i < randChoice<number>([1, 1, 1, 1, 2, 2, 3]); i++) {
       canv += tree06(xoff + normRand(grbd.xmin, grbd.xmax), yoff + (grbd.ymin + grbd.ymax) / 2, {
         alto: 60 + Math.random() * 60,
       });
     }
-    if (canv.includes('NaN')) console.log(canv);
   } else if (tt == 4) {
     const pmin = Math.random() * 0.5;
     const pmax = Math.random() * 0.5 + 0.5;
@@ -275,12 +270,12 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
       });
     }
   }
-  if (canv.includes('NaN')) console.log(canv);
+
   for (let i = 0; i < 50 * Math.random(); i++) {
     canv += tree02(xoff + normRand(grbd.xmin, grbd.xmax), yoff + normRand(grbd.ymin, grbd.ymax));
   }
-  if (canv.includes('NaN')) console.log(canv);
   const ts = randChoice([0, 0, 0, 0, 1]);
+
   if (ts == 1 && tt != 4) {
     canv += arch01(xoff + normRand(grbd.xmin, grbd.xmax), yoff + (grbd.ymin + grbd.ymax) / 2 + 20, Math.random(), {
       ancho: normRand(160, 200),
@@ -288,6 +283,6 @@ export function flatDec(xoff: number, yoff: number, grbd: { xmin: number; xmax: 
       per: Math.random(),
     });
   }
-  if (canv.includes('NaN')) console.log(canv);
+
   return canv;
 }

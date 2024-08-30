@@ -112,7 +112,7 @@ export default (xoff: number, yoff: number, args?: ArgsCaja) => {
     })
   );
 
-  const polist = [
+  const polist: Punto[] = [
     [-ancho * 0.5, -alto],
     [ancho * 0.5, -alto],
     [ancho * 0.5, 0],
@@ -124,8 +124,8 @@ export default (xoff: number, yoff: number, args?: ArgsCaja) => {
 
   if (!tra) {
     canv += poly(polist, {
-      xof: xoff,
-      yof: yoff,
+      x: xoff,
+      y: yoff,
       str: 'none',
       fil: 'white',
     });
@@ -133,7 +133,7 @@ export default (xoff: number, yoff: number, args?: ArgsCaja) => {
 
   for (let i = 0; i < cajas.length; i++) {
     canv += stroke(
-      cajas[i].map((x) => [x[0] + xoff, x[1] + yoff]),
+      cajas[i].map((punto) => [punto[0] + xoff, punto[1] + yoff]),
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,

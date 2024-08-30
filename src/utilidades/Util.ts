@@ -1,11 +1,11 @@
 import type { ArgsPoly, Punto } from '../tipos';
 import { centro } from './Polytools';
 
-export function unNan(plist: Punto[]) {
-  if (typeof plist != 'object' || plist == null) {
-    return plist || 0;
+export function unNan(puntos: Punto[]) {
+  if (typeof puntos != 'object' || puntos == null) {
+    return puntos || 0;
   } else {
-    return plist.map(unNan);
+    return puntos.map(unNan);
   }
 }
 
@@ -32,8 +32,8 @@ export function loopNoise(nslist: number[]) {
   }
 }
 
-export function randChoice(arr: (number | boolean | ((x: number) => number))[]) {
-  return arr[Math.floor(arr.length * Math.random())];
+export function randChoice<Tipo>(arr: (number | boolean | ((x: number) => number))[]) {
+  return arr[Math.floor(arr.length * Math.random())] as Tipo;
 }
 
 export function normRand(m: number, M: number) {
@@ -93,21 +93,23 @@ export function bezmh(puntos: Punto[], w: number = 1) {
   return plist;
 }
 
-export function poly(plist: number[][], args: ArgsPoly) {
+export function poly(puntos: Punto[], args: ArgsPoly) {
   const predeterminados = {
-    xof: 0,
-    yof: 0,
+    x: 0,
+    y: 0,
     fil: 'rgba(0,0,0,0)',
     str: 'rgba(0,0,0,0)',
     ancho: 0,
   };
 
-  const { xof, yof, fil, str, ancho } = { ...predeterminados, ...args };
+  const { x, y, fil, str, ancho } = { ...predeterminados, ...args };
 
   let canv = "<polyline points='";
-  for (let i = 0; i < plist.length; i++) {
-    canv += ' ' + (plist[i][0] + xof).toFixed(1) + ',' + (plist[i][1] + yof).toFixed(1);
-  }
-  canv += "' style='fill:" + fil + ';stroke:' + str + ';stroke-width:' + ancho + "'/>";
+
+  puntos.forEach((punto) => {
+    canv += ` ${(punto[0] + x).toFixed(1)},${(punto[1] + y).toFixed(1)}`;
+  });
+
+  canv += `' style='fill:${fil};stroke:${str};stroke-width:${ancho}'/>`;
   return canv;
 }

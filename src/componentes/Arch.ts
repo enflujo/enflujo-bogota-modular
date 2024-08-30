@@ -191,8 +191,8 @@ var rail = function (xoff, yoff, seed, args) {
       );
       ln[0][0] += (Math.random() - 0.5) * alto * 0.5;
       canv += poly(ln, {
-        xof: xoff,
-        yof: yoff,
+        x: xoff,
+        y: yoff,
         fil: 'none',
         str: 'rgba(100,100,100,0.5)',
         ancho: 2,
@@ -295,14 +295,14 @@ var roof = function (xoff, yoff, args) {
 
   var canv = '';
 
-  var polist = opf([
+  const polist = opf([
     [-ancho * 0.5, 0],
     [-ancho * 0.5 + quat, -alto - per / 2],
     [mid + quat, -alto],
     [ancho * 0.5, 0],
     [mid, per],
   ]);
-  canv += poly(polist, { xof: xoff, yof: yoff, str: 'none', fil: 'white' });
+  canv += poly(polist, { x: xoff, y: yoff, str: 'none', fil: 'white' });
 
   for (let i = 0; i < ptlist.length; i++) {
     canv += stroke(
@@ -339,14 +339,13 @@ var pagroof = function (xoff, yoff, args) {
   var args = args != undefined ? args : {};
   var alto = args.alto != undefined ? args.alto : 20;
   var ancho = args.ancho != undefined ? args.ancho : 120;
-  var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 4;
   var cor = args.cor != undefined ? args.cor : 10;
   var sid = args.sid != undefined ? args.sid : 4;
   var wei = args.wei != undefined ? args.wei : 3;
 
-  var ptlist = [];
-  var polist = [[0, -alto]];
+  var ptlist: Punto[][] = [];
+  var polist: Punto[] = [[0, -alto]];
   var canv = '';
   for (var i = 0; i < sid; i++) {
     var fx = ancho * ((i * 1.0) / (sid - 1) - 0.5);
@@ -363,7 +362,7 @@ var pagroof = function (xoff, yoff, args) {
     polist.push([fxx, fy]);
   }
 
-  canv += poly(polist, { xof: xoff, yof: yoff, str: 'none', fil: 'white' });
+  canv += poly(polist, { x: xoff, y: yoff, str: 'none', fil: 'white' });
   for (let i = 0; i < ptlist.length; i++) {
     canv += stroke(
       div(ptlist[i], 5).map((x) => [x[0] + xoff, x[1] + yoff]),
@@ -371,7 +370,7 @@ var pagroof = function (xoff, yoff, args) {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
         ancho: wei,
-        fun: (x) => 1,
+        fun: () => 1,
       }
     );
   }
@@ -383,7 +382,6 @@ export function arch01(xoff: number, yoff: number, seed = 0, args) {
   var args = args != undefined ? args : {};
   var alto = args.alto != undefined ? args.alto : 70;
   var ancho = args.ancho != undefined ? args.ancho : 180;
-  var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 5;
 
   seed = seed != undefined ? seed : 0;
@@ -463,7 +461,7 @@ export function arch02(xoff, yoff, seed, args) {
       rot: rot,
       wei: 1.5,
       per: per,
-      dec: (a) => {
+      dec: (a: number) => {
         return deco(
           sty,
           Object.assign({}, a, {

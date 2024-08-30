@@ -40,8 +40,8 @@ export interface ArgsStroke {
 }
 
 export interface ArgsPoly {
-  xof?: number;
-  yof?: number;
+  x?: number;
+  y?: number;
   fil?: string;
   str?: string;
   ancho?: number;

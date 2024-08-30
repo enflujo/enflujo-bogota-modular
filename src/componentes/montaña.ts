@@ -1,4 +1,4 @@
-import type { OpcionesMontaña } from '@/tipos';
+import type { OpcionesMontaña, Punto } from '@/tipos';
 import { stroke, texture } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 import { normRand, poly, randChoice } from '@/utilidades/Util';
@@ -13,13 +13,12 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
     ancho: 400 + Math.random() * 200,
     tex: 200,
     veg: true,
-    ret: 0,
     col: '',
   };
   const { alto, ancho, tex, veg } = { ...predeterminados, ...args };
 
-  let canv = '';
-  const ptlist: number[][][] = [];
+  let svg = '';
+  const puntos: Punto[][] = [];
   const h = alto;
   const w = ancho;
   const reso = [10, 50];
@@ -27,14 +26,14 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
 
   for (let j = 0; j < reso[0]; j++) {
     hoff += (Math.random() * yoff) / 100;
-    ptlist.push([]);
+    puntos.push([]);
 
     for (let i = 0; i < reso[1]; i++) {
       const x = (i / reso[1] - 0.5) * Math.PI;
       let y = Math.cos(x);
       y *= noise(x + 10, j * 0.15, seed);
       const p = 1 - j / reso[0];
-      ptlist[ptlist.length - 1].push([(x / Math.PI) * w * p, -y * h * p + hoff]);
+      puntos[puntos.length - 1].push([(x / Math.PI) * w * p, -y * h * p + hoff]);
     }
   }
 
@@ -45,22 +44,22 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   ) {
     const veglist = [];
 
-    for (let i = 0; i < ptlist.length; i += 1) {
-      for (let j = 0; j < ptlist[i].length; j += 1) {
+    for (let i = 0; i < puntos.length; i += 1) {
+      for (let j = 0; j < puntos[i].length; j += 1) {
         if (growthRule(i, j)) {
-          veglist.push([ptlist[i][j][0], ptlist[i][j][1]]);
+          veglist.push([puntos[i][j][0], puntos[i][j][1]]);
         }
       }
     }
 
     for (let i = 0; i < veglist.length; i++) {
       if (proofRule(veglist, i)) {
-        canv += treeFunc(veglist[i][0], veglist[i][1]);
+        svg += treeFunc(veglist[i][0], veglist[i][1]);
       }
     }
   }
 
-  //RIM
+  /** Arboles por contorno superior */
   vegetate(
     (x: number, y: number) => {
       return tree02(x + xoff, y + yoff - 5, {
@@ -70,34 +69,37 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
     },
     (i: number, j: number) => {
       const ns = noise(j * 0.1, seed);
-      return i == 0 && ns * ns * ns < 0.1 && Math.abs(ptlist[i][j][1]) / h > 0.2;
+      return i == 0 && ns * ns * ns < 0.1 && Math.abs(puntos[i][j][1]) / h > 0.2;
     },
     () => true
   );
 
-  //WHITE BG
-  canv += poly(ptlist[0].concat([[0, reso[0] * 4]]), {
-    xof: xoff,
-    yof: yoff,
+  /** Fondo */
+  svg += poly(puntos[0].concat([[0, reso[0] * 4]]), {
+    x: xoff,
+    y: yoff,
     fil: 'white',
     str: 'none',
   });
 
-  //OUTLINE
-  canv += stroke(
-    ptlist[0].map((x) => [x[0] + xoff, x[1] + yoff]),
+  /** Contorno pero sin piso o parte baja */
+  svg += stroke(
+    puntos[0].map((x) => [x[0] + xoff, x[1] + yoff]),
     { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
 
-  canv += foot(ptlist, { xof: xoff, yof: yoff });
-  canv += texture(ptlist, {
+  /** Contornos parte baja de la montaña, como deditos de pies */
+  svg += foot(puntos, { xof: xoff, yof: yoff });
+
+  /** Textura interior */
+  svg += texture(puntos, {
     xof: xoff,
     yof: yoff,
     tex: tex,
     sha: randChoice([0, 0, 0, 0, 5]),
   });
 
-  //TOP
+  /** Arboles punta */
   vegetate(
     (x: number, y: number) => {
       return tree02(x + xoff, y + yoff, {
@@ -106,13 +108,13 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
     },
     (i: number, j: number) => {
       const ns = noise(i * 0.1, j * 0.1, seed + 2);
-      return ns * ns * ns < 0.1 && Math.abs(ptlist[i][j][1]) / h > 0.5;
+      return ns * ns * ns < 0.1 && Math.abs(puntos[i][j][1]) / h > 0.5;
     },
     () => true
   );
 
   if (veg) {
-    //MIDDLE
+    // /** Arboles parte media */
     vegetate(
       (x: number, y: number) => {
         let ht = ((h + y) / h) * 70;
@@ -125,7 +127,7 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
       },
       (i: number, j: number) => {
         const ns = noise(i * 0.2, j * 0.05, seed);
-        return !!(j % 2 && ns * ns * ns * ns < 0.012 && Math.abs(ptlist[i][j][1]) / h < 0.3);
+        return !!(j % 2 && ns * ns * ns * ns < 0.012 && Math.abs(puntos[i][j][1]) / h < 0.3);
       },
       (veglist: number[][], i: number) => {
         let counter = 0;
@@ -144,7 +146,7 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
       }
     );
 
-    //BOTTOM
+    /** Arboles parte baja */
     vegetate(
       (x: number, y: number) => {
         let ht = ((h + y) / h) * 120;
@@ -159,13 +161,13 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
       },
       (i: number, j: number) => {
         const ns = noise(i * 0.2, j * 0.05, seed);
-        return (j == 0 || j == ptlist[i].length - 1) && ns * ns * ns * ns < 0.012;
+        return (j == 0 || j == puntos[i].length - 1) && ns * ns * ns * ns < 0.012;
       },
       () => true
     );
   }
 
-  //BOTT ARCH
+  /** Casitas parte baja */
   vegetate(
     (x: number, y: number) => {
       const tt = randChoice([0, 0, 1, 1, 1, 2]);
@@ -187,12 +189,12 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
     },
     (i: number, j: number) => {
       const ns = noise(i * 0.2, j * 0.05, seed + 10);
-      return i != 0 && (j == 1 || j == ptlist[i].length - 2) && ns * ns * ns * ns < 0.008;
+      return i != 0 && (j == 1 || j == puntos[i].length - 2) && ns * ns * ns * ns < 0.008;
     },
     () => true
   );
 
-  //TOP ARCH
+  /** Torres punta de la montaña */
   vegetate(
     (x: number, y: number) => {
       return arch03(x + xoff, y + yoff, seed, {
@@ -200,20 +202,21 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
         ancho: 40 + Math.random() * 20,
       });
     },
-    (i: number, j: number) => i == 1 && Math.abs(j - ptlist[i].length / 2) < 1 && Math.random() < 0.02,
+    (i: number, j: number) => i == 1 && Math.abs(j - puntos[i].length / 2) < 1 && Math.random() < 0.02,
     () => true
   );
 
+  /** Torres de luz */
   vegetate(
     (x: number, y: number) => torreLuz(x + xoff, y + yoff),
     (i: number, j: number) => {
       const ns = noise(i * 0.2, j * 0.05, seed + 20 * Math.PI);
-      return i % 2 == 0 && (j == 1 || j == ptlist[i].length - 2) && ns * ns * ns * ns < 0.002;
+      return i % 2 == 0 && (j == 1 || j == puntos[i].length - 2) && ns * ns * ns * ns < 0.002;
     },
     () => true
   );
 
-  //BOTT ROCK
+  /** Rocas parte inferior */
   vegetate(
     (x: number, y: number) => {
       return roca(x + xoff, y + yoff, seed, {
@@ -222,67 +225,72 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
         sha: 2,
       });
     },
-    (i: number, j: number) => (j == 0 || j == ptlist[i].length - 1) && Math.random() < 0.1,
+    (i: number, j: number) => (j == 0 || j == puntos[i].length - 1) && Math.random() < 0.1,
     () => true
   );
 
-  return canv;
+  return svg;
 }
 
-function foot(ptlist: number[][][], args: { xof?: number; yof?: number; ret?: number }) {
-  const predeterminados = { xof: 0, yof: 0, ret: 0 };
-  const { xof, yof } = { ...predeterminados, ...args };
-  const ftlist: number[][][] = [];
-  const span = 10;
+function foot(areaMontaña: Punto[][], args: { x?: number; y?: number }) {
+  const predeterminados = { x: 0, y: 0 };
+  const { x, y } = { ...predeterminados, ...args };
+  const lineas: Punto[][] = [];
+  const cantidadLineas = 6;
   let ni = 0;
 
-  for (let i = 0; i < ptlist.length - 2; i += 1) {
-    if (i == ni) {
-      ni = Math.min(ni + +randChoice([1, 2]), ptlist.length - 1);
-      ftlist.push([]);
-      ftlist.push([]);
+  for (let i = 0; i < areaMontaña.length - 2; i++) {
+    if (i === ni) {
+      const puntos = areaMontaña[i];
+      const totalPuntos = puntos.length;
+      const altura = noise(x * 0.05, i) * 5;
 
-      for (let j = 0; j < Math.min(ptlist[i].length / 8, 10); j++) {
-        ftlist[ftlist.length - 2].push([ptlist[i][j][0] + noise(j * 0.1, i) * 10, ptlist[i][j][1]]);
-        ftlist[ftlist.length - 1].push([
-          ptlist[i][ptlist[i].length - 1 - j][0] - noise(j * 0.1, i) * 10,
-          ptlist[i][ptlist[i].length - 1 - j][1],
-        ]);
+      ni = Math.min(ni + randChoice<number>([1, 2]), areaMontaña.length - 1);
+      lineas.push([], []);
+      const posLineaA = lineas.length - 2;
+      const posLineaB = posLineaA + 1;
+
+      for (let j = 0; j < Math.min(totalPuntos / 8, 10); j++) {
+        const punto = puntos[j];
+        const ruido = noise(j * 0.1, i) * 10;
+        const ii = totalPuntos - 1 - j;
+        lineas[posLineaA].push([punto[0] + ruido, punto[1]]);
+        lineas[posLineaB].push([puntos[ii][0] - ruido, puntos[ii][1]]);
       }
 
-      ftlist[ftlist.length - 2] = ftlist[ftlist.length - 2].reverse();
-      ftlist[ftlist.length - 1] = ftlist[ftlist.length - 1].reverse();
+      lineas[posLineaA] = lineas[posLineaA].reverse();
+      lineas[posLineaB] = lineas[posLineaB].reverse();
 
-      for (let j = 0; j < span; j++) {
-        const p = j / span;
-        const x1 = ptlist[i][0][0] * (1 - p) + ptlist[ni][0][0] * p;
-        const x2 = ptlist[i][ptlist[i].length - 1][0] * (1 - p) + ptlist[ni][ptlist[i].length - 1][0] * p;
-        let y1 = ptlist[i][0][1] * (1 - p) + ptlist[ni][0][1] * p;
-        let y2 = ptlist[i][ptlist[i].length - 1][1] * (1 - p) + ptlist[ni][ptlist[i].length - 1][1] * p;
+      for (let j = 0; j < cantidadLineas; j++) {
+        const p = j / cantidadLineas;
+        const x1 = puntos[0][0] * (1 - p) + areaMontaña[ni][0][0] * p;
+        const x2 = puntos[totalPuntos - 1][0] * (1 - p) + areaMontaña[ni][totalPuntos - 1][0] * p;
+        let y1 = puntos[0][1] * (1 - p) + areaMontaña[ni][0][1] * p;
+        let y2 = puntos[totalPuntos - 1][1] * (1 - p) + areaMontaña[ni][totalPuntos - 1][1] * p;
         const vib = -1.7 * (p - 1) * Math.pow(p, 1 / 5);
-        y1 += vib * 5 + noise(xof * 0.05, i) * 5;
-        y2 += vib * 5 + noise(xof * 0.05, i) * 5;
+        y1 += vib * 5 + altura;
+        y2 += vib * 5 + altura;
 
-        ftlist[ftlist.length - 2].push([x1, y1]);
-        ftlist[ftlist.length - 1].push([x2, y2]);
+        lineas[posLineaA].push([x1, y1]);
+        lineas[posLineaB].push([x2, y2]);
       }
     }
   }
 
-  let canv = '';
+  let svg = '';
 
-  for (let i = 0; i < ftlist.length; i++) {
-    canv += poly(ftlist[i], {
-      xof: xof,
-      yof: yof,
+  for (let i = 0; i < lineas.length; i++) {
+    svg += poly(lineas[i], {
+      x,
+      y,
       fil: 'white',
       str: 'none',
     });
   }
 
-  for (let j = 0; j < ftlist.length; j++) {
-    canv += stroke(
-      ftlist[j].map((x) => [x[0] + xof, x[1] + yof]),
+  for (let j = 0; j < lineas.length; j++) {
+    svg += stroke(
+      lineas[j].map((punto) => [punto[0] + x, punto[1] + y]),
       {
         col: 'rgba(100,100,100,' + (0.1 + Math.random() * 0.1).toFixed(3) + ')',
         ancho: 1,
@@ -290,5 +298,5 @@ function foot(ptlist: number[][][], args: { xof?: number; yof?: number; ret?: nu
     );
   }
 
-  return canv;
+  return svg;
 }

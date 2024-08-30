@@ -1,3 +1,4 @@
+import type { Punto } from '@/tipos';
 import { stroke, texture } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 import { loopNoise, poly } from '@/utilidades/Util';
@@ -18,7 +19,7 @@ export default (
   const { alto, ancho, tex, sha } = { ...predeterminados, ...args };
   let canv = '';
   const reso = [10, 50];
-  const ptlist: number[][][] = [];
+  const ptlist: Punto[][] = [];
 
   for (let i = 0; i < reso[0]; i++) {
     ptlist.push([]);
@@ -46,8 +47,8 @@ export default (
 
   //WHITE BG
   canv += poly(ptlist[0].concat([[0, 0]]), {
-    xof: xoff,
-    yof: yoff,
+    x: xoff,
+    y: yoff,
     fil: 'white',
     str: 'none',
   });
@@ -73,7 +74,7 @@ export default (
   });
 
   // for (let i = 0; i < reso[0]; i++) {
-  //   canv += poly(ptlist[i], { xof: xoff, yof: yoff, fil: 'none', str: 'red', ancho: 2 });
+  //   canv += poly(ptlist[i], { x: xoff, y: yoff, fil: 'none', str: 'red', ancho: 2 });
   // }
   return canv;
 };

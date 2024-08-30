@@ -243,7 +243,7 @@ function chunkloader(xmin: number, xmax: number) {
           y: plan[i].y,
           canv: montañasAguadas(plan[i].x, plan[i].y, Math.random() * 100, {
             alto: 150,
-            len: +randChoice([500, 1000, 1500]),
+            len: randChoice([500, 1000, 1500]),
           }),
         });
       } else if (plan[i].tag == 'boat') {
@@ -253,7 +253,7 @@ function chunkloader(xmin: number, xmax: number) {
           y: plan[i].y,
           canv: barco(plan[i].x, plan[i].y, {
             sca: plan[i].y / 800,
-            fli: !!randChoice([true, false]),
+            fli: randChoice([true, false]),
           }),
         });
       } else if (plan[i].tag == 'redcirc') {
