@@ -1,7 +1,7 @@
 import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsTwig } from '@/tipos';
 import { blob, div, stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
-import { midPt, triangulate } from '@/utilidades/Polytools';
+import { centro, triangulate } from '@/utilidades/Polytools';
 import { distance, loopNoise, normRand, poly, randChoice, randGaussian } from '@/utilidades/Util';
 
 export function tree01(x: number, y: number, args: ArgsArbol1) {
@@ -719,7 +719,7 @@ export function tree07(x, y, args) {
   }).concat(T);
 
   for (var k = 0; k < T.length; k++) {
-    var m = midPt(T[k]);
+    var m = centro(T[k]);
     var c = (noise(m[0] * 0.02, m[1] * 0.02) * 200 + 50) | 0;
     var co = 'rgba(' + c + ',' + c + ',' + c + ',0.8)';
     canv += poly(T[k], { fil: co, str: co, ancho: 0 });

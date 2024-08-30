@@ -13,13 +13,13 @@ export function toggleText(id: string, a: string, b: string) {
   const elemento = document.getElementById(id);
 
   if (elemento) {
-    var v = elemento.innerHTML;
+    const v = elemento.innerHTML;
     elemento.innerHTML = v == '' || v == b ? a : b;
   }
 }
 
-var lastScrollX = 0;
-var pFrame = 0;
+let lastScrollX = 0;
+let pFrame = 0;
 
 export function present() {
   const currScrollX = window.scrollX;
@@ -36,8 +36,8 @@ export function present() {
   }
 }
 
-export function reloadWSeed(s) {
+export function reloadWSeed(s: number) {
   const u = window.location.href.split('?')[0];
-  window.location.href = u + '?seed=' + s;
+  window.location.href = `${u}?seed=${s}`;
   //window.location.reload(true)
 }

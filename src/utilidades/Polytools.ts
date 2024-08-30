@@ -6,17 +6,9 @@ type ArgsTriangulacion = {
   optimize: boolean;
 };
 
-export function midPt() {
-  const plist = arguments.length == 1 ? arguments[0] : Array.apply(null, arguments);
-  return plist.reduce(
-    function (acc: number[], v: number[]) {
-      /*       if (v == undefined || acc == undefined){
-      console.log("ERRR");
-      console.log(plist)
-      return [0,0]
-    } */
-      return [v[0] / plist.length + acc[0], v[1] / plist.length + acc[1]];
-    },
+export function centro(puntos: Punto[]) {
+  return puntos.reduce(
+    (acc: number[], v: number[]) => [v[0] / puntos.length + acc[0], v[1] / puntos.length + acc[1]],
     [0, 0]
   );
 }
@@ -27,22 +19,21 @@ export function triangulate(
 ): number[][][] {
   const { area, convex, optimize } = args;
 
-  function lineExpr(pt0: Punto, pt1: Punto) {
-    const den = pt1[0] - pt0[0];
-    const m = den == 0 ? Infinity : (pt1[1] - pt0[1]) / den;
-    const k = pt0[1] - m * pt0[0];
+  function lineExpr(punto0: Punto, punto1: Punto) {
+    const den = punto1[0] - punto0[0];
+    const m = den == 0 ? Infinity : (punto1[1] - punto0[1]) / den;
+    const k = punto0[1] - m * punto0[0];
     return [m, k];
   }
 
-  function intersect(ln0: Punto[], ln1: Punto[]) {
+  function intersect(ln0: [Punto, Punto], ln1: [Punto, Punto]) {
     const le0 = lineExpr(...ln0);
     const le1 = lineExpr(...ln1);
     const den = le0[0] - le1[0];
-    if (den == 0) {
-      return false;
-    }
-    var x = (le1[1] - le0[1]) / den;
-    var y = le0[0] * x + le0[1];
+    if (den == 0) return false;
+
+    const x = (le1[1] - le0[1]) / den;
+    const y = le0[0] * x + le0[1];
 
     function onSeg(p: Punto, ln: Punto[]) {
       //non-inclusive
@@ -57,6 +48,7 @@ export function triangulate(
     if (onSeg([x, y], ln0) && onSeg([x, y], ln1)) {
       return [x, y];
     }
+
     return false;
   }
 
@@ -73,8 +65,9 @@ export function triangulate(
     }
     return scount % 2 == 1;
   }
-  function lnInPoly(ln: number[][], plist: number[][]) {
-    const lnc = [
+
+  function lnInPoly(ln: Punto[], plist: Punto[]) {
+    const lnc: [Punto, Punto] = [
       [0, 0],
       [0, 0],
     ];
@@ -93,7 +86,7 @@ export function triangulate(
       }
     }
 
-    const mid = midPt(ln);
+    const mid = centro(ln);
 
     if (ptInPoly(mid, plist) == false) {
       return false;
@@ -134,7 +127,7 @@ export function triangulate(
   function bestEar(plist: Punto[]) {
     const cuts = [];
 
-    for (var i = 0; i < plist.length; i++) {
+    for (let i = 0; i < plist.length; i++) {
       const pt = plist[i];
       const lp = plist[i != 0 ? i - 1 : plist.length - 1];
       const np = plist[i != plist.length - 1 ? i + 1 : 0];
@@ -173,7 +166,7 @@ export function triangulate(
       const lind = (ind + 2) % plist.length;
 
       try {
-        const mid = midPt([plist[ind], plist[nind]]);
+        const mid = centro([plist[ind], plist[nind]]);
         return shatter([plist[ind], mid, plist[lind]], a).concat(shatter([plist[lind], plist[nind], mid], a));
       } catch (err) {
         console.log(plist);

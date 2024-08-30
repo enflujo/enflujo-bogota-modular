@@ -2,7 +2,7 @@ import { invertir } from '@/utilidades/ayudas';
 import type { Punto } from '@/tipos';
 import { div, stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
-import { midPt } from '@/utilidades/Polytools';
+import { centro } from '@/utilidades/Polytools';
 import { normRand, poly, randChoice } from '@/utilidades/Util';
 import caja from '@/componentes/caja';
 import chozaTecho from '@/componentes/chozaTecho';
@@ -326,7 +326,7 @@ var roof = function (xoff, yoff, args) {
       pp = [pp[1], pp[0]];
     }
 
-    const mp = midPt(pp);
+    const mp = centro(pp);
     const a = Math.atan2(pp[1][1] - pp[0][1], pp[1][0] - pp[0][0]);
     const adeg = (a * 180) / Math.PI;
     canv += `<text font-size='${alto * 0.6}' font-family='Verdana' style='fill:rgba(100,100,100,0.9)' text-anchor='middle' transform='translate(${mp[0] + xoff},${mp[1] + yoff}) rotate(${adeg})'>${pla[1]}</text>`;

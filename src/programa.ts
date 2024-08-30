@@ -339,28 +339,28 @@ function mountplanner(xmin: number, xmax: number) {
     }
   }
 
-  // for (let i = xmin; i < xmax; i += xstep) {
-  //   if (planmtx[Math.floor(i / xstep)] == 0) {
-  //     if (Math.random() < 0.01) {
-  //       for (let j = 0; j < 4 * Math.random(); j++) {
-  //         const r = {
-  //           tag: 'flatmount',
-  //           x: i + 2 * (Math.random() - 0.5) * 700,
-  //           y: 700 - j * 50,
-  //           h: ns(i),
-  //         };
-  //         chadd(r);
-  //       }
-  //     }
-  //   }
-  // }
+  for (let i = xmin; i < xmax; i += xstep) {
+    if (planmtx[Math.floor(i / xstep)] == 0) {
+      if (Math.random() < 0.01) {
+        for (let j = 0; j < 4 * Math.random(); j++) {
+          const r = {
+            tag: 'flatmount',
+            x: i + 2 * (Math.random() - 0.5) * 700,
+            y: 700 - j * 50,
+            h: ns(i),
+          };
+          chadd(r);
+        }
+      }
+    }
+  }
 
-  // for (let i = xmin; i < xmax; i += xstep) {
-  //   if (Math.random() < 0.2) {
-  //     const r = { tag: 'boat', x: i, y: 300 + Math.random() * 390 };
-  //     chadd(r, 400);
-  //   }
-  // }
+  for (let i = xmin; i < xmax; i += xstep) {
+    if (Math.random() < 0.2) {
+      const r = { tag: 'boat', x: i, y: 300 + Math.random() * 390 };
+      chadd(r, 400);
+    }
+  }
 
   return reg;
 }

@@ -32,9 +32,6 @@ export default (
     for (let j = 0; j < reso[1]; j++) {
       const a = (j / reso[1]) * Math.PI * 2 - Math.PI / 2;
       let l = (ancho * alto) / Math.sqrt(Math.pow(alto * Math.cos(a), 2) + Math.pow(ancho * Math.sin(a), 2));
-
-      /*           var l = Math.sin(a)>0? Math.pow(Math.sin(a),0.1)*ancho
-                             : - Math.pow(Math.sin(a+Math.PI),0.1)*ancho */
       l *= 0.7 + 0.3 * nslist[j];
 
       const p = 1 - i / reso[0];

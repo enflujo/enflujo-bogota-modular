@@ -1,5 +1,5 @@
 import type { ArgsPoly, Punto } from '../tipos';
-import { midPt } from './Polytools';
+import { centro } from './Polytools';
 
 export function unNan(plist: Punto[]) {
   if (typeof plist != 'object' || plist == null) {
@@ -57,7 +57,7 @@ export function randGaussian() {
 
 export function bezmh(puntos: Punto[], w: number = 1) {
   if (puntos.length == 2) {
-    puntos = [puntos[0], midPt(puntos[0], puntos[1]), puntos[1]];
+    puntos = [puntos[0], centro(puntos[0], puntos[1]), puntos[1]];
   }
 
   const plist: Punto[] = [];
@@ -70,13 +70,13 @@ export function bezmh(puntos: Punto[], w: number = 1) {
     if (j == 0) {
       p0 = puntos[j];
     } else {
-      p0 = midPt(puntos[j], puntos[j + 1]);
+      p0 = centro(puntos[j], puntos[j + 1]);
     }
     p1 = puntos[j + 1];
     if (j == puntos.length - 3) {
       p2 = puntos[j + 2];
     } else {
-      p2 = midPt(puntos[j + 1], puntos[j + 2]);
+      p2 = centro(puntos[j + 1], puntos[j + 2]);
     }
 
     const pl = 20;

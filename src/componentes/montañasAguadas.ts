@@ -1,5 +1,5 @@
 import { noise } from '@/utilidades/Perlin';
-import { midPt, triangulate } from '@/utilidades/Polytools';
+import { centro, triangulate } from '@/utilidades/Polytools';
 import { poly } from '@/utilidades/Util';
 
 export default (xoff: number, yoff: number, seed = 0, args?: { alto?: number; len?: number; seg?: number }) => {
@@ -49,7 +49,7 @@ export default (xoff: number, yoff: number, seed = 0, args?: { alto?: number; le
     });
 
     for (let k = 0; k < T.length; k++) {
-      const m = midPt(T[k]);
+      const m = centro(T[k]);
       const co = getCol(m[0], m[1]);
       canv += poly(T[k], { fil: co, str: co, ancho: 1 });
     }
