@@ -1,4 +1,4 @@
-import type { ArgsBolb, ArgsStroke, ArgsTexture, Punto } from '../tipos';
+import type { ArgsBolb, ArgsStroke, ArgsTexture, Punto } from '@/tipos';
 import { noise } from './Perlin';
 import { loopNoise, poly } from './Util';
 
@@ -8,14 +8,14 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
   const predeterminados = {
     xof: 0,
     yof: 0,
-    wid: 2,
+    ancho: 2,
     col: 'rgba(200,200,200,0.9)',
     noi: 0.5,
     out: 1,
     fun: (x: number) => Math.sin(x * Math.PI),
   };
 
-  const { xof, yof, wid, col, noi, out, fun } = { ...predeterminados, ...args };
+  const { xof, yof, ancho, col, noi, out, fun } = { ...predeterminados, ...args };
 
   if (ptlist.length == 0) return '';
 
@@ -26,7 +26,7 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
   const n0 = Math.random() * 10;
 
   for (let i = 1; i < ptlist.length - 1; i++) {
-    let w = wid * fun(i / ptlist.length);
+    let w = ancho * fun(i / ptlist.length);
     w = w * (1 - noi) + w * noi * noise(i * 0.5, n0);
     let a1 = Math.atan2(ptlist[i][1] - ptlist[i - 1][1], ptlist[i][0] - ptlist[i - 1][0]);
     let a2 = Math.atan2(ptlist[i][1] - ptlist[i + 1][1], ptlist[i][0] - ptlist[i + 1][0]);
@@ -44,7 +44,7 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
 
   const canv = poly(
     vtxlist.map((x) => [x[0] + xof, x[1] + yof]),
-    { fil: col, str: col, wid: out }
+    { fil: col, str: col, ancho: out }
   );
 
   return canv;
@@ -53,7 +53,7 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
 export function blob(x: number, y: number, args: ArgsBolb) {
   const predeterminados = {
     len: 20,
-    wid: 5,
+    ancho: 5,
     ang: 0,
     col: 'rgba(200,200,200,0.9)',
     noi: 0.5,
@@ -62,7 +62,7 @@ export function blob(x: number, y: number, args: ArgsBolb) {
       return x <= 1 ? Math.pow(Math.sin(x * Math.PI), 0.5) : -Math.pow(Math.sin((x + 1) * Math.PI), 0.5);
     },
   };
-  const { len, wid, ang, col, noi, ret, fun } = { ...predeterminados, ...args };
+  const { len, ancho, ang, col, noi, ret, fun } = { ...predeterminados, ...args };
 
   const reso = 20.0;
   const lalist = [];
@@ -70,7 +70,7 @@ export function blob(x: number, y: number, args: ArgsBolb) {
   for (let i = 0; i < reso + 1; i++) {
     const p = (i / reso) * 2;
     const xo = len / 2 - Math.abs(p - 1) * len;
-    const yo = (fun(p) * wid) / 2;
+    const yo = (fun(p) * ancho) / 2;
     const a = Math.atan2(yo, xo);
     const l = Math.sqrt(xo * xo + yo * yo);
     lalist.push([l, a]);
@@ -92,43 +92,43 @@ export function blob(x: number, y: number, args: ArgsBolb) {
   }
 
   if (ret == 0) {
-    return poly(plist, { fil: col, str: col, wid: 0 });
+    return poly(plist, { fil: col, str: col, ancho: 0 });
   } else {
     return plist;
   }
 }
 
-export function div(plist: Punto[], reso: number) {
-  const tl = (plist.length - 1) * reso;
-  let lx = 0;
-  let ly = 0;
-  const rlist: Punto[] = [];
+export function div(puntos: Punto[], reso: number): Punto[] {
+  const total = (puntos.length - 1) * reso;
+  let _x = 0;
+  let _y = 0;
+  const respuesta: Punto[] = [];
 
-  for (let i = 0; i < tl; i += 1) {
-    const lastp = plist[Math.floor(i / reso)];
-    const nextp = plist[Math.ceil(i / reso)];
-    const p = (i % reso) / reso;
-    const nx = lastp[0] * (1 - p) + nextp[0] * p;
-    const ny = lastp[1] * (1 - p) + nextp[1] * p;
+  for (let i = 0; i < total; i++) {
+    const ultimoPunto = puntos[Math.floor(i / reso)];
+    const siguientePunto = puntos[Math.ceil(i / reso)];
+    const punto = (i % reso) / reso;
+    const x = ultimoPunto[0] * (1 - punto) + siguientePunto[0] * punto;
+    const y = ultimoPunto[1] * (1 - punto) + siguientePunto[1] * punto;
 
-    rlist.push([nx, ny]);
-    lx = nx;
-    ly = ny;
+    respuesta.push([x, y]);
+    _x = x;
+    _y = y;
   }
 
-  if (plist.length > 0) {
-    rlist.push(plist[plist.length - 1]);
+  if (puntos.length > 0) {
+    respuesta.push(puntos[puntos.length - 1]);
   }
 
-  return rlist;
+  return respuesta;
 }
 
-export function texture(ptlist: Punto[], args: ArgsTexture) {
+export function texture(ptlist: Punto[][], args: ArgsTexture) {
   const predeterminados = {
     xof: 0,
     yof: 0,
     tex: 400,
-    wid: 1.5,
+    ancho: 1.5,
     len: 0.2,
     sha: 0,
     ret: 0,
@@ -142,7 +142,7 @@ export function texture(ptlist: Punto[], args: ArgsTexture) {
       }
     },
   };
-  const { xof, yof, tex, wid, len, sha, ret, noi, col, dis } = { ...predeterminados, ...args };
+  const { xof, yof, tex, ancho, len, sha, ret, noi, col, dis } = { ...predeterminados, ...args };
   const reso = [ptlist.length, ptlist[0].length];
   const texlist: Punto[][] = [];
 
@@ -172,7 +172,7 @@ export function texture(ptlist: Punto[], args: ArgsTexture) {
     for (let j = 0; j < texlist.length; j += 1 + +(sha != 0)) {
       canv += stroke(
         texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
-        { col: 'rgba(100,100,100,0.1)', wid: +sha }
+        { col: 'rgba(100,100,100,0.1)', ancho: +sha }
       );
     }
   }
@@ -180,7 +180,7 @@ export function texture(ptlist: Punto[], args: ArgsTexture) {
   for (let j = 0 + +sha; j < texlist.length; j += 1 + +sha) {
     canv += stroke(
       texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
-      { col: col(j / texlist.length), wid: wid }
+      { col: col(j / texlist.length), ancho: ancho }
     );
   }
   return ret ? texlist : canv;

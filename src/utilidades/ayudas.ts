@@ -1,3 +1,5 @@
+import type { Punto } from '@/tipos';
+
 export function parseArgs(key2f: { [llave: string]: (x: string) => void }) {
   let par = window.location.href.split('?')[1];
 
@@ -22,3 +24,18 @@ export function calcViewBox(x: number, ancho: number, alto: number) {
   const zoom = 1.142;
   return `${x} 0 ${ancho / zoom} ${alto / zoom}`;
 }
+
+export const invertir = (puntos: Punto[] | Punto[][], axis = 0) => {
+  for (let i = 0; i < puntos.length; i++) {
+    if (puntos[i].length > 0) {
+      if (typeof puntos[i][0] == 'object') {
+        for (let j = 0; j < puntos[i].length; j++) {
+          (puntos as Punto[][])[i][j][0] = axis - ((puntos as Punto[][])[i][j][0] - axis);
+        }
+      } else {
+        puntos[i][0] = axis - ((puntos as Punto[])[i][0] - axis);
+      }
+    }
+  }
+  return puntos;
+};

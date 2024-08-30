@@ -1,6 +1,6 @@
 export interface BaseArbol {
-  hei?: number;
-  wid?: number;
+  alto?: number;
+  ancho?: number;
   col?: string;
   noi?: number;
 }
@@ -24,7 +24,7 @@ export interface ArgsBranch extends BaseArbol {
 export interface ArgsTwig {
   dir?: number;
   sca?: number;
-  wid?: number;
+  ancho?: number;
   ang?: number;
   lea?: [boolean, number];
 }
@@ -32,7 +32,7 @@ export interface ArgsTwig {
 export interface ArgsStroke {
   xof?: number;
   yof?: number;
-  wid?: number;
+  ancho?: number;
   col?: string;
   noi?: number;
   out?: number;
@@ -44,12 +44,12 @@ export interface ArgsPoly {
   yof?: number;
   fil?: string;
   str?: string;
-  wid?: number;
+  ancho?: number;
 }
 
 export interface ArgsBolb {
   len?: number;
-  wid?: number;
+  ancho?: number;
   ang?: number;
   col?: string;
   noi?: number;
@@ -61,7 +61,7 @@ export interface ArgsTexture {
   xof?: number;
   yof?: number;
   tex?: number;
-  wid?: number;
+  ancho?: number;
   len?: number;
   sha?: number | boolean;
   ret?: number;
@@ -71,8 +71,8 @@ export interface ArgsTexture {
 }
 
 export interface OpcionesMontaña {
-  hei: number;
-  wid: number;
+  alto: number;
+  ancho: number;
   tex: number;
   veg: boolean;
   ret: number;
@@ -87,3 +87,27 @@ export interface Chunk {
 }
 
 export type Punto = [x: number, y: number];
+export type Cubo = [Punto, Punto][];
+
+export interface ArgsCaja {
+  alto?: number;
+  ancho?: number;
+  rot?: number;
+  per?: number;
+  tra?: boolean;
+  bot?: boolean;
+  wei?: number;
+  dec?: () => Punto;
+}
+
+export interface ArgsChoza {
+  alto?: number;
+  ancho?: number;
+  tex?: number;
+}
+
+export interface ArgsBarco {
+  len?: number;
+  sca?: number;
+  fli?: boolean;
+}

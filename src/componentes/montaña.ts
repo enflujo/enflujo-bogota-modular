@@ -1,27 +1,27 @@
-import type { OpcionesMontaña } from '../tipos';
-import { stroke, texture } from '../utilidades/cosas';
-import { noise } from '../utilidades/Perlin';
-import { normRand, poly, randChoice } from '../utilidades/Util';
-import { arch02, arch03, arch04 } from './Arch';
-import roca from './roca';
-import torreLuz from './torreLuz';
-import { tree01, tree02, tree03 } from './Tree';
+import type { OpcionesMontaña } from '@/tipos';
+import { stroke, texture } from '@/utilidades/cosas';
+import { noise } from '@/utilidades/Perlin';
+import { normRand, poly, randChoice } from '@/utilidades/Util';
+import { arch02, arch03, arch04 } from '@/componentes/Arch';
+import roca from '@/componentes/roca';
+import torreLuz from '@/componentes/torreLuz';
+import { tree01, tree02, tree03 } from '@/componentes/Tree';
 
 export default function montaña(xoff: number, yoff: number, seed = 0, args?: OpcionesMontaña) {
   const predeterminados = {
-    hei: 100 + Math.random() * 400,
-    wid: 400 + Math.random() * 200,
+    alto: 100 + Math.random() * 400,
+    ancho: 400 + Math.random() * 200,
     tex: 200,
     veg: true,
     ret: 0,
     col: '',
   };
-  const { hei, wid, tex, veg } = { ...predeterminados, ...args };
+  const { alto, ancho, tex, veg } = { ...predeterminados, ...args };
 
   let canv = '';
   const ptlist: number[][][] = [];
-  const h = hei;
-  const w = wid;
+  const h = alto;
+  const w = ancho;
   const reso = [10, 50];
   let hoff = 0;
 
@@ -61,19 +61,19 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   }
 
   //RIM
-  vegetate(
-    (x: number, y: number) => {
-      return tree02(x + xoff, y + yoff - 5, {
-        col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
-        clu: 2,
-      });
-    },
-    (i: number, j: number) => {
-      const ns = noise(j * 0.1, seed);
-      return i == 0 && ns * ns * ns < 0.1 && Math.abs(ptlist[i][j][1]) / h > 0.2;
-    },
-    () => true
-  );
+  // vegetate(
+  //   (x: number, y: number) => {
+  //     return tree02(x + xoff, y + yoff - 5, {
+  //       col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
+  //       clu: 2,
+  //     });
+  //   },
+  //   (i: number, j: number) => {
+  //     const ns = noise(j * 0.1, seed);
+  //     return i == 0 && ns * ns * ns < 0.1 && Math.abs(ptlist[i][j][1]) / h > 0.2;
+  //   },
+  //   () => true
+  // );
 
   //WHITE BG
   canv += poly(ptlist[0].concat([[0, reso[0] * 4]]), {
@@ -85,7 +85,7 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   //OUTLINE
   canv += stroke(
     ptlist[0].map((x) => [x[0] + xoff, x[1] + yoff]),
-    { col: 'rgba(100,100,100,0.3)', noi: 1, wid: 3 }
+    { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
 
   canv += foot(ptlist, { xof: xoff, yof: yoff });
@@ -97,113 +97,110 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   });
 
   //TOP
-  vegetate(
-    (x: number, y: number) => {
-      return tree02(x + xoff, y + yoff, {
-        col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
-      });
-    },
-    (i: number, j: number) => {
-      const ns = noise(i * 0.1, j * 0.1, seed + 2);
-      return ns * ns * ns < 0.1 && Math.abs(ptlist[i][j][1]) / h > 0.5;
-    },
-    () => true
-  );
+  // vegetate(
+  //   (x: number, y: number) => {
+  //     return tree02(x + xoff, y + yoff, {
+  //       col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
+  //     });
+  //   },
+  //   (i: number, j: number) => {
+  //     const ns = noise(i * 0.1, j * 0.1, seed + 2);
+  //     return ns * ns * ns < 0.1 && Math.abs(ptlist[i][j][1]) / h > 0.5;
+  //   },
+  //   () => true
+  // );
 
   if (veg) {
     //MIDDLE
-    vegetate(
-      (x: number, y: number) => {
-        let ht = ((h + y) / h) * 70;
-        ht = ht * 0.3 + Math.random() * ht * 0.7;
-        return tree01(x + xoff, y + yoff, {
-          hei: ht,
-          wid: Math.random() * 3 + 1,
-          col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
-        });
-      },
-
-      (i: number, j: number) => {
-        const ns = noise(i * 0.2, j * 0.05, seed);
-        return !!(j % 2 && ns * ns * ns * ns < 0.012 && Math.abs(ptlist[i][j][1]) / h < 0.3);
-      },
-
-      (veglist: number[][], i: number) => {
-        let counter = 0;
-        for (let j = 0; j < veglist.length; j++) {
-          if (
-            i != j &&
-            Math.pow(veglist[i][0] - veglist[j][0], 2) + Math.pow(veglist[i][1] - veglist[j][1], 2) < 30 * 30
-          ) {
-            counter++;
-          }
-          if (counter > 2) {
-            return true;
-          }
-        }
-        return false;
-      }
-    );
-
+    // vegetate(
+    //   (x: number, y: number) => {
+    //     let ht = ((h + y) / h) * 70;
+    //     ht = ht * 0.3 + Math.random() * ht * 0.7;
+    //     return tree01(x + xoff, y + yoff, {
+    //       alto: ht,
+    //       ancho: Math.random() * 3 + 1,
+    //       col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
+    //     });
+    //   },
+    //   (i: number, j: number) => {
+    //     const ns = noise(i * 0.2, j * 0.05, seed);
+    //     return !!(j % 2 && ns * ns * ns * ns < 0.012 && Math.abs(ptlist[i][j][1]) / h < 0.3);
+    //   },
+    //   (veglist: number[][], i: number) => {
+    //     let counter = 0;
+    //     for (let j = 0; j < veglist.length; j++) {
+    //       if (
+    //         i != j &&
+    //         Math.pow(veglist[i][0] - veglist[j][0], 2) + Math.pow(veglist[i][1] - veglist[j][1], 2) < 30 * 30
+    //       ) {
+    //         counter++;
+    //       }
+    //       if (counter > 2) {
+    //         return true;
+    //       }
+    //     }
+    //     return false;
+    //   }
+    // );
     //BOTTOM
-    vegetate(
-      (x: number, y: number) => {
-        let ht = ((h + y) / h) * 120;
-        ht = ht * 0.5 + Math.random() * ht * 0.5;
-        const bc = Math.random() * 0.1;
-        const bp = 1;
-        return tree03(x + xoff, y + yoff, {
-          hei: ht,
-          ben: (x) => Math.pow(x * bc, bp),
-          col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
-        });
-      },
-      (i: number, j: number) => {
-        const ns = noise(i * 0.2, j * 0.05, seed);
-        return (j == 0 || j == ptlist[i].length - 1) && ns * ns * ns * ns < 0.012;
-      },
-      () => true
-    );
+    // vegetate(
+    //   (x: number, y: number) => {
+    //     let ht = ((h + y) / h) * 120;
+    //     ht = ht * 0.5 + Math.random() * ht * 0.5;
+    //     const bc = Math.random() * 0.1;
+    //     const bp = 1;
+    //     return tree03(x + xoff, y + yoff, {
+    //       alto: ht,
+    //       ben: (x) => Math.pow(x * bc, bp),
+    //       col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
+    //     });
+    //   },
+    //   (i: number, j: number) => {
+    //     const ns = noise(i * 0.2, j * 0.05, seed);
+    //     return (j == 0 || j == ptlist[i].length - 1) && ns * ns * ns * ns < 0.012;
+    //   },
+    //   () => true
+    // );
   }
 
   //BOTT ARCH
-  vegetate(
-    (x: number, y: number) => {
-      const tt = randChoice([0, 0, 1, 1, 1, 2]);
+  // vegetate(
+  //   (x: number, y: number) => {
+  //     const tt = randChoice([0, 0, 1, 1, 1, 2]);
 
-      if (tt == 1) {
-        return arch02(x + xoff, y + yoff, seed, {
-          wid: normRand(40, 70),
-          sto: randChoice([1, 2, 2, 3]),
-          rot: Math.random(),
-          sty: randChoice([1, 2, 3]),
-        });
-      } else if (tt == 2) {
-        return arch04(x + xoff, y + yoff, seed, {
-          sto: randChoice([1, 1, 1, 2, 2]),
-        });
-      } else {
-        return '';
-      }
-    },
-    (i: number, j: number) => {
-      const ns = noise(i * 0.2, j * 0.05, seed + 10);
-      return i != 0 && (j == 1 || j == ptlist[i].length - 2) && ns * ns * ns * ns < 0.008;
-    },
-    () => true
-  );
+  //     if (tt == 1) {
+  //       return arch02(x + xoff, y + yoff, seed, {
+  //         ancho: normRand(40, 70),
+  //         sto: randChoice([1, 2, 2, 3]),
+  //         rot: Math.random(),
+  //         sty: randChoice([1, 2, 3]),
+  //       });
+  //     } else if (tt == 2) {
+  //       return arch04(x + xoff, y + yoff, seed, {
+  //         sto: randChoice([1, 1, 1, 2, 2]),
+  //       });
+  //     } else {
+  //       return '';
+  //     }
+  //   },
+  //   (i: number, j: number) => {
+  //     const ns = noise(i * 0.2, j * 0.05, seed + 10);
+  //     return i != 0 && (j == 1 || j == ptlist[i].length - 2) && ns * ns * ns * ns < 0.008;
+  //   },
+  //   () => true
+  // );
 
   //TOP ARCH
-  vegetate(
-    (x: number, y: number) => {
-      return arch03(x + xoff, y + yoff, seed, {
-        sto: randChoice([5, 7]),
-        wid: 40 + Math.random() * 20,
-      });
-    },
-    (i: number, j: number) => i == 1 && Math.abs(j - ptlist[i].length / 2) < 1 && Math.random() < 0.02,
-    () => true
-  );
+  // vegetate(
+  //   (x: number, y: number) => {
+  //     return arch03(x + xoff, y + yoff, seed, {
+  //       sto: randChoice([5, 7]),
+  //       ancho: 40 + Math.random() * 20,
+  //     });
+  //   },
+  //   (i: number, j: number) => i == 1 && Math.abs(j - ptlist[i].length / 2) < 1 && Math.random() < 0.02,
+  //   () => true
+  // );
 
   vegetate(
     (x: number, y: number) => torreLuz(x + xoff, y + yoff),
@@ -215,17 +212,17 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   );
 
   //BOTT ROCK
-  vegetate(
-    (x: number, y: number) => {
-      return roca(x + xoff, y + yoff, seed, {
-        wid: 20 + Math.random() * 20,
-        hei: 20 + Math.random() * 20,
-        sha: 2,
-      });
-    },
-    (i: number, j: number) => (j == 0 || j == ptlist[i].length - 1) && Math.random() < 0.1,
-    () => true
-  );
+  // vegetate(
+  //   (x: number, y: number) => {
+  //     return roca(x + xoff, y + yoff, seed, {
+  //       ancho: 20 + Math.random() * 20,
+  //       alto: 20 + Math.random() * 20,
+  //       sha: 2,
+  //     });
+  //   },
+  //   (i: number, j: number) => (j == 0 || j == ptlist[i].length - 1) && Math.random() < 0.1,
+  //   () => true
+  // );
 
   return canv;
 }
@@ -286,7 +283,7 @@ function foot(ptlist: number[][][], args: { xof?: number; yof?: number; ret?: nu
       ftlist[j].map((x) => [x[0] + xof, x[1] + yof]),
       {
         col: 'rgba(100,100,100,' + (0.1 + Math.random() * 0.1).toFixed(3) + ')',
-        wid: 1,
+        ancho: 1,
       }
     );
   }

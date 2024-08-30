@@ -1,10 +1,10 @@
-import { noise } from '../utilidades/Perlin';
-import { midPt, triangulate } from '../utilidades/Polytools';
-import { poly } from '../utilidades/Util';
+import { noise } from '@/utilidades/Perlin';
+import { midPt, triangulate } from '@/utilidades/Polytools';
+import { poly } from '@/utilidades/Util';
 
-export default (xoff: number, yoff: number, seed = 0, args?: { hei?: number; len?: number; seg?: number }) => {
-  const predeterminados = { hei: 300, len: 2000, seg: 5 };
-  const { hei, len, seg } = { ...predeterminados, ...args };
+export default (xoff: number, yoff: number, seed = 0, args?: { alto?: number; len?: number; seg?: number }) => {
+  const predeterminados = { alto: 300, len: 2000, seg: 5 };
+  const { alto, len, seg } = { ...predeterminados, ...args };
   let canv = '';
   const span = 10;
   const ptlist: number[][][] = [];
@@ -15,7 +15,7 @@ export default (xoff: number, yoff: number, seed = 0, args?: { hei?: number; len
     for (let j = 0; j < seg + 1; j++) {
       const tran = (k: number) => [
         xoff + k * span,
-        yoff - hei * noise(k * 0.05, seed) * Math.pow(Math.sin((Math.PI * k) / (len / span)), 0.5),
+        yoff - alto * noise(k * 0.05, seed) * Math.pow(Math.sin((Math.PI * k) / (len / span)), 0.5),
       ];
 
       ptlist[ptlist.length - 1].push(tran(i * seg + j));
@@ -39,7 +39,7 @@ export default (xoff: number, yoff: number, seed = 0, args?: { hei?: number; len
     canv += poly(ptlist[i], {
       fil: getCol(...ptlist[i][ptlist[i].length - 1]),
       str: 'none',
-      wid: 1,
+      ancho: 1,
     });
 
     const T = triangulate(ptlist[i], {
@@ -51,7 +51,7 @@ export default (xoff: number, yoff: number, seed = 0, args?: { hei?: number; len
     for (let k = 0; k < T.length; k++) {
       const m = midPt(T[k]);
       const co = getCol(m[0], m[1]);
-      canv += poly(T[k], { fil: co, str: co, wid: 1 });
+      canv += poly(T[k], { fil: co, str: co, ancho: 1 });
     }
   }
   return canv;

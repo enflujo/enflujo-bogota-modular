@@ -1,15 +1,15 @@
-import agua from './componentes/agua';
-import barco from './componentes/barco';
-import montaña from './componentes/montaña';
-import montaña2 from './componentes/montaña2';
-import { flatMount } from './componentes/Mount';
-import { btnHoverCol, present, reloadWSeed, toggleText, toggleVisible } from './componentes/UI';
-import './scss/estilos.scss';
-import type { Chunk } from './tipos';
-import { calcViewBox, parseArgs } from './utilidades/ayudas';
-import { download } from './utilidades/downloader';
-import { noise } from './utilidades/Perlin';
-import { randChoice } from './utilidades/Util';
+import '@/scss/estilos.scss';
+import agua from '@/componentes/agua';
+import barco from '@/componentes/barco';
+import montaña from '@/componentes/montaña';
+import { flatMount } from '@/componentes/Mount';
+import { btnHoverCol, present, reloadWSeed, toggleText, toggleVisible } from '@/componentes/UI';
+import type { Chunk } from '@/tipos';
+import { calcViewBox, parseArgs } from '@/utilidades/ayudas';
+import { download } from '@/utilidades/downloader';
+import { noise } from '@/utilidades/Perlin';
+import { randChoice } from '@/utilidades/Util';
+import montañasAguadas from './componentes/montañasAguadas';
 
 const SET_BTN = document.getElementById('SET_BTN') as HTMLDivElement;
 const SETTING = document.getElementById('SETTING') as HTMLDivElement;
@@ -231,8 +231,8 @@ function chunkloader(xmin: number, xmax: number) {
           x: plan[i].x,
           y: plan[i].y,
           canv: flatMount(plan[i].x, plan[i].y, 2 * Math.random() * Math.PI, {
-            wid: 600 + Math.random() * 400,
-            hei: 100,
+            ancho: 600 + Math.random() * 400,
+            alto: 100,
             cho: 0.5 + Math.random() * 0.2,
           }),
         });
@@ -241,8 +241,8 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: montaña2(plan[i].x, plan[i].y, Math.random() * 100, {
-            hei: 150,
+          canv: montañasAguadas(plan[i].x, plan[i].y, Math.random() * 100, {
+            alto: 150,
             len: +randChoice([500, 1000, 1500]),
           }),
         });
@@ -307,6 +307,7 @@ function mountplanner(xmin: number, xmax: number) {
   const yr = (x: number) => noise(x * 0.01, Math.PI);
   const xstep = 5;
   const mwid = 200;
+
   for (let i = xmin; i < xmax; i += xstep) {
     const i1 = Math.floor(i / xstep);
     planmtx[i1] = planmtx[i1] || 0;
@@ -338,28 +339,28 @@ function mountplanner(xmin: number, xmax: number) {
     }
   }
 
-  for (let i = xmin; i < xmax; i += xstep) {
-    if (planmtx[Math.floor(i / xstep)] == 0) {
-      if (Math.random() < 0.01) {
-        for (let j = 0; j < 4 * Math.random(); j++) {
-          const r = {
-            tag: 'flatmount',
-            x: i + 2 * (Math.random() - 0.5) * 700,
-            y: 700 - j * 50,
-            h: ns(i),
-          };
-          chadd(r);
-        }
-      }
-    }
-  }
+  // for (let i = xmin; i < xmax; i += xstep) {
+  //   if (planmtx[Math.floor(i / xstep)] == 0) {
+  //     if (Math.random() < 0.01) {
+  //       for (let j = 0; j < 4 * Math.random(); j++) {
+  //         const r = {
+  //           tag: 'flatmount',
+  //           x: i + 2 * (Math.random() - 0.5) * 700,
+  //           y: 700 - j * 50,
+  //           h: ns(i),
+  //         };
+  //         chadd(r);
+  //       }
+  //     }
+  //   }
+  // }
 
-  for (let i = xmin; i < xmax; i += xstep) {
-    if (Math.random() < 0.2) {
-      const r = { tag: 'boat', x: i, y: 300 + Math.random() * 390 };
-      chadd(r, 400);
-    }
-  }
+  // for (let i = xmin; i < xmax; i += xstep) {
+  //   if (Math.random() < 0.2) {
+  //     const r = { tag: 'boat', x: i, y: 300 + Math.random() * 390 };
+  //     chadd(r, 400);
+  //   }
+  // }
 
   return reg;
 }

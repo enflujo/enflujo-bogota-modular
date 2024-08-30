@@ -1,8 +1,9 @@
-import { stroke } from '../utilidades/cosas';
-import { poly } from '../utilidades/Util';
-import { hat02, man, stick01 } from './Man';
+import type { ArgsBarco } from '@/tipos';
+import { stroke } from '@/utilidades/cosas';
+import { poly } from '@/utilidades/Util';
+import { hat02, man, stick01 } from '@/componentes/Man';
 
-export default (xoff: number, yoff: number, args?: { len?: number; sca?: number; fli?: boolean }) => {
+export default (xoff: number, yoff: number, args?: ArgsBarco) => {
   const predeterminados = { len: 120, sca: 1, fli: false };
   const { len, sca, fli } = { ...predeterminados, ...args };
   let canv = '';
@@ -31,7 +32,7 @@ export default (xoff: number, yoff: number, args?: { len?: number; sca?: number;
   canv += stroke(
     plist.map((v) => [xoff + v[0], yoff + v[1]]),
     {
-      wid: 1,
+      ancho: 1,
       fun: (x) => Math.sin(x * Math.PI * 2),
       col: 'rgba(100,100,100,0.4)',
     }

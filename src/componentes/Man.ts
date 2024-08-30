@@ -1,7 +1,7 @@
-import type { Punto } from '../tipos';
-import { div, stroke } from '../utilidades/cosas';
-import { noise } from '../utilidades/Perlin';
-import { bezmh, distance, normRand, poly } from '../utilidades/Util';
+import type { Punto } from '@/tipos';
+import { div, stroke } from '@/utilidades/cosas';
+import { noise } from '@/utilidades/Perlin';
+import { bezmh, distance, normRand, poly } from '@/utilidades/Util';
 
 const expand = (ptlist: Punto[], wfun: (x: number) => number) => {
   const vtxlist0 = [];
@@ -74,7 +74,7 @@ function hat01(p0: Punto, p1: Punto, args?: { fli?: boolean }) {
   }
   canv += poly(tranpoly(p0, p1, f(qlist1)), {
     str: 'rgba(100,100,100,0.8)',
-    wid: 1,
+    ancho: 1,
   });
 
   return canv;
@@ -123,7 +123,7 @@ export function stick01(p0: Punto, p1: Punto, args) {
   }
   canv += poly(tranpoly(p0, p1, f(qlist1)), {
     str: 'rgba(100,100,100,0.5)',
-    wid: 1,
+    ancho: 1,
   });
 
   return canv;
@@ -225,11 +225,11 @@ export function man(x: number, y: number, args) {
       fil: 'white',
     });
     canv += stroke(tlist1.map(toGlobal), {
-      wid: 1,
+      ancho: 1,
       col: 'rgba(100,100,100,0.5)',
     });
     canv += stroke(tlist2.map(toGlobal), {
-      wid: 1,
+      ancho: 1,
       col: 'rgba(100,100,100,0.6)',
     });
 

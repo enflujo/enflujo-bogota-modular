@@ -1,26 +1,25 @@
-import { div, stroke, texture } from '../utilidades/cosas';
-import { noise } from '../utilidades/Perlin';
-import { midPt, triangulate } from '../utilidades/Polytools';
-import { normRand, poly, randChoice } from '../utilidades/Util';
-import { arch01 } from './Arch';
+import { div, stroke, texture } from '@/utilidades/cosas';
+import { noise } from '@/utilidades/Perlin';
+import { normRand, poly, randChoice } from '@/utilidades/Util';
 import roca from './roca';
 import { tree02, tree04, tree05, tree06, tree07, tree08 } from './Tree';
+import { arch01 } from './Arch';
 
 export function flatMount(
   xoff: number,
   yoff: number,
   seed = 0,
-  args?: { hei?: number; wid?: number; tex?: number; cho?: number; ret?: number }
+  args?: { alto?: number; ancho?: number; tex?: number; cho?: number; ret?: number }
 ) {
   const predeterminados = {
-    hei: 40 + Math.random() * 400,
-    wid: 400 + Math.random() * 200,
+    alto: 40 + Math.random() * 400,
+    ancho: 400 + Math.random() * 200,
     tex: 80,
     cho: 0.5,
     ret: 0,
   };
 
-  const { hei, wid, tex, cho } = { ...predeterminados, ...args };
+  const { alto, ancho, tex, cho } = { ...predeterminados, ...args };
 
   let canv = '';
   const ptlist: number[][] = [];
@@ -38,8 +37,8 @@ export function flatMount(
       let y = Math.cos(x * 2) + 1;
       y *= noise(x + 10, j * 0.1, seed);
       const p = 1 - (j / reso[0]) * 0.6;
-      const nx = (x / Math.PI) * wid * p;
-      let ny = -y * hei * p + hoff;
+      const nx = (x / Math.PI) * ancho * p;
+      let ny = -y * alto * p + hoff;
       const h = 100;
 
       if (ny < -h * cho + hoff) {
@@ -67,14 +66,14 @@ export function flatMount(
   //OUTLINE
   canv += stroke(
     ptlist[0].map((x) => [x[0] + xoff, x[1] + yoff]),
-    { col: 'rgba(100,100,100,0.3)', noi: 1, wid: 3 }
+    { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
 
   canv += texture(ptlist, {
     xof: xoff,
     yof: yoff,
     tex: tex,
-    wid: 2,
+    ancho: 2,
     dis: function () {
       if (Math.random() > 0.5) {
         return 0.1 + 0.4 * Math.random();
@@ -119,7 +118,7 @@ export function flatMount(
     grlist[i][0] *= 1 - v + noise(grlist[i][1] * 0.5) * v;
   }
   /*       for (var i = 0; i < ptlist.length; i++){
-        canv += poly(ptlist[i],{xof:xoff,yof:yoff,str:"red",fil:"none",wid:2})
+        canv += poly(ptlist[i],{xof:xoff,yof:yoff,str:"red",fil:"none",ancho:2})
       }
  */
   canv += poly(grlist, {
@@ -127,12 +126,12 @@ export function flatMount(
     yof: yoff,
     str: 'none',
     fil: 'white',
-    wid: 2,
+    ancho: 2,
   });
   canv += stroke(
     grlist.map((x) => [x[0] + xoff, x[1] + yoff]),
     {
-      wid: 3,
+      ancho: 3,
       col: 'rgba(100,100,100,0.2)',
     }
   );
@@ -176,8 +175,8 @@ export function flatDec(xoff, yoff, grbd) {
       yoff + (grbd.ymin + grbd.ymax) / 2 + normRand(-10, 10) + 10,
       Math.random() * 100,
       {
-        wid: 10 + Math.random() * 20,
-        hei: 10 + Math.random() * 20,
+        ancho: 10 + Math.random() * 20,
+        alto: 10 + Math.random() * 20,
         sha: 2,
       }
     );
@@ -187,7 +186,7 @@ export function flatDec(xoff, yoff, grbd) {
     var yr = yoff + (grbd.ymin + grbd.ymax) / 2 + normRand(-5, 5) + 20;
     for (var k = 0; k < 2 + Math.random() * 3; k++) {
       canv += tree08(xr + Math.min(Math.max(normRand(-30, 30), grbd.xmin), grbd.xmax), yr, {
-        hei: 60 + Math.random() * 40,
+        alto: 60 + Math.random() * 40,
       });
     }
   }
@@ -199,8 +198,8 @@ export function flatDec(xoff, yoff, grbd) {
         yoff + (grbd.ymin + grbd.ymax) / 2 + normRand(-5, 5) + 20,
         Math.random() * 100,
         {
-          wid: 50 + Math.random() * 20,
-          hei: 40 + Math.random() * 20,
+          ancho: 50 + Math.random() * 20,
+          alto: 40 + Math.random() * 20,
           sha: 5,
         }
       );
@@ -213,7 +212,7 @@ export function flatDec(xoff, yoff, grbd) {
     var xmax = grbd.xmin * (1 - pmax) + grbd.xmax * pmax;
     for (var i = xmin; i < xmax; i += 30) {
       canv += tree05(xoff + i + 20 * normRand(-1, 1), yoff + (grbd.ymin + grbd.ymax) / 2 + 20, {
-        hei: 100 + Math.random() * 200,
+        alto: 100 + Math.random() * 200,
       });
     }
     for (var j = 0; j < Math.random() * 4; j++) {
@@ -222,8 +221,8 @@ export function flatDec(xoff, yoff, grbd) {
         yoff + (grbd.ymin + grbd.ymax) / 2 + normRand(-5, 5) + 20,
         Math.random() * 100,
         {
-          wid: 50 + Math.random() * 20,
-          hei: 40 + Math.random() * 20,
+          ancho: 50 + Math.random() * 20,
+          alto: 40 + Math.random() * 20,
           sha: 5,
         }
       );
@@ -240,8 +239,8 @@ export function flatDec(xoff, yoff, grbd) {
           yoff + yr + normRand(-5, 5) + 20,
           j * i * Math.random() * 100,
           {
-            wid: 50 + Math.random() * 20,
-            hei: 40 + Math.random() * 20,
+            ancho: 50 + Math.random() * 20,
+            alto: 40 + Math.random() * 20,
             sha: 5,
           }
         );
@@ -250,7 +249,7 @@ export function flatDec(xoff, yoff, grbd) {
   } else if (tt == 3) {
     for (let i = 0; i < +randChoice([1, 1, 1, 1, 2, 2, 3]); i++) {
       canv += tree06(xoff + normRand(grbd.xmin, grbd.xmax), yoff + (grbd.ymin + grbd.ymax) / 2, {
-        hei: 60 + Math.random() * 60,
+        alto: 60 + Math.random() * 60,
       });
     }
   } else if (tt == 4) {
@@ -260,7 +259,7 @@ export function flatDec(xoff, yoff, grbd) {
     const xmax = grbd.xmin * (1 - pmax) + grbd.xmax * pmax;
     for (let i = xmin; i < xmax; i += 20) {
       canv += tree07(xoff + i + 20 * normRand(-1, 1), yoff + (grbd.ymin + grbd.ymax) / 2 + normRand(-1, 1) + 0, {
-        hei: normRand(40, 80),
+        alto: normRand(40, 80),
       });
     }
   }
@@ -272,8 +271,8 @@ export function flatDec(xoff, yoff, grbd) {
   const ts = randChoice([0, 0, 0, 0, 1]);
   if (ts == 1 && tt != 4) {
     canv += arch01(xoff + normRand(grbd.xmin, grbd.xmax), yoff + (grbd.ymin + grbd.ymax) / 2 + 20, Math.random(), {
-      wid: normRand(160, 200),
-      hei: normRand(80, 100),
+      ancho: normRand(160, 200),
+      alto: normRand(80, 100),
       per: Math.random(),
     });
   }

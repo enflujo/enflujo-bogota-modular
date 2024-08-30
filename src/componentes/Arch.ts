@@ -1,220 +1,12 @@
-import { Punto } from '../tipos';
-import { div, stroke, texture } from '../utilidades/cosas';
-import { noise } from '../utilidades/Perlin';
-import { midPt } from '../utilidades/Polytools';
-import { normRand, poly, randChoice, wtrand } from '../utilidades/Util';
-import { man } from './Man';
-
-const flip = (ptlist: number[][] | number[][][], axis = 0) => {
-  for (let i = 0; i < ptlist.length; i++) {
-    if (ptlist[i].length > 0) {
-      if (typeof ptlist[i][0] == 'object') {
-        for (let j = 0; j < ptlist[i].length; j++) {
-          ptlist[i][j][0] = axis - (ptlist[i][j][0] - axis);
-        }
-      } else {
-        ptlist[i][0] = axis - (ptlist[i][0] - axis);
-      }
-    }
-  }
-  return ptlist;
-};
-
-const hut = (xoff: number, yoff: number, args: { hei: number; wid: number; tex: number }) => {
-  const predeterminados = { hei: 40, wid: 180, tex: 300 };
-  const { hei, wid, tex } = { ...predeterminados, ...args };
-  const reso = [10, 10];
-  const ptlist: number[][][] = [];
-
-  for (let i = 0; i < reso[0]; i++) {
-    ptlist.push([]);
-    const heir = hei + hei * 0.2 * Math.random();
-
-    for (let j = 0; j < reso[1]; j++) {
-      const nx = wid * (i / (reso[0] - 1) - 0.5) * Math.pow(j / (reso[1] - 1), 0.7);
-      const ny = heir * (j / (reso[1] - 1));
-      ptlist[ptlist.length - 1].push([nx, ny]);
-    }
-  }
-
-  let canv = '';
-
-  canv += poly(ptlist[0].slice(0, -1).concat(ptlist[ptlist.length - 1].slice(0, -1).reverse()), {
-    xof: xoff,
-    yof: yoff,
-    fil: 'white',
-    str: 'none',
-  });
-
-  canv += poly(ptlist[0], {
-    xof: xoff,
-    yof: yoff,
-    fil: 'none',
-    str: 'rgba(100,100,100,0.3)',
-    wid: 2,
-  });
-
-  canv += poly(ptlist[ptlist.length - 1], {
-    xof: xoff,
-    yof: yoff,
-    fil: 'none',
-    str: 'rgba(100,100,100,0.3)',
-    wid: 2,
-  });
-
-  canv += texture(ptlist, {
-    xof: xoff,
-    yof: yoff,
-    tex: tex,
-    wid: 1,
-    len: 0.25,
-    col: () => 'rgba(120,120,120,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
-    dis: () => wtrand((a) => a * a),
-    noi: () => 5,
-  });
-
-  /** Marcar techo de casitas con líneas rojas */
-  // for (let i = 0; i < reso[0]; i++) {
-  // canv += poly(ptlist[i], { xof: xoff, yof: yoff, fil: 'none', str: 'red', wid: 2 });
-  // }
-
-  return canv;
-};
-
-var box = function (xoff, yoff, args) {
-  var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 20;
-  var wid = args.wid != undefined ? args.wid : 120;
-  var rot = args.rot != undefined ? args.rot : 0.7;
-  var per = args.per != undefined ? args.per : 4;
-  var tra = args.tra != undefined ? args.tra : true;
-  var bot = args.bot != undefined ? args.bot : true;
-  var wei = args.wei != undefined ? args.wei : 3;
-  var dec = args.dec != undefined ? args.dec : () => [];
-
-  const mid = -wid * 0.5 + wid * rot;
-  const bmid = -wid * 0.5 + wid * (1 - rot);
-  let ptlist = [];
-  ptlist.push(
-    div(
-      [
-        [-wid * 0.5, -hei],
-        [-wid * 0.5, 0],
-      ],
-      5
-    )
-  );
-  ptlist.push(
-    div(
-      [
-        [wid * 0.5, -hei],
-        [wid * 0.5, 0],
-      ],
-      5
-    )
-  );
-  if (bot) {
-    ptlist.push(
-      div(
-        [
-          [-wid * 0.5, 0],
-          [mid, per],
-        ],
-        5
-      )
-    );
-    ptlist.push(
-      div(
-        [
-          [wid * 0.5, 0],
-          [mid, per],
-        ],
-        5
-      )
-    );
-  }
-  ptlist.push(
-    div(
-      [
-        [mid, -hei],
-        [mid, per],
-      ],
-      5
-    )
-  );
-  if (tra) {
-    if (bot) {
-      ptlist.push(
-        div(
-          [
-            [-wid * 0.5, 0],
-            [bmid, -per],
-          ],
-          5
-        )
-      );
-      ptlist.push(
-        div(
-          [
-            [wid * 0.5, 0],
-            [bmid, -per],
-          ],
-          5
-        )
-      );
-    }
-    ptlist.push(
-      div(
-        [
-          [bmid, -hei],
-          [bmid, -per],
-        ],
-        5
-      )
-    );
-  }
-
-  const surf = (rot < 0.5) * 2 - 1;
-  ptlist = ptlist.concat(
-    dec({
-      pul: [surf * wid * 0.5, -hei],
-      pur: [mid, -hei + per],
-      pdl: [surf * wid * 0.5, 0],
-      pdr: [mid, per],
-    })
-  );
-
-  const polist = [
-    [-wid * 0.5, -hei],
-    [wid * 0.5, -hei],
-    [wid * 0.5, 0],
-    [mid, per],
-    [-wid * 0.5, 0],
-  ];
-
-  let canv = '';
-  if (!tra) {
-    canv += poly(polist, {
-      xof: xoff,
-      yof: yoff,
-      str: 'none',
-      fil: 'white',
-    });
-  }
-
-  for (let i = 0; i < ptlist.length; i++) {
-    canv += stroke(
-      ptlist[i].map((x) => [x[0] + xoff, x[1] + yoff]),
-      {
-        col: 'rgba(100,100,100,0.4)',
-        noi: 1,
-        wid: wei,
-        fun: (x: number) => 1,
-      }
-    );
-  }
-  return canv;
-};
+import { invertir } from '@/utilidades/ayudas';
+import type { Punto } from '@/tipos';
+import { div, stroke } from '@/utilidades/cosas';
+import { noise } from '@/utilidades/Perlin';
+import { midPt } from '@/utilidades/Polytools';
+import { normRand, poly, randChoice } from '@/utilidades/Util';
+import caja from '@/componentes/caja';
+import chozaTecho from '@/componentes/chozaTecho';
+import { man } from '@/componentes/Man';
 
 var deco = function (style, args) {
   var args = args != undefined ? args : {};
@@ -282,8 +74,8 @@ var deco = function (style, args) {
 
 var rail = function (xoff, yoff, seed, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 20;
-  var wid = args.wid != undefined ? args.wid : 180;
+  var alto = args.alto != undefined ? args.alto : 20;
+  var ancho = args.ancho != undefined ? args.ancho : 180;
   var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 4;
   var seg = args.seg != undefined ? args.seg : 4;
@@ -293,15 +85,15 @@ var rail = function (xoff, yoff, seed, args) {
 
   seed = seed != undefined ? seed : 0;
 
-  var mid = -wid * 0.5 + wid * rot;
-  var bmid = -wid * 0.5 + wid * (1 - rot);
+  var mid = -ancho * 0.5 + ancho * rot;
+  var bmid = -ancho * 0.5 + ancho * (1 - rot);
   var ptlist = [];
 
   if (fro) {
     ptlist.push(
       div(
         [
-          [-wid * 0.5, 0],
+          [-ancho * 0.5, 0],
           [mid, per],
         ],
         seg
@@ -311,7 +103,7 @@ var rail = function (xoff, yoff, seed, args) {
       div(
         [
           [mid, per],
-          [wid * 0.5, 0],
+          [ancho * 0.5, 0],
         ],
         seg
       )
@@ -321,7 +113,7 @@ var rail = function (xoff, yoff, seed, args) {
     ptlist.push(
       div(
         [
-          [-wid * 0.5, 0],
+          [-ancho * 0.5, 0],
           [bmid, -per],
         ],
         seg
@@ -331,7 +123,7 @@ var rail = function (xoff, yoff, seed, args) {
       div(
         [
           [bmid, -per],
-          [wid * 0.5, 0],
+          [ancho * 0.5, 0],
         ],
         seg
       )
@@ -341,8 +133,8 @@ var rail = function (xoff, yoff, seed, args) {
     ptlist.push(
       div(
         [
-          [-wid * 0.5, -hei],
-          [mid, -hei + per],
+          [-ancho * 0.5, -alto],
+          [mid, -alto + per],
         ],
         seg
       )
@@ -350,8 +142,8 @@ var rail = function (xoff, yoff, seed, args) {
     ptlist.push(
       div(
         [
-          [mid, -hei + per],
-          [wid * 0.5, -hei],
+          [mid, -alto + per],
+          [ancho * 0.5, -alto],
         ],
         seg
       )
@@ -361,8 +153,8 @@ var rail = function (xoff, yoff, seed, args) {
     ptlist.push(
       div(
         [
-          [-wid * 0.5, -hei],
-          [bmid, -hei - per],
+          [-ancho * 0.5, -alto],
+          [bmid, -alto - per],
         ],
         seg
       )
@@ -370,8 +162,8 @@ var rail = function (xoff, yoff, seed, args) {
     ptlist.push(
       div(
         [
-          [bmid, -hei - per],
-          [wid * 0.5, -hei],
+          [bmid, -alto - per],
+          [ancho * 0.5, -alto],
         ],
         seg
       )
@@ -387,9 +179,9 @@ var rail = function (xoff, yoff, seed, args) {
   for (var i = 0; i < ptlist.length / 2; i++) {
     for (var j = 0; j < ptlist[i].length; j++) {
       //ptlist.push(div([ptlist[i][j],ptlist[4+i][j]],2))
-      ptlist[i][j][1] += (noise(i, j * 0.5, seed) - 0.5) * hei;
+      ptlist[i][j][1] += (noise(i, j * 0.5, seed) - 0.5) * alto;
       ptlist[(ptlist.length / 2 + i) % ptlist.length][j % ptlist[(ptlist.length / 2 + i) % ptlist.length].length][1] +=
-        (noise(i + 0.5, j * 0.5, seed) - 0.5) * hei;
+        (noise(i + 0.5, j * 0.5, seed) - 0.5) * alto;
       var ln = div(
         [
           ptlist[i][j],
@@ -397,13 +189,13 @@ var rail = function (xoff, yoff, seed, args) {
         ],
         2
       );
-      ln[0][0] += (Math.random() - 0.5) * hei * 0.5;
+      ln[0][0] += (Math.random() - 0.5) * alto * 0.5;
       canv += poly(ln, {
         xof: xoff,
         yof: yoff,
         fil: 'none',
         str: 'rgba(100,100,100,0.5)',
-        wid: 2,
+        ancho: 2,
       });
     }
   }
@@ -414,7 +206,7 @@ var rail = function (xoff, yoff, seed, args) {
       {
         col: 'rgba(100,100,100,0.5)',
         noi: 0.5,
-        wid: wei,
+        ancho: wei,
         fun: (x: number) => 1,
       }
     );
@@ -424,29 +216,29 @@ var rail = function (xoff, yoff, seed, args) {
 
 var roof = function (xoff, yoff, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 20;
-  var wid = args.wid != undefined ? args.wid : 120;
+  var alto = args.alto != undefined ? args.alto : 20;
+  var ancho = args.ancho != undefined ? args.ancho : 120;
   var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 4;
   var cor = args.cor != undefined ? args.cor : 5;
   var wei = args.wei != undefined ? args.wei : 3;
   var pla = args.pla != undefined ? args.pla : [0, ''];
 
-  const opf = (ptlist) => (rot < 0.5 ? flip(ptlist) : ptlist);
+  const opf = (puntos: Punto[]) => (rot < 0.5 ? invertir(puntos) : puntos);
 
   var rrot = rot < 0.5 ? 1 - rot : rot;
 
-  var mid = -wid * 0.5 + wid * rrot;
-  var bmid = -wid * 0.5 + wid * (1 - rrot);
-  var quat = (mid + wid * 0.5) * 0.5 - mid;
+  var mid = -ancho * 0.5 + ancho * rrot;
+  var bmid = -ancho * 0.5 + ancho * (1 - rrot);
+  var quat = (mid + ancho * 0.5) * 0.5 - mid;
 
   var ptlist = [];
   ptlist.push(
     div(
       opf([
-        [-wid * 0.5 + quat, -hei - per / 2],
-        [-wid * 0.5 + quat * 0.5, -hei / 2 - per / 4],
-        [-wid * 0.5 - cor, 0],
+        [-ancho * 0.5 + quat, -alto - per / 2],
+        [-ancho * 0.5 + quat * 0.5, -alto / 2 - per / 4],
+        [-ancho * 0.5 - cor, 0],
       ]),
       5
     )
@@ -454,9 +246,9 @@ var roof = function (xoff, yoff, args) {
   ptlist.push(
     div(
       opf([
-        [mid + quat, -hei],
-        [(mid + quat + wid * 0.5) / 2, -hei / 2],
-        [wid * 0.5 + cor, 0],
+        [mid + quat, -alto],
+        [(mid + quat + ancho * 0.5) / 2, -alto / 2],
+        [ancho * 0.5 + cor, 0],
       ]),
       5
     )
@@ -464,8 +256,8 @@ var roof = function (xoff, yoff, args) {
   ptlist.push(
     div(
       opf([
-        [mid + quat, -hei],
-        [mid + quat / 2, -hei / 2 + per / 2],
+        [mid + quat, -alto],
+        [mid + quat / 2, -alto / 2 + per / 2],
         [mid + cor, per],
       ]),
       5
@@ -475,7 +267,7 @@ var roof = function (xoff, yoff, args) {
   ptlist.push(
     div(
       opf([
-        [-wid * 0.5 - cor, 0],
+        [-ancho * 0.5 - cor, 0],
         [mid + cor, per],
       ]),
       5
@@ -484,7 +276,7 @@ var roof = function (xoff, yoff, args) {
   ptlist.push(
     div(
       opf([
-        [wid * 0.5 + cor, 0],
+        [ancho * 0.5 + cor, 0],
         [mid + cor, per],
       ]),
       5
@@ -494,8 +286,8 @@ var roof = function (xoff, yoff, args) {
   ptlist.push(
     div(
       opf([
-        [-wid * 0.5 + quat, -hei - per / 2],
-        [mid + quat, -hei],
+        [-ancho * 0.5 + quat, -alto - per / 2],
+        [mid + quat, -alto],
       ]),
       5
     )
@@ -504,10 +296,10 @@ var roof = function (xoff, yoff, args) {
   var canv = '';
 
   var polist = opf([
-    [-wid * 0.5, 0],
-    [-wid * 0.5 + quat, -hei - per / 2],
-    [mid + quat, -hei],
-    [wid * 0.5, 0],
+    [-ancho * 0.5, 0],
+    [-ancho * 0.5 + quat, -alto - per / 2],
+    [mid + quat, -alto],
+    [ancho * 0.5, 0],
     [mid, per],
   ]);
   canv += poly(polist, { xof: xoff, yof: yoff, str: 'none', fil: 'white' });
@@ -518,7 +310,7 @@ var roof = function (xoff, yoff, args) {
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
-        wid: wei,
+        ancho: wei,
         fun: () => 1,
       }
     );
@@ -526,8 +318,8 @@ var roof = function (xoff, yoff, args) {
 
   if (pla[0] == 1) {
     let pp: Punto[] = opf([
-      [mid + quat / 2, -hei / 2 + per / 2],
-      [-wid * 0.5 + quat * 0.5, -hei / 2 - per / 4],
+      [mid + quat / 2, -alto / 2 + per / 2],
+      [-ancho * 0.5 + quat * 0.5, -alto / 2 - per / 4],
     ]);
 
     if (pp[0][0] > pp[1][0]) {
@@ -537,7 +329,7 @@ var roof = function (xoff, yoff, args) {
     const mp = midPt(pp);
     const a = Math.atan2(pp[1][1] - pp[0][1], pp[1][0] - pp[0][0]);
     const adeg = (a * 180) / Math.PI;
-    canv += `<text font-size='${hei * 0.6}' font-family='Verdana' style='fill:rgba(100,100,100,0.9)' text-anchor='middle' transform='translate(${mp[0] + xoff},${mp[1] + yoff}) rotate(${adeg})'>${pla[1]}</text>`;
+    canv += `<text font-size='${alto * 0.6}' font-family='Verdana' style='fill:rgba(100,100,100,0.9)' text-anchor='middle' transform='translate(${mp[0] + xoff},${mp[1] + yoff}) rotate(${adeg})'>${pla[1]}</text>`;
   }
 
   return canv;
@@ -545,8 +337,8 @@ var roof = function (xoff, yoff, args) {
 
 var pagroof = function (xoff, yoff, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 20;
-  var wid = args.wid != undefined ? args.wid : 120;
+  var alto = args.alto != undefined ? args.alto : 20;
+  var ancho = args.ancho != undefined ? args.ancho : 120;
   var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 4;
   var cor = args.cor != undefined ? args.cor : 10;
@@ -554,18 +346,18 @@ var pagroof = function (xoff, yoff, args) {
   var wei = args.wei != undefined ? args.wei : 3;
 
   var ptlist = [];
-  var polist = [[0, -hei]];
+  var polist = [[0, -alto]];
   var canv = '';
   for (var i = 0; i < sid; i++) {
-    var fx = wid * ((i * 1.0) / (sid - 1) - 0.5);
+    var fx = ancho * ((i * 1.0) / (sid - 1) - 0.5);
     var fy = per * (1 - Math.abs((i * 1.0) / (sid - 1) - 0.5) * 2);
-    var fxx = (wid + cor) * ((i * 1.0) / (sid - 1) - 0.5);
+    var fxx = (ancho + cor) * ((i * 1.0) / (sid - 1) - 0.5);
     if (i > 0) {
       ptlist.push([ptlist[ptlist.length - 1][2], [fxx, fy]]);
     }
     ptlist.push([
-      [0, -hei],
-      [fx * 0.5, (-hei + fy) * 0.5],
+      [0, -alto],
+      [fx * 0.5, (-alto + fy) * 0.5],
       [fxx, fy],
     ]);
     polist.push([fxx, fy]);
@@ -578,7 +370,7 @@ var pagroof = function (xoff, yoff, args) {
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
-        wid: wei,
+        ancho: wei,
         fun: (x) => 1,
       }
     );
@@ -587,24 +379,26 @@ var pagroof = function (xoff, yoff, args) {
   return canv;
 };
 
-export function arch01(xoff, yoff, seed, args) {
+export function arch01(xoff: number, yoff: number, seed = 0, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 70;
-  var wid = args.wid != undefined ? args.wid : 180;
+  var alto = args.alto != undefined ? args.alto : 70;
+  var ancho = args.ancho != undefined ? args.ancho : 180;
   var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 5;
 
   seed = seed != undefined ? seed : 0;
 
   var p = 0.4 + Math.random() * 0.2;
-  var h0 = hei * p;
-  var h1 = hei * (1 - p);
+  var h0 = alto * p;
+  var h1 = alto * (1 - p);
 
   var canv = '';
-  canv += hut(xoff, yoff - hei, { hei: h0, wid: wid });
-  canv += box(xoff, yoff, {
-    hei: h1,
-    wid: (wid * 2) / 3,
+
+  canv += chozaTecho(xoff, yoff - alto, { alto: h0, ancho: ancho });
+
+  canv += caja(xoff, yoff, {
+    alto: h1,
+    ancho: (ancho * 2) / 3,
     per: per,
     bot: false,
   });
@@ -612,24 +406,25 @@ export function arch01(xoff, yoff, seed, args) {
   canv += rail(xoff, yoff, seed, {
     tra: true,
     fro: false,
-    hei: 10,
-    wid: wid,
+    alto: 10,
+    ancho: ancho,
     per: per * 2,
     seg: (3 + Math.random() * 3) | 0,
   });
 
   var mcnt = randChoice([0, 1, 1, 2]);
+
   if (mcnt == 1) {
-    canv += man(xoff + normRand(-wid / 3, wid / 3), yoff, {
+    canv += man(xoff + normRand(-ancho / 3, ancho / 3), yoff, {
       fli: randChoice([true, false]),
       sca: 0.42,
     });
   } else if (mcnt == 2) {
-    canv += man(xoff + normRand(-wid / 4, -wid / 5), yoff, {
+    canv += man(xoff + normRand(-ancho / 4, -ancho / 5), yoff, {
       fli: false,
       sca: 0.42,
     });
-    canv += man(xoff + normRand(wid / 5, wid / 4), yoff, {
+    canv += man(xoff + normRand(ancho / 5, ancho / 4), yoff, {
       fli: true,
       sca: 0.42,
     });
@@ -637,8 +432,8 @@ export function arch01(xoff, yoff, seed, args) {
   canv += rail(xoff, yoff, seed, {
     tra: false,
     fro: true,
-    hei: 10,
-    wid: wid,
+    alto: 10,
+    ancho: ancho,
     per: per * 2,
     seg: (3 + Math.random() * 3) | 0,
   });
@@ -648,8 +443,8 @@ export function arch01(xoff, yoff, seed, args) {
 
 export function arch02(xoff, yoff, seed, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 10;
-  var wid = args.wid != undefined ? args.wid : 50;
+  var alto = args.alto != undefined ? args.alto : 10;
+  var ancho = args.ancho != undefined ? args.ancho : 50;
   var rot = args.rot != undefined ? args.rot : 0.3;
   var per = args.per != undefined ? args.per : 5;
   var sto = args.sto != undefined ? args.sto : 3;
@@ -661,14 +456,14 @@ export function arch02(xoff, yoff, seed, args) {
 
   var hoff = 0;
   for (var i = 0; i < sto; i++) {
-    canv += box(xoff, yoff - hoff, {
+    canv += caja(xoff, yoff - hoff, {
       tra: false,
-      hei: hei,
-      wid: wid * Math.pow(0.85, i),
+      alto: alto,
+      ancho: ancho * Math.pow(0.85, i),
       rot: rot,
       wei: 1.5,
       per: per,
-      dec: function (a) {
+      dec: (a) => {
         return deco(
           sty,
           Object.assign({}, a, {
@@ -680,8 +475,8 @@ export function arch02(xoff, yoff, seed, args) {
     });
     canv += rai
       ? rail(xoff, yoff - hoff, i * 0.2, {
-          wid: wid * Math.pow(0.85, i) * 1.1,
-          hei: hei / 2,
+          ancho: ancho * Math.pow(0.85, i) * 1.1,
+          alto: alto / 2,
           per: per,
           rot: rot,
           wei: 0.5,
@@ -692,24 +487,24 @@ export function arch02(xoff, yoff, seed, args) {
     if (sto == 1 && Math.random() < 1 / 3) {
       pla = [1, 'Pizza Hut'];
     }
-    canv += roof(xoff, yoff - hoff - hei, {
-      hei: hei,
-      wid: wid * Math.pow(0.9, i),
+    canv += roof(xoff, yoff - hoff - alto, {
+      alto: alto,
+      ancho: ancho * Math.pow(0.9, i),
       rot: rot,
       wei: 1.5,
       per: per,
       pla: pla,
     });
 
-    hoff += hei * 1.5;
+    hoff += alto * 1.5;
   }
   return canv;
 }
 
 export function arch03(xoff, yoff, seed, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 10;
-  var wid = args.wid != undefined ? args.wid : 50;
+  var alto = args.alto != undefined ? args.alto : 10;
+  var ancho = args.ancho != undefined ? args.ancho : 50;
   var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 5;
   var sto = args.sto != undefined ? args.sto : 7;
@@ -719,79 +514,76 @@ export function arch03(xoff, yoff, seed, args) {
 
   var hoff = 0;
   for (var i = 0; i < sto; i++) {
-    canv += box(xoff, yoff - hoff, {
+    canv += caja(xoff, yoff - hoff, {
       tra: false,
-      hei: hei,
-      wid: wid * Math.pow(0.85, i),
+      alto: alto,
+      ancho: ancho * Math.pow(0.85, i),
       rot: rot,
       wei: 1.5,
       per: per / 2,
-      dec: function (a) {
+      dec: (a) => {
         return deco(1, Object.assign({}, a, { hsp: [1, 4], vsp: [1, 2] }));
       },
     });
     canv += rail(xoff, yoff - hoff, i * 0.2, {
       seg: 5,
-      wid: wid * Math.pow(0.85, i) * 1.1,
-      hei: hei / 2,
+      ancho: ancho * Math.pow(0.85, i) * 1.1,
+      alto: alto / 2,
       per: per / 2,
       rot: rot,
       wei: 0.5,
       tra: false,
     });
-    canv += pagroof(xoff, yoff - hoff - hei, {
-      hei: hei * 1.5,
-      wid: wid * Math.pow(0.9, i),
+    canv += pagroof(xoff, yoff - hoff - alto, {
+      alto: alto * 1.5,
+      ancho: ancho * Math.pow(0.9, i),
       rot: rot,
       wei: 1.5,
       per: per,
     });
-    hoff += hei * 1.5;
+    hoff += alto * 1.5;
   }
   return canv;
 }
 
-export function arch04(xoff, yoff, seed, args) {
+export function arch04(xoff: number, yoff: number, seed = 0, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 15;
-  var wid = args.wid != undefined ? args.wid : 30;
+  var alto = args.alto != undefined ? args.alto : 15;
+  var ancho = args.ancho != undefined ? args.ancho : 30;
   var rot = args.rot != undefined ? args.rot : 0.7;
   var per = args.per != undefined ? args.per : 5;
   var sto = args.sto != undefined ? args.sto : 2;
 
-  seed = seed != undefined ? seed : 0;
   var canv = '';
 
   var hoff = 0;
   for (var i = 0; i < sto; i++) {
-    canv += box(xoff, yoff - hoff, {
+    canv += caja(xoff, yoff - hoff, {
       tra: true,
-      hei: hei,
-      wid: wid * Math.pow(0.85, i),
+      alto: alto,
+      ancho: ancho * Math.pow(0.85, i),
       rot: rot,
       wei: 1.5,
       per: per / 2,
-      dec: function (a) {
-        return [];
-      },
+      dec: () => [],
     });
     canv += rail(xoff, yoff - hoff, i * 0.2, {
       seg: 3,
-      wid: wid * Math.pow(0.85, i) * 1.2,
-      hei: hei / 3,
+      ancho: ancho * Math.pow(0.85, i) * 1.2,
+      alto: alto / 3,
       per: per / 2,
       rot: rot,
       wei: 0.5,
       tra: true,
     });
-    canv += pagroof(xoff, yoff - hoff - hei, {
-      hei: hei * 1,
-      wid: wid * Math.pow(0.9, i),
+    canv += pagroof(xoff, yoff - hoff - alto, {
+      alto: alto * 1,
+      ancho: ancho * Math.pow(0.9, i),
       rot: rot,
       wei: 1.5,
       per: per,
     });
-    hoff += hei * 1.2;
+    hoff += alto * 1.2;
   }
   return canv;
 }

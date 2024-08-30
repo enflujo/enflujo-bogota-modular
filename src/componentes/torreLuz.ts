@@ -1,55 +1,56 @@
-import { div, stroke } from '../utilidades/cosas';
+import type { Punto } from '@/tipos';
+import { div, stroke } from '@/utilidades/cosas';
 
-export default (xoff: number, yoff: number, args?: { hei?: number; wid?: number }) => {
-  const predeterminados = { hei: 100, wid: 20 };
-  const { hei, wid } = { ...predeterminados, ...args };
+export default (xoff: number, yoff: number, args?: { alto?: number; ancho?: number }) => {
+  const predeterminados = { alto: 100, ancho: 20 };
+  const { alto, ancho } = { ...predeterminados, ...args };
 
-  let canv = '';
-  const toGlobal = (v: number[]) => [v[0] + xoff, v[1] + yoff];
+  let svg = '';
+  const toGlobal = (v: Punto): Punto => [v[0] + xoff, v[1] + yoff];
 
-  const quickstroke = (pl: number[][]) => {
-    return stroke(div(pl, 5).map(toGlobal), {
-      wid: 1,
+  const quickstroke = (punto: Punto[]) => {
+    return stroke(div(punto, 5).map(toGlobal), {
+      ancho: 1,
       fun: () => 0.5,
       col: 'rgba(100,100,100,0.4)',
     });
   };
 
-  const p00 = [-wid * 0.05, -hei];
-  const p01 = [wid * 0.05, -hei];
-  const p10 = [-wid * 0.1, -hei * 0.9];
-  const p11 = [wid * 0.1, -hei * 0.9];
-  const p20 = [-wid * 0.2, -hei * 0.5];
-  const p21 = [wid * 0.2, -hei * 0.5];
-  const p30 = [-wid * 0.5, 0];
-  const p31 = [wid * 0.5, 0];
-  const bch = [
+  const p00: Punto = [-ancho * 0.05, -alto];
+  const p01: Punto = [ancho * 0.05, -alto];
+  const p10: Punto = [-ancho * 0.1, -alto * 0.9];
+  const p11: Punto = [ancho * 0.1, -alto * 0.9];
+  const p20: Punto = [-ancho * 0.2, -alto * 0.5];
+  const p21: Punto = [ancho * 0.2, -alto * 0.5];
+  const p30: Punto = [-ancho * 0.5, 0];
+  const p31: Punto = [ancho * 0.5, 0];
+  const bch: Punto[] = [
     [0.7, -0.85],
     [1, -0.675],
     [0.7, -0.5],
   ];
 
   for (let i = 0; i < bch.length; i++) {
-    canv += quickstroke([
-      [-bch[i][0] * wid, bch[i][1] * hei],
-      [bch[i][0] * wid, bch[i][1] * hei],
+    svg += quickstroke([
+      [-bch[i][0] * ancho, bch[i][1] * alto],
+      [bch[i][0] * ancho, bch[i][1] * alto],
     ]);
-    canv += quickstroke([
-      [-bch[i][0] * wid, bch[i][1] * hei],
-      [0, (bch[i][1] - 0.05) * hei],
+    svg += quickstroke([
+      [-bch[i][0] * ancho, bch[i][1] * alto],
+      [0, (bch[i][1] - 0.05) * alto],
     ]);
-    canv += quickstroke([
-      [bch[i][0] * wid, bch[i][1] * hei],
-      [0, (bch[i][1] - 0.05) * hei],
+    svg += quickstroke([
+      [bch[i][0] * ancho, bch[i][1] * alto],
+      [0, (bch[i][1] - 0.05) * alto],
     ]);
 
-    canv += quickstroke([
-      [-bch[i][0] * wid, bch[i][1] * hei],
-      [-bch[i][0] * wid, (bch[i][1] + 0.1) * hei],
+    svg += quickstroke([
+      [-bch[i][0] * ancho, bch[i][1] * alto],
+      [-bch[i][0] * ancho, (bch[i][1] + 0.1) * alto],
     ]);
-    canv += quickstroke([
-      [bch[i][0] * wid, bch[i][1] * hei],
-      [bch[i][0] * wid, (bch[i][1] + 0.1) * hei],
+    svg += quickstroke([
+      [bch[i][0] * ancho, bch[i][1] * alto],
+      [bch[i][0] * ancho, (bch[i][1] + 0.1) * alto],
     ]);
   }
 
@@ -57,15 +58,15 @@ export default (xoff: number, yoff: number, args?: { hei?: number; wid?: number 
   const l11 = div([p01, p11, p21, p31], 5);
 
   for (let i = 0; i < l10.length - 1; i++) {
-    canv += quickstroke([l10[i], l11[i + 1]]);
-    canv += quickstroke([l11[i], l10[i + 1]]);
+    svg += quickstroke([l10[i], l11[i + 1]]);
+    svg += quickstroke([l11[i], l10[i + 1]]);
   }
 
-  canv += quickstroke([p00, p01]);
-  canv += quickstroke([p10, p11]);
-  canv += quickstroke([p20, p21]);
-  canv += quickstroke([p00, p10, p20, p30]);
-  canv += quickstroke([p01, p11, p21, p31]);
+  svg += quickstroke([p00, p01]);
+  svg += quickstroke([p10, p11]);
+  svg += quickstroke([p20, p21]);
+  svg += quickstroke([p00, p10, p20, p30]);
+  svg += quickstroke([p01, p11, p21, p31]);
 
-  return canv;
+  return svg;
 };

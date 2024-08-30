@@ -1,4 +1,4 @@
-import { Punto } from '../tipos';
+import { Punto } from '@/tipos';
 
 type ArgsTriangulacion = {
   area: number;

@@ -1,18 +1,18 @@
-import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsTwig } from '../tipos';
-import { blob, div, stroke } from '../utilidades/cosas';
-import { noise } from '../utilidades/Perlin';
-import { midPt, triangulate } from '../utilidades/Polytools';
-import { distance, loopNoise, normRand, poly, randChoice, randGaussian } from '../utilidades/Util';
+import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsTwig } from '@/tipos';
+import { blob, div, stroke } from '@/utilidades/cosas';
+import { noise } from '@/utilidades/Perlin';
+import { midPt, triangulate } from '@/utilidades/Polytools';
+import { distance, loopNoise, normRand, poly, randChoice, randGaussian } from '@/utilidades/Util';
 
 export function tree01(x: number, y: number, args: ArgsArbol1) {
   const predeterminados = {
-    hei: 50,
-    wid: 3,
+    alto: 50,
+    ancho: 3,
     col: 'rgba(100,100,100,0.5)',
     noi: 0.5,
   };
 
-  const { hei, wid, col } = { ...predeterminados, ...args };
+  const { alto, ancho, col } = { ...predeterminados, ...args };
 
   let reso = 10;
   const nslist = [];
@@ -35,36 +35,36 @@ export function tree01(x: number, y: number, args: ArgsArbol1) {
 
   for (let i = 0; i < reso; i++) {
     const nx = x;
-    const ny = y - (i * hei) / reso;
+    const ny = y - (i * alto) / reso;
 
     if (i >= reso / 4) {
       for (let j = 0; j < (reso - i) / 5; j++) {
         const [r, g, b] = leafcol;
-        canv += blob(nx + (Math.random() - 0.5) * wid * 1.2 * (reso - i), ny + (Math.random() - 0.5) * wid, {
+        canv += blob(nx + (Math.random() - 0.5) * ancho * 1.2 * (reso - i), ny + (Math.random() - 0.5) * ancho, {
           len: Math.random() * 20 * (reso - i) * 0.2 + 10,
-          wid: Math.random() * 6 + 3,
+          ancho: Math.random() * 6 + 3,
           ang: ((Math.random() - 0.5) * Math.PI) / 6,
           col: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(1)})`,
         });
       }
     }
-    line1.push([nx + (nslist[i][0] - 0.5) * wid - wid / 2, ny]);
-    line2.push([nx + (nslist[i][1] - 0.5) * wid + wid / 2, ny]);
+    line1.push([nx + (nslist[i][0] - 0.5) * ancho - ancho / 2, ny]);
+    line2.push([nx + (nslist[i][1] - 0.5) * ancho + ancho / 2, ny]);
   }
-  canv += poly(line1, { fil: 'none', str: col, wid: 1.5 }) + poly(line2, { fil: 'none', str: col, wid: 1.5 });
+  canv += poly(line1, { fil: 'none', str: col, ancho: 1.5 }) + poly(line2, { fil: 'none', str: col, ancho: 1.5 });
   return canv;
 }
 
 export function tree02(x: number, y: number, args?: ArgsArbol2) {
   const predeterminados = {
-    hei: 16,
-    wid: 8,
+    alto: 16,
+    ancho: 8,
     clu: 5,
     col: 'rgba(100,100,100,0.5)',
     noi: 0.5,
   };
 
-  const { hei, wid, clu, col } = { ...predeterminados, ...args };
+  const { alto, ancho, clu, col } = { ...predeterminados, ...args };
 
   let leafcol;
 
@@ -79,13 +79,13 @@ export function tree02(x: number, y: number, args?: ArgsArbol2) {
   for (let i = 0; i < clu; i++) {
     canv += blob(x + randGaussian() * clu * 4, y + randGaussian() * clu * 4, {
       ang: Math.PI / 2,
-      fun: function (x: number) {
+      fun: (x: number) => {
         return x <= 1
           ? Math.pow(Math.sin(x * Math.PI) * x, 0.5)
           : -Math.pow(Math.sin((x - 2) * Math.PI * (x - 2)), 0.5);
       },
-      wid: Math.random() * wid * 0.75 + wid * 0.5,
-      len: Math.random() * hei * 0.75 + hei * 0.5,
+      ancho: Math.random() * ancho * 0.75 + ancho * 0.5,
+      len: Math.random() * alto * 0.75 + alto * 0.5,
       col,
     });
   }
@@ -95,14 +95,14 @@ export function tree02(x: number, y: number, args?: ArgsArbol2) {
 
 export function tree03(x: number, y: number, args: ArgsArbol3) {
   const predeterminados = {
-    hei: 50,
-    wid: 5,
+    alto: 50,
+    ancho: 5,
     ben: () => 0,
     col: 'rgba(100,100,100,0.5)',
     noi: 0.5,
   };
 
-  const { hei, wid, ben, col } = { ...predeterminados, ...args };
+  const { alto, ancho, ben, col } = { ...predeterminados, ...args };
 
   const reso = 10;
   const nslist = [];
@@ -123,39 +123,39 @@ export function tree03(x: number, y: number, args: ArgsArbol3) {
 
   for (let i = 0; i < reso; i++) {
     const nx = x + ben(i / reso) * 100;
-    const ny = y - (i * hei) / reso;
+    const ny = y - (i * alto) / reso;
     if (i >= reso / 5) {
       for (let j = 0; j < (reso - i) * 2; j++) {
         const shape = (x: number) => Math.log(50 * x + 1) / 3.95;
-        const ox = Math.random() * wid * 2 * shape((reso - i) / reso);
+        const ox = Math.random() * ancho * 2 * shape((reso - i) / reso);
         const [r, g, b] = leafcol;
 
-        blobs += blob(nx + ox * +randChoice([-1, 1]), ny + (Math.random() - 0.5) * wid * 2, {
+        blobs += blob(nx + ox * +randChoice([-1, 1]), ny + (Math.random() - 0.5) * ancho * 2, {
           len: ox * 2,
-          wid: Math.random() * 6 + 3,
+          ancho: Math.random() * 6 + 3,
           ang: ((Math.random() - 0.5) * Math.PI) / 6,
           col: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(3)})`,
         });
       }
     }
-    line1.push([nx + (((nslist[i][0] - 0.5) * wid - wid / 2) * (reso - i)) / reso, ny]);
-    line2.push([nx + (((nslist[i][1] - 0.5) * wid + wid / 2) * (reso - i)) / reso, ny]);
+    line1.push([nx + (((nslist[i][0] - 0.5) * ancho - ancho / 2) * (reso - i)) / reso, ny]);
+    line2.push([nx + (((nslist[i][1] - 0.5) * ancho + ancho / 2) * (reso - i)) / reso, ny]);
   }
   const lc = line1.concat(line2.reverse());
-  canv += poly(lc, { fil: 'white', str: col, wid: 1.5 });
+  canv += poly(lc, { fil: 'white', str: col, ancho: 1.5 });
   canv += blobs;
   return canv;
 }
 
 function branch(args: ArgsArbol1) {
   const predeterminadoRama = {
-    hei: 300,
-    wid: 6,
+    alto: 300,
+    ancho: 6,
     ang: 0,
     det: 10,
     ben: Math.PI * 0.2,
   };
-  const { hei, wid, ang, det, ben } = { ...predeterminadoRama, ...args };
+  const { alto, ancho, ang, det, ben } = { ...predeterminadoRama, ...args };
 
   let tlist;
   let nx = 0;
@@ -166,8 +166,8 @@ function branch(args: ArgsArbol1) {
 
   for (let i = 0; i < g; i++) {
     a0 += (ben / 2 + (Math.random() * ben) / 2) * +randChoice([-1, 1]);
-    nx += (Math.cos(a0) * hei) / g;
-    ny -= (Math.sin(a0) * hei) / g;
+    nx += (Math.cos(a0) * alto) / g;
+    ny -= (Math.sin(a0) * alto) / g;
     tlist.push([nx, ny]);
   }
 
@@ -195,14 +195,14 @@ function branch(args: ArgsArbol1) {
     const ny = lastp[1] * (1 - p) + nextp[1] * p;
 
     const ang = Math.atan2(ny - ly, nx - lx);
-    const woff = ((noise(i * 0.3) - 0.5) * wid * hei) / 80;
+    const woff = ((noise(i * 0.3) - 0.5) * ancho * alto) / 80;
 
     let b = 0;
     if (p == 0) {
-      b = Math.random() * wid;
+      b = Math.random() * ancho;
     }
 
-    const nw = wid * (((tl - i) / tl) * 0.5 + 0.5);
+    const nw = ancho * (((tl - i) / tl) * 0.5 + 0.5);
     trlist1.push([
       nx + Math.cos(ang + Math.PI / 2) * (nw + woff + b),
       ny + Math.sin(ang + Math.PI / 2) * (nw + woff + b),
@@ -219,8 +219,8 @@ function branch(args: ArgsArbol1) {
 }
 
 function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
-  const predeterminados = { dir: 1, sca: 1, wid: 1, ang: 0, lea: [true, 12] };
-  const { dir, sca, wid, ang, lea } = { ...predeterminados, ...args };
+  const predeterminados = { dir: 1, sca: 1, ancho: 1, ang: 0, lea: [true, 12] };
+  const { dir, sca, ancho, ang, lea } = { ...predeterminados, ...args };
 
   let canv = '';
   const twlist = [];
@@ -244,7 +244,7 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
       canv += twig(nx + tx, ny + ty, dep - 1, {
         ang: ang,
         sca: sca * 0.8,
-        wid: wid,
+        ancho: ancho,
         dir: dir * +randChoice([-1, 1]),
         lea: lea,
       });
@@ -252,22 +252,26 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
     if (i == tl - 1 && lea[0] == true) {
       for (let j = 0; j < 5; j++) {
         const dj = (j - 2.5) * 5;
-        canv += blob(nx + tx + Math.cos(ang) * dj * wid, ny + ty + (Math.sin(ang) * dj - lea[1] / (dep + 1)) * wid, {
-          wid: (6 + 3 * Math.random()) * wid,
-          len: (15 + 12 * Math.random()) * wid,
-          ang: ang / 2 + Math.PI / 2 + Math.PI * 0.2 * (Math.random() - 0.5),
-          col: 'rgba(100,100,100,' + (0.5 + dep * 0.2).toFixed(3) + ')',
-          fun: (x: number) => {
-            return x <= 1
-              ? Math.pow(Math.sin(x * Math.PI) * x, 0.5)
-              : -Math.pow(Math.sin((x - 2) * Math.PI * (x - 2)), 0.5);
-          },
-        });
+        canv += blob(
+          nx + tx + Math.cos(ang) * dj * ancho,
+          ny + ty + (Math.sin(ang) * dj - lea[1] / (dep + 1)) * ancho,
+          {
+            ancho: (6 + 3 * Math.random()) * ancho,
+            len: (15 + 12 * Math.random()) * ancho,
+            ang: ang / 2 + Math.PI / 2 + Math.PI * 0.2 * (Math.random() - 0.5),
+            col: 'rgba(100,100,100,' + (0.5 + dep * 0.2).toFixed(3) + ')',
+            fun: (x: number) => {
+              return x <= 1
+                ? Math.pow(Math.sin(x * Math.PI) * x, 0.5)
+                : -Math.pow(Math.sin((x - 2) * Math.PI * (x - 2)), 0.5);
+            },
+          }
+        );
       }
     }
   }
   canv += stroke(twlist, {
-    wid: 1,
+    ancho: 1,
     fun: (x) => Math.cos((x * Math.PI) / 2),
     col: 'rgba(100,100,100,0.5)',
   });
@@ -275,7 +279,7 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
 }
 
 function barkify(x, y, trlist) {
-  function bark(x, y, wid, ang) {
+  function bark(x, y, ancho, ang) {
     var len = 10 + 10 * Math.random();
     var noi = 0.5;
     var fun = function (x) {
@@ -288,7 +292,7 @@ function barkify(x, y, trlist) {
     for (var i = 0; i < reso + 1; i++) {
       var p = (i / reso) * 2;
       var xo = len / 2 - Math.abs(p - 1) * len;
-      var yo = (fun(p) * wid) / 2;
+      var yo = (fun(p) * ancho) / 2;
       var a = Math.atan2(yo, xo);
       var l = Math.sqrt(xo * xo + yo * yo);
       lalist.push([l, a]);
@@ -309,7 +313,7 @@ function barkify(x, y, trlist) {
     }
     var fr = Math.random();
     canv += stroke(brklist, {
-      wid: 0.8,
+      ancho: 0.8,
       noi: 0,
       col: 'rgba(100,100,100,0.4)',
       out: 0,
@@ -332,7 +336,7 @@ function barkify(x, y, trlist) {
       canv += blob(nx + x, ny + y, {
         noi: 1,
         len: 15,
-        wid: 6 - Math.abs(p - 0.5) * 10,
+        ancho: 6 - Math.abs(p - 0.5) * 10,
         ang: (a0 + a1) / 2,
         col: 'rgba(100,100,100,0.6)',
       });
@@ -351,7 +355,7 @@ function barkify(x, y, trlist) {
           xya[0] + x + Math.cos(xya[2]) * (j - jl / 2) * 4,
           xya[1] + y + Math.sin(xya[2]) * (j - jl / 2) * 4,
           {
-            wid: 4,
+            ancho: 4,
             len: 4 + 6 * Math.random(),
             ang: a0 + Math.PI / 2,
             col: 'rgba(100,100,100,0.6)',
@@ -378,7 +382,7 @@ function barkify(x, y, trlist) {
     }
     canv += stroke(
       rglist[i].map((v) => [v[0] + x, v[1] + y]),
-      { wid: 1.5, col: 'rgba(100,100,100,0.7)', out: 0 }
+      { ancho: 1.5, col: 'rgba(100,100,100,0.7)', out: 0 }
     );
   }
   return canv;
@@ -386,8 +390,8 @@ function barkify(x, y, trlist) {
 
 export function tree04(x, y, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 300;
-  var wid = args.wid != undefined ? args.wid : 6;
+  var alto = args.alto != undefined ? args.alto : 300;
+  var ancho = args.ancho != undefined ? args.ancho : 6;
   var col = args.col != undefined ? args.col : 'rgba(100,100,100,0.5)';
   var noi = args.noi != undefined ? args.noi : 0.5;
 
@@ -395,7 +399,7 @@ export function tree04(x, y, args) {
   var txcanv = '';
   var twcanv = '';
 
-  var trlist = branch({ hei: hei, wid: wid, ang: -Math.PI / 2 });
+  var trlist = branch({ alto: alto, ancho: ancho, ang: -Math.PI / 2 });
   txcanv += barkify(x, y, trlist);
   trlist = trlist[0].concat(trlist[1].reverse());
 
@@ -405,8 +409,8 @@ export function tree04(x, y, args) {
     if ((i >= trlist.length * 0.3 && i <= trlist.length * 0.7 && Math.random() < 0.1) || i == trlist.length / 2 - 1) {
       var ba = Math.PI * 0.2 - Math.PI * 1.4 * (i > trlist.length / 2);
       var brlist = branch({
-        hei: hei * (Math.random() + 1) * 0.3,
-        wid: wid * 0.5,
+        alto: alto * (Math.random() + 1) * 0.3,
+        ancho: ancho * 0.5,
         ang: ba,
       });
 
@@ -420,9 +424,9 @@ export function tree04(x, y, args) {
       for (var j = 0; j < brlist[0].length; j++) {
         if (Math.random() < 0.2 || j == brlist[0].length - 1) {
           twcanv += twig(brlist[0][j][0] + trlist[i][0] + x, brlist[0][j][1] + trlist[i][1] + y, 1, {
-            wid: hei / 300,
+            ancho: alto / 300,
             ang: ba > -Math.PI / 2 ? ba : ba + Math.PI,
-            sca: (0.5 * hei) / 300,
+            sca: (0.5 * alto) / 300,
             dir: ba > -Math.PI / 2 ? 1 : -1,
           });
         }
@@ -437,7 +441,7 @@ export function tree04(x, y, args) {
       trmlist.push(trlist[i]);
     }
   }
-  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, wid: 0 });
+  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
 
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
@@ -445,7 +449,7 @@ export function tree04(x, y, args) {
     trmlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
-      wid: 2.5,
+      ancho: 2.5,
       fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,
@@ -459,8 +463,8 @@ export function tree04(x, y, args) {
 
 export function tree05(x, y, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 300;
-  var wid = args.wid != undefined ? args.wid : 5;
+  var alto = args.alto != undefined ? args.alto : 300;
+  var ancho = args.ancho != undefined ? args.ancho : 5;
   var col = args.col != undefined ? args.col : 'rgba(100,100,100,0.5)';
   var noi = args.noi != undefined ? args.noi : 0.5;
 
@@ -468,7 +472,7 @@ export function tree05(x, y, args) {
   var txcanv = '';
   var twcanv = '';
 
-  var trlist = branch({ hei: hei, wid: wid, ang: -Math.PI / 2, ben: 0 });
+  var trlist = branch({ alto: alto, ancho: ancho, ang: -Math.PI / 2, ben: 0 });
   txcanv += barkify(x, y, trlist);
   trlist = trlist[0].concat(trlist[1].reverse());
 
@@ -483,8 +487,8 @@ export function tree05(x, y, args) {
       var bar = Math.random() * 0.2;
       var ba = -bar * Math.PI - (1 - bar * 2) * Math.PI * (i > trlist.length / 2);
       var brlist = branch({
-        hei: hei * (0.3 * p - Math.random() * 0.05),
-        wid: wid * 0.5,
+        alto: alto * (0.3 * p - Math.random() * 0.05),
+        ancho: ancho * 0.5,
         ang: ba,
         ben: 0.5,
       });
@@ -499,9 +503,9 @@ export function tree05(x, y, args) {
       for (var j = 0; j < brlist[0].length; j++) {
         if (j % 20 == 0 || j == brlist[0].length - 1) {
           twcanv += twig(brlist[0][j][0] + trlist[i][0] + x, brlist[0][j][1] + trlist[i][1] + y, 0, {
-            wid: hei / 300,
+            ancho: alto / 300,
             ang: ba > -Math.PI / 2 ? ba : ba + Math.PI,
-            sca: (0.2 * hei) / 300,
+            sca: (0.2 * alto) / 300,
             dir: ba > -Math.PI / 2 ? 1 : -1,
             lea: [true, 5],
           });
@@ -518,7 +522,7 @@ export function tree05(x, y, args) {
     }
   }
 
-  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, wid: 0 });
+  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
 
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
@@ -526,7 +530,7 @@ export function tree05(x, y, args) {
     trmlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
-      wid: 2.5,
+      ancho: 2.5,
       fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,
@@ -540,8 +544,8 @@ export function tree05(x, y, args) {
 
 export function tree06(x, y, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 100;
-  var wid = args.wid != undefined ? args.wid : 6;
+  var alto = args.alto != undefined ? args.alto : 100;
+  var ancho = args.ancho != undefined ? args.ancho : 6;
   var col = args.col != undefined ? args.col : 'rgba(100,100,100,0.5)';
   var noi = args.noi != undefined ? args.noi : 0.5;
 
@@ -551,17 +555,17 @@ export function tree06(x, y, args) {
 
   function fracTree(xoff, yoff, dep, args) {
     var args = args != undefined ? args : {};
-    var hei = args.hei != undefined ? args.hei : 300;
-    var wid = args.wid != undefined ? args.wid : 5;
+    var alto = args.alto != undefined ? args.alto : 300;
+    var ancho = args.ancho != undefined ? args.ancho : 5;
     var ang = args.ang != undefined ? args.ang : 0;
     var ben = args.ben != undefined ? args.ben : Math.PI * 0.2;
 
     var trlist = branch({
-      hei: hei,
-      wid: wid,
+      alto: alto,
+      ancho: ancho,
       ang: ang,
       ben: ben,
-      det: hei / 20,
+      det: alto / 20,
     });
     txcanv += barkify(xoff, yoff, trlist);
     trlist = trlist[0].concat(trlist[1].reverse());
@@ -580,8 +584,8 @@ export function tree06(x, y, args) {
         var ba = bar * Math.PI - bar * 2 * Math.PI * (i > trlist.length / 2);
 
         var brlist = fracTree(trlist[i][0] + xoff, trlist[i][1] + yoff, dep - 1, {
-          hei: hei * (0.7 + Math.random() * 0.2),
-          wid: wid * 0.6,
+          alto: alto * (0.7 + Math.random() * 0.2),
+          ancho: ancho * 0.6,
           ang: ang + ba,
           ben: 0.55,
         });
@@ -610,13 +614,13 @@ export function tree06(x, y, args) {
   }
 
   var trmlist = fracTree(x, y, 3, {
-    hei: hei,
-    wid: wid,
+    alto: alto,
+    ancho: ancho,
     ang: -Math.PI / 2,
     ben: 0,
   });
 
-  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, wid: 0 });
+  canv += poly(trmlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
 
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
@@ -624,7 +628,7 @@ export function tree06(x, y, args) {
     trmlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
-      wid: 2.5,
+      ancho: 2.5,
       fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,
@@ -638,8 +642,8 @@ export function tree06(x, y, args) {
 
 export function tree07(x, y, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 60;
-  var wid = args.wid != undefined ? args.wid : 4;
+  var alto = args.alto != undefined ? args.alto : 60;
+  var ancho = args.ancho != undefined ? args.ancho : 4;
   var ben =
     args.ben != undefined
       ? args.ben
@@ -666,15 +670,15 @@ export function tree07(x, y, args) {
   var T = [];
   for (var i = 0; i < reso; i++) {
     var nx = x + ben(i / reso) * 100;
-    var ny = y - (i * hei) / reso;
+    var ny = y - (i * alto) / reso;
     if (i >= reso / 4) {
       for (var j = 0; j < 1; j++) {
         var bpl = blob(
-          nx + (Math.random() - 0.5) * wid * 1.2 * (reso - i) * 0.5,
-          ny + (Math.random() - 0.5) * wid * 0.5,
+          nx + (Math.random() - 0.5) * ancho * 1.2 * (reso - i) * 0.5,
+          ny + (Math.random() - 0.5) * ancho * 0.5,
           {
             len: Math.random() * 50 + 20,
-            wid: Math.random() * 12 + 12,
+            ancho: Math.random() * 12 + 12,
             ang: (-Math.random() * Math.PI) / 6,
             col:
               'rgba(' +
@@ -693,7 +697,7 @@ export function tree07(x, y, args) {
           }
         );
 
-        //canv+=poly(bpl,{fil:col,wid:0})
+        //canv+=poly(bpl,{fil:col,ancho:0})
         T = T.concat(
           triangulate(bpl, {
             area: 50,
@@ -703,11 +707,11 @@ export function tree07(x, y, args) {
         );
       }
     }
-    line1.push([nx + (nslist[i][0] - 0.5) * wid - wid / 2, ny]);
-    line2.push([nx + (nslist[i][1] - 0.5) * wid + wid / 2, ny]);
+    line1.push([nx + (nslist[i][0] - 0.5) * ancho - ancho / 2, ny]);
+    line2.push([nx + (nslist[i][1] - 0.5) * ancho + ancho / 2, ny]);
   }
 
-  //canv += poly(line1.concat(line2.reverse()),{fil:col,wid:0})
+  //canv += poly(line1.concat(line2.reverse()),{fil:col,ancho:0})
   T = triangulate(line1.concat(line2.reverse()), {
     area: 50,
     convex: true,
@@ -718,15 +722,15 @@ export function tree07(x, y, args) {
     var m = midPt(T[k]);
     var c = (noise(m[0] * 0.02, m[1] * 0.02) * 200 + 50) | 0;
     var co = 'rgba(' + c + ',' + c + ',' + c + ',0.8)';
-    canv += poly(T[k], { fil: co, str: co, wid: 0 });
+    canv += poly(T[k], { fil: co, str: co, ancho: 0 });
   }
   return canv;
 }
 
 export function tree08(x, y, args) {
   var args = args != undefined ? args : {};
-  var hei = args.hei != undefined ? args.hei : 80;
-  var wid = args.wid != undefined ? args.wid : 1;
+  var alto = args.alto != undefined ? args.alto : 80;
+  var ancho = args.ancho != undefined ? args.ancho : 1;
   var col = args.col != undefined ? args.col : 'rgba(100,100,100,0.5)';
   var noi = args.noi != undefined ? args.noi : 0.5;
 
@@ -737,11 +741,11 @@ export function tree08(x, y, args) {
   var ang = normRand(-1, 1) * Math.PI * 0.2;
 
   var trlist = branch({
-    hei: hei,
-    wid: wid,
+    alto: alto,
+    ancho: ancho,
     ang: -Math.PI / 2 + ang,
     ben: Math.PI * 0.2,
-    det: hei / 20,
+    det: alto / 20,
   });
   //txcanv += barkify(x,y,trlist)
 
@@ -786,7 +790,7 @@ export function tree08(x, y, args) {
     var tcanv = '';
     tcanv += stroke(trmlist, {
       fun: fun,
-      wid: 0.8,
+      ancho: 0.8,
       col: 'rgba(100,100,100,0.5)',
     });
     if (dep != 0) {
@@ -816,24 +820,24 @@ export function tree08(x, y, args) {
   for (var i = 0; i < trlist.length; i++) {
     if (Math.random() < 0.2) {
       twcanv += fracTree(x + trlist[i][0], y + trlist[i][1], Math.floor(4 * Math.random()), {
-        hei: 20,
+        alto: 20,
         ang: -Math.PI / 2 - ang * Math.random(),
       });
     } else if (i == Math.floor(trlist.length / 2)) {
       twcanv += fracTree(x + trlist[i][0], y + trlist[i][1], 3, {
-        hei: 25,
+        alto: 25,
         ang: -Math.PI / 2 + ang,
       });
     }
   }
 
-  canv += poly(trlist, { xof: x, yof: y, fil: 'white', str: col, wid: 0 });
+  canv += poly(trlist, { xof: x, yof: y, fil: 'white', str: col, ancho: 0 });
 
   canv += stroke(
     trlist.map((v) => [v[0] + x, v[1] + y]),
     {
       col: 'rgba(100,100,100,' + (0.6 + Math.random() * 0.1).toFixed(3) + ')',
-      wid: 2.5,
+      ancho: 2.5,
       fun: (x) => Math.sin(1),
       noi: 0.9,
       out: 0,

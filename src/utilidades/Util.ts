@@ -99,15 +99,15 @@ export function poly(plist: number[][], args: ArgsPoly) {
     yof: 0,
     fil: 'rgba(0,0,0,0)',
     str: 'rgba(0,0,0,0)',
-    wid: 0,
+    ancho: 0,
   };
 
-  const { xof, yof, fil, str, wid } = { ...predeterminados, ...args };
+  const { xof, yof, fil, str, ancho } = { ...predeterminados, ...args };
 
   let canv = "<polyline points='";
   for (let i = 0; i < plist.length; i++) {
     canv += ' ' + (plist[i][0] + xof).toFixed(1) + ',' + (plist[i][1] + yof).toFixed(1);
   }
-  canv += "' style='fill:" + fil + ';stroke:' + str + ';stroke-width:' + wid + "'/>";
+  canv += "' style='fill:" + fil + ';stroke:' + str + ';stroke-width:' + ancho + "'/>";
   return canv;
 }

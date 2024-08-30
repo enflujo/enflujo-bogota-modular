@@ -1,9 +1,9 @@
-import { stroke } from '../utilidades/cosas';
-import { noise } from '../utilidades/Perlin';
+import { stroke } from '@/utilidades/cosas';
+import { noise } from '@/utilidades/Perlin';
 
-export default (xoff: number, yoff: number, args?: { hei?: number; len?: number; clu?: number }) => {
-  const predeterminados = { hei: 2, len: 800, clu: 10 };
-  const { hei, len, clu } = { ...predeterminados, ...args };
+export default (xoff: number, yoff: number, args?: { alto?: number; len?: number; clu?: number }) => {
+  const predeterminados = { alto: 2, len: 800, clu: 10 };
+  const { alto, len, clu } = { ...predeterminados, ...args };
   let canv = '';
   const ptlist: number[][][] = [];
   let yk = 0;
@@ -16,7 +16,7 @@ export default (xoff: number, yoff: number, args?: { hei?: number; len?: number;
     const reso = 5;
 
     for (let j = -lk; j < lk; j += reso) {
-      ptlist[ptlist.length - 1].push([j + xk, Math.sin(j * 0.2) * hei * noise(j * 0.1) - 20 + yk]);
+      ptlist[ptlist.length - 1].push([j + xk, Math.sin(j * 0.2) * alto * noise(j * 0.1) - 20 + yk]);
     }
   }
 
@@ -25,7 +25,7 @@ export default (xoff: number, yoff: number, args?: { hei?: number; len?: number;
       ptlist[j].map((x) => [x[0] + xoff, x[1] + yoff]),
       {
         col: `rgba(100,100,100,${(0.3 + Math.random() * 0.3).toFixed(3)})`,
-        wid: 1,
+        ancho: 1,
       }
     );
   }
