@@ -10,6 +10,7 @@ import { download } from '@/utilidades/downloader';
 import { noise } from '@/utilidades/Perlin';
 import { randChoice } from '@/utilidades/Util';
 import montañasAguadas from './componentes/montañasAguadas';
+import { PI } from './utilidades/constantes';
 
 const SET_BTN = document.getElementById('SET_BTN') as HTMLDivElement;
 const SETTING = document.getElementById('SETTING') as HTMLDivElement;
@@ -19,7 +20,6 @@ const INP_SEED = document.getElementById('INP_SEED') as HTMLInputElement;
 const VIEW_LEFT = document.getElementById('VIEW_LEFT') as HTMLButtonElement;
 const VIEW_RIGHT = document.getElementById('VIEW_RIGHT') as HTMLButtonElement;
 const INC_STEP = document.getElementById('INC_STEP') as HTMLInputElement;
-const AUTO_SCROLL = document.getElementById('AUTO_SCROLL') as HTMLInputElement;
 const dwnbtn = document.getElementById('dwn-btn') as HTMLButtonElement;
 const SOURCE_BTN = document.getElementById('SOURCE_BTN') as HTMLDivElement;
 const L = document.getElementById('L') as HTMLDivElement;
@@ -46,10 +46,9 @@ GRUPO.setAttribute('transform', `translate(0,0)`);
 SVG.appendChild(GRUPO);
 BG.appendChild(SVG);
 
-GENERATE.onclick = () => reloadWSeed(INP_SEED.value);
+GENERATE.onclick = () => reloadWSeed(+INP_SEED.value);
 VIEW_LEFT.onclick = () => xcroll(-parseFloat(INC_STEP.value));
 VIEW_RIGHT.onclick = () => xcroll(parseFloat(INC_STEP.value));
-AUTO_SCROLL.onchange = () => autoxcroll(parseFloat(INC_STEP.value));
 dwnbtn.onclick = () => download('' + Math.random() + '.svg', BG.innerHTML);
 SOURCE_BTN.onmouseover = () => (SOURCE_BTN.style.backgroundColor = btnHoverCol);
 SOURCE_BTN.onmouseout = () => (SOURCE_BTN.style.backgroundColor = 'rgba(0,0,0,0)');
@@ -168,7 +167,7 @@ function chunkrender(xmin: number, xmax: number) {
 
 function chunkloader(xmin: number, xmax: number) {
   const add = (nch: Chunk) => {
-    if (nch.canv.includes('NaN')) {
+    if (nch.canv?.includes('NaN')) {
       console.log('gotcha:');
       console.log(nch.tag);
       nch.canv = nch.canv.replace(/NaN/g, '-1000');
@@ -230,7 +229,7 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: flatMount(plan[i].x, plan[i].y, 2 * Math.random() * Math.PI, {
+          canv: flatMount(plan[i].x, plan[i].y, 2 * Math.random() * PI, {
             ancho: 600 + Math.random() * 400,
             alto: 100,
             cho: 0.5 + Math.random() * 0.2,
@@ -289,7 +288,7 @@ function mountplanner(xmin: number, xmax: number) {
     return true;
   }
 
-  function chadd(r: { x: number; y: number }, mind = 10) {
+  function chadd(r: Chunk, mind = 10) {
     for (let k = 0; k < reg.length; k++) {
       if (Math.abs(reg[k].x - r.x) < mind) {
         return false;
@@ -299,12 +298,12 @@ function mountplanner(xmin: number, xmax: number) {
     return true;
   }
 
-  const reg: { x: number; y: number; tag: string }[] = [];
+  const reg: Chunk[] = [];
   const samp = 0.03;
   const ns = (x: number) => Math.max(noise(x * samp) - 0.55, 0) * 2;
   // const nns = (x: number) => 1 - noise(x * samp);
   // const nnns = (x: number, y: number) => Math.max(noise(x * samp * 2, 2) - 0.55, 0) * 2;
-  const yr = (x: number) => noise(x * 0.01, Math.PI);
+  const yr = (x: number) => noise(x * 0.01, PI);
   const xstep = 5;
   const mwid = 200;
 
@@ -318,7 +317,7 @@ function mountplanner(xmin: number, xmax: number) {
       if (locmax(i, j, ns, 2)) {
         const xof = i + 2 * (Math.random() - 0.5) * 500;
         const yof = j + 300;
-        const r = { tag: 'mount', x: xof, y: yof, h: ns(i, j) };
+        const r = { tag: 'mount', x: xof, y: yof, h: ns(i) };
         const res = chadd(r);
         if (res) {
           for (let k = Math.floor((xof - mwid) / xstep); k < (xof + mwid) / xstep; k++) {
@@ -372,17 +371,6 @@ function xcroll(v: number) {
     update();
   } else {
     viewupdate();
-  }
-}
-
-function autoxcroll(v) {
-  const caja = document.querySelector<HTMLInputElement>('#AUTO_SCROLL');
-
-  if (caja?.checked) {
-    xcroll(v);
-    setTimeout(function () {
-      autoxcroll(v);
-    }, 2000);
   }
 }
 
