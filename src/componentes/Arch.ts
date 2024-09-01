@@ -1,188 +1,134 @@
 import { invertir } from '@/utilidades/ayudas';
-import type { Punto } from '@/tipos';
+import type { ArgsArco, ArgsDeco, ArgsPagRoof, ArgsRail, ArgsTecho, OpcionesDeco, Punto } from '@/tipos';
 import { div, stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
-import { centro } from '@/utilidades/Polytools';
+import { buscarCentro } from '@/utilidades/Polytools';
 import { normRand, poly, randChoice } from '@/utilidades/Util';
 import caja from '@/componentes/caja';
 import chozaTecho from '@/componentes/chozaTecho';
 import { man } from '@/componentes/Man';
+import { PI } from '@/utilidades/constantes';
 
-var deco = function (style, args) {
-  var args = args != undefined ? args : {};
-  var pul = args.pul != undefined ? args.pul : [0, 0];
-  var pur = args.pur != undefined ? args.pur : [0, 100];
-  var pdl = args.pdl != undefined ? args.pdl : [100, 0];
-  var pdr = args.pdr != undefined ? args.pdr : [100, 100];
-  var hsp = args.hsp != undefined ? args.hsp : [1, 3];
-  var vsp = args.vsp != undefined ? args.vsp : [1, 2];
+const deco = (estilo: number, args?: ArgsDeco) => {
+  const predeterminados: OpcionesDeco = {
+    pul: [0, 0],
+    pur: [0, 100],
+    pdl: [100, 0],
+    pdr: [100, 100],
+    hsp: [1, 3],
+    vsp: [1, 2],
+  };
+  const { pul, pur, pdl, pdr, hsp, vsp } = { ...predeterminados, ...args };
 
-  var plist = [];
-  var dl = div([pul, pdl], vsp[1]);
-  var dr = div([pur, pdr], vsp[1]);
-  var du = div([pul, pur], hsp[1]);
-  var dd = div([pdl, pdr], hsp[1]);
+  const puntos = [];
+  const dl = div([pul, pdl], vsp[1]);
+  const dr = div([pur, pdr], vsp[1]);
+  const du = div([pul, pur], hsp[1]);
+  const dd = div([pdl, pdr], hsp[1]);
 
-  if (style == 1) {
+  if (estilo == 1) {
     //-| |-
-    var mlu = du[hsp[0]];
-    var mru = du[du.length - 1 - hsp[0]];
-    var mld = dd[hsp[0]];
-    var mrd = dd[du.length - 1 - hsp[0]];
+    const mlu = du[hsp[0]];
+    const mru = du[du.length - 1 - hsp[0]];
+    const mld = dd[hsp[0]];
+    const mrd = dd[du.length - 1 - hsp[0]];
 
-    for (var i = vsp[0]; i < dl.length - vsp[0]; i += vsp[0]) {
-      var mml = div([mlu, mld], vsp[1])[i];
-      var mmr = div([mru, mrd], vsp[1])[i];
-      var ml = dl[i];
-      var mr = dr[i];
-      plist.push(div([mml, ml], 5));
-      plist.push(div([mmr, mr], 5));
+    for (let i = vsp[0]; i < dl.length - vsp[0]; i += vsp[0]) {
+      const mml = div([mlu, mld], vsp[1])[i];
+      const mmr = div([mru, mrd], vsp[1])[i];
+      const ml = dl[i];
+      const mr = dr[i];
+      puntos.push(div([mml, ml], 5));
+      puntos.push(div([mmr, mr], 5));
     }
-    plist.push(div([mlu, mld], 5));
-    plist.push(div([mru, mrd], 5));
-  } else if (style == 2) {
+    puntos.push(div([mlu, mld], 5));
+    puntos.push(div([mru, mrd], 5));
+  } else if (estilo == 2) {
     //||||
 
-    for (var i = hsp[0]; i < du.length - hsp[0]; i += hsp[0]) {
-      var mu = du[i];
-      var md = dd[i];
-      plist.push(div([mu, md], 5));
+    for (let i = hsp[0]; i < du.length - hsp[0]; i += hsp[0]) {
+      const mu = du[i];
+      const md = dd[i];
+      puntos.push(div([mu, md], 5));
     }
-  } else if (style == 3) {
+  } else if (estilo == 3) {
     //|##|
-    var mlu = du[hsp[0]];
-    var mru = du[du.length - 1 - hsp[0]];
-    var mld = dd[hsp[0]];
-    var mrd = dd[du.length - 1 - hsp[0]];
+    const mlu = du[hsp[0]];
+    const mru = du[du.length - 1 - hsp[0]];
+    const mld = dd[hsp[0]];
+    const mrd = dd[du.length - 1 - hsp[0]];
 
-    for (var i = vsp[0]; i < dl.length - vsp[0]; i += vsp[0]) {
-      var mml = div([mlu, mld], vsp[1])[i];
-      var mmr = div([mru, mrd], vsp[1])[i];
-      var mmu = div([mlu, mru], vsp[1])[i];
-      var mmd = div([mld, mrd], vsp[1])[i];
+    for (let i = vsp[0]; i < dl.length - vsp[0]; i += vsp[0]) {
+      const mml = div([mlu, mld], vsp[1])[i];
+      const mmr = div([mru, mrd], vsp[1])[i];
+      const mmu = div([mlu, mru], vsp[1])[i];
+      const mmd = div([mld, mrd], vsp[1])[i];
 
-      var ml = dl[i];
-      var mr = dr[i];
-      plist.push(div([mml, mmr], 5));
-      plist.push(div([mmu, mmd], 5));
+      puntos.push(div([mml, mmr], 5));
+      puntos.push(div([mmu, mmd], 5));
     }
-    plist.push(div([mlu, mld], 5));
-    plist.push(div([mru, mrd], 5));
+    puntos.push(div([mlu, mld], 5));
+    puntos.push(div([mru, mrd], 5));
   }
-  return plist;
+  return puntos;
 };
 
-var rail = function (xoff, yoff, seed, args) {
-  var args = args != undefined ? args : {};
-  var alto = args.alto != undefined ? args.alto : 20;
-  var ancho = args.ancho != undefined ? args.ancho : 180;
-  var rot = args.rot != undefined ? args.rot : 0.7;
-  var per = args.per != undefined ? args.per : 4;
-  var seg = args.seg != undefined ? args.seg : 4;
-  var wei = args.wei != undefined ? args.wei : 1;
-  var tra = args.tra != undefined ? args.tra : true;
-  var fro = args.fro != undefined ? args.fro : true;
+const rail = (x: number, y: number, seed = 0, args?: ArgsRail) => {
+  const predeterminados = {
+    alto: 20,
+    ancho: 180,
+    rot: 0.7,
+    per: 4,
+    seg: 4,
+    wei: 1,
+    tra: true,
+    fro: true,
+  };
 
-  seed = seed != undefined ? seed : 0;
-
-  var mid = -ancho * 0.5 + ancho * rot;
-  var bmid = -ancho * 0.5 + ancho * (1 - rot);
-  var ptlist = [];
+  const { alto, ancho, rot, per, seg, wei, tra, fro } = { ...predeterminados, ...args };
+  const centro = ancho * 0.5;
+  const mid = -centro + ancho * rot;
+  const bmid = -centro + ancho * (1 - rot);
+  const ptlist = [];
 
   if (fro) {
-    ptlist.push(
-      div(
-        [
-          [-ancho * 0.5, 0],
-          [mid, per],
-        ],
-        seg
-      )
-    );
-    ptlist.push(
-      div(
-        [
-          [mid, per],
-          [ancho * 0.5, 0],
-        ],
-        seg
-      )
-    );
+    const a: Punto = [mid, per];
+    ptlist.push(div([[-centro, 0], a], seg));
+    ptlist.push(div([a, [centro, 0]], seg));
   }
+
   if (tra) {
-    ptlist.push(
-      div(
-        [
-          [-ancho * 0.5, 0],
-          [bmid, -per],
-        ],
-        seg
-      )
-    );
-    ptlist.push(
-      div(
-        [
-          [bmid, -per],
-          [ancho * 0.5, 0],
-        ],
-        seg
-      )
-    );
+    const a: Punto = [bmid, -per];
+    ptlist.push(div([[-centro, 0], a], seg));
+    ptlist.push(div([a, [centro, 0]], seg));
   }
+
   if (fro) {
-    ptlist.push(
-      div(
-        [
-          [-ancho * 0.5, -alto],
-          [mid, -alto + per],
-        ],
-        seg
-      )
-    );
-    ptlist.push(
-      div(
-        [
-          [mid, -alto + per],
-          [ancho * 0.5, -alto],
-        ],
-        seg
-      )
-    );
+    const a: Punto = [mid, -alto + per];
+    ptlist.push(div([[-centro, -alto], a], seg));
+    ptlist.push(div([a, [centro, -alto]], seg));
   }
+
   if (tra) {
-    ptlist.push(
-      div(
-        [
-          [-ancho * 0.5, -alto],
-          [bmid, -alto - per],
-        ],
-        seg
-      )
-    );
-    ptlist.push(
-      div(
-        [
-          [bmid, -alto - per],
-          [ancho * 0.5, -alto],
-        ],
-        seg
-      )
-    );
+    const a: Punto = [bmid, -alto - per];
+    ptlist.push(div([[-centro, -alto], a], seg));
+    ptlist.push(div([a, [centro, -alto]], seg));
   }
+
   if (tra) {
-    var open = Math.floor(Math.random() * ptlist.length);
+    const open = Math.floor(Math.random() * ptlist.length);
     ptlist[open] = ptlist[open].slice(0, -1);
     ptlist[(open + ptlist.length) % ptlist.length] = ptlist[(open + ptlist.length) % ptlist.length].slice(0, -1);
   }
-  var canv = '';
 
-  for (var i = 0; i < ptlist.length / 2; i++) {
-    for (var j = 0; j < ptlist[i].length; j++) {
-      //ptlist.push(div([ptlist[i][j],ptlist[4+i][j]],2))
+  let svg = '';
+
+  for (let i = 0; i < ptlist.length / 2; i++) {
+    for (let j = 0; j < ptlist[i].length; j++) {
       ptlist[i][j][1] += (noise(i, j * 0.5, seed) - 0.5) * alto;
       ptlist[(ptlist.length / 2 + i) % ptlist.length][j % ptlist[(ptlist.length / 2 + i) % ptlist.length].length][1] +=
         (noise(i + 0.5, j * 0.5, seed) - 0.5) * alto;
-      var ln = div(
+      const ln = div(
         [
           ptlist[i][j],
           ptlist[(ptlist.length / 2 + i) % ptlist.length][j % ptlist[(ptlist.length / 2 + i) % ptlist.length].length],
@@ -190,9 +136,9 @@ var rail = function (xoff, yoff, seed, args) {
         2
       );
       ln[0][0] += (Math.random() - 0.5) * alto * 0.5;
-      canv += poly(ln, {
-        x: xoff,
-        y: yoff,
+      svg += poly(ln, {
+        x,
+        y,
         fil: 'none',
         str: 'rgba(100,100,100,0.5)',
         ancho: 2,
@@ -201,59 +147,62 @@ var rail = function (xoff, yoff, seed, args) {
   }
 
   for (let i = 0; i < ptlist.length; i++) {
-    canv += stroke(
-      ptlist[i].map((x) => [x[0] + xoff, x[1] + yoff]),
+    svg += stroke(
+      ptlist[i].map((p) => [p[0] + x, p[1] + y]),
       {
         col: 'rgba(100,100,100,0.5)',
         noi: 0.5,
         ancho: wei,
-        fun: (x: number) => 1,
+        fun: () => 1,
       }
     );
   }
-  return canv;
+
+  return svg;
 };
 
-var roof = function (xoff, yoff, args) {
-  var args = args != undefined ? args : {};
-  var alto = args.alto != undefined ? args.alto : 20;
-  var ancho = args.ancho != undefined ? args.ancho : 120;
-  var rot = args.rot != undefined ? args.rot : 0.7;
-  var per = args.per != undefined ? args.per : 4;
-  var cor = args.cor != undefined ? args.cor : 5;
-  var wei = args.wei != undefined ? args.wei : 3;
-  var pla = args.pla != undefined ? args.pla : [0, ''];
+const techo = (x: number, y: number, args: ArgsTecho) => {
+  const predeterminados = {
+    alto: 20,
+    ancho: 120,
+    rot: 0.7,
+    per: 4,
+    cor: 5,
+    wei: 3,
+    pla: [0, ''],
+  };
 
-  const opf = (puntos: Punto[]) => (rot < 0.5 ? invertir(puntos) : puntos);
+  const { alto, ancho, rot, per, cor, wei, pla } = { ...predeterminados, ...args };
+  const opf = (puntos: Punto[]) => (rot < 0.5 ? invertir<Punto[]>(puntos) : puntos);
+  const centro = ancho * 0.5;
+  const rrot = rot < 0.5 ? 1 - rot : rot;
+  const mid = -centro + ancho * rrot;
+  const quat = (mid + centro) * 0.5 - mid;
+  const puntos = [];
 
-  var rrot = rot < 0.5 ? 1 - rot : rot;
-
-  var mid = -ancho * 0.5 + ancho * rrot;
-  var bmid = -ancho * 0.5 + ancho * (1 - rrot);
-  var quat = (mid + ancho * 0.5) * 0.5 - mid;
-
-  var ptlist = [];
-  ptlist.push(
+  puntos.push(
     div(
       opf([
-        [-ancho * 0.5 + quat, -alto - per / 2],
-        [-ancho * 0.5 + quat * 0.5, -alto / 2 - per / 4],
-        [-ancho * 0.5 - cor, 0],
+        [-centro + quat, -alto - per / 2],
+        [-centro + quat * 0.5, -alto / 2 - per / 4],
+        [-centro - cor, 0],
       ]),
       5
     )
   );
-  ptlist.push(
+
+  puntos.push(
     div(
       opf([
         [mid + quat, -alto],
-        [(mid + quat + ancho * 0.5) / 2, -alto / 2],
-        [ancho * 0.5 + cor, 0],
+        [(mid + quat + centro) / 2, -alto / 2],
+        [centro + cor, 0],
       ]),
       5
     )
   );
-  ptlist.push(
+
+  puntos.push(
     div(
       opf([
         [mid + quat, -alto],
@@ -264,49 +213,49 @@ var roof = function (xoff, yoff, args) {
     )
   );
 
-  ptlist.push(
+  puntos.push(
     div(
       opf([
-        [-ancho * 0.5 - cor, 0],
-        [mid + cor, per],
-      ]),
-      5
-    )
-  );
-  ptlist.push(
-    div(
-      opf([
-        [ancho * 0.5 + cor, 0],
+        [-centro - cor, 0],
         [mid + cor, per],
       ]),
       5
     )
   );
 
-  ptlist.push(
+  puntos.push(
     div(
       opf([
-        [-ancho * 0.5 + quat, -alto - per / 2],
+        [centro + cor, 0],
+        [mid + cor, per],
+      ]),
+      5
+    )
+  );
+
+  puntos.push(
+    div(
+      opf([
+        [-centro + quat, -alto - per / 2],
         [mid + quat, -alto],
       ]),
       5
     )
   );
 
-  var canv = '';
-
   const polist = opf([
-    [-ancho * 0.5, 0],
-    [-ancho * 0.5 + quat, -alto - per / 2],
+    [-centro, 0],
+    [-centro + quat, -alto - per / 2],
     [mid + quat, -alto],
-    [ancho * 0.5, 0],
+    [centro, 0],
     [mid, per],
   ]);
-  canv += poly(polist, { x: xoff, y: yoff, str: 'none', fil: 'white' });
 
-  for (let i = 0; i < ptlist.length; i++) {
-    canv += stroke(
-      ptlist[i].map((x) => [x[0] + xoff, x[1] + yoff]),
+  let svg = poly(polist, { x, y, str: 'none', fil: 'white' });
+
+  for (let i = 0; i < puntos.length; i++) {
+    svg += stroke(
+      puntos[i].map((p) => [p[0] + x, p[1] + y]),
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
@@ -319,53 +268,61 @@ var roof = function (xoff, yoff, args) {
   if (pla[0] == 1) {
     let pp: Punto[] = opf([
       [mid + quat / 2, -alto / 2 + per / 2],
-      [-ancho * 0.5 + quat * 0.5, -alto / 2 - per / 4],
+      [-centro + quat * 0.5, -alto / 2 - per / 4],
     ]);
 
     if (pp[0][0] > pp[1][0]) {
       pp = [pp[1], pp[0]];
     }
 
-    const mp = centro(pp);
+    const mp = buscarCentro(pp);
     const a = Math.atan2(pp[1][1] - pp[0][1], pp[1][0] - pp[0][0]);
-    const adeg = (a * 180) / Math.PI;
-    canv += `<text font-size='${alto * 0.6}' font-family='Verdana' style='fill:rgba(100,100,100,0.9)' text-anchor='middle' transform='translate(${mp[0] + xoff},${mp[1] + yoff}) rotate(${adeg})'>${pla[1]}</text>`;
+    const grados = (a * 180) / PI;
+    svg += `<text font-size='${alto * 0.6}' font-family='Verdana' style='fill:rgba(100,100,100,0.9)' text-anchor='middle' `;
+    svg += `transform='translate(${mp[0] + x},${mp[1] + y}) rotate(${grados})'>${pla[1]}</text>`;
   }
 
-  return canv;
+  return svg;
 };
 
-var pagroof = function (xoff, yoff, args) {
-  var args = args != undefined ? args : {};
-  var alto = args.alto != undefined ? args.alto : 20;
-  var ancho = args.ancho != undefined ? args.ancho : 120;
-  var per = args.per != undefined ? args.per : 4;
-  var cor = args.cor != undefined ? args.cor : 10;
-  var sid = args.sid != undefined ? args.sid : 4;
-  var wei = args.wei != undefined ? args.wei : 3;
+const pagroof = (x: number, y: number, args?: ArgsPagRoof) => {
+  const predeterminados = {
+    alto: 20,
+    ancho: 120,
+    per: 4,
+    cor: 10,
+    sid: 4,
+    wei: 3,
+  };
 
-  var ptlist: Punto[][] = [];
-  var polist: Punto[] = [[0, -alto]];
-  var canv = '';
-  for (var i = 0; i < sid; i++) {
-    var fx = ancho * ((i * 1.0) / (sid - 1) - 0.5);
-    var fy = per * (1 - Math.abs((i * 1.0) / (sid - 1) - 0.5) * 2);
-    var fxx = (ancho + cor) * ((i * 1.0) / (sid - 1) - 0.5);
+  const { alto, ancho, per, cor, sid, wei } = { ...predeterminados, ...args };
+
+  const puntos: Punto[][] = [];
+  const polist: Punto[] = [[0, -alto]];
+
+  for (let i = 0; i < sid; i++) {
+    const fx = ancho * ((i * 1.0) / (sid - 1) - 0.5);
+    const fy = per * (1 - Math.abs((i * 1.0) / (sid - 1) - 0.5) * 2);
+    const fxx = (ancho + cor) * ((i * 1.0) / (sid - 1) - 0.5);
+
     if (i > 0) {
-      ptlist.push([ptlist[ptlist.length - 1][2], [fxx, fy]]);
+      puntos.push([puntos[puntos.length - 1][2], [fxx, fy]]);
     }
-    ptlist.push([
+
+    puntos.push([
       [0, -alto],
       [fx * 0.5, (-alto + fy) * 0.5],
       [fxx, fy],
     ]);
+
     polist.push([fxx, fy]);
   }
 
-  canv += poly(polist, { x: xoff, y: yoff, str: 'none', fil: 'white' });
-  for (let i = 0; i < ptlist.length; i++) {
-    canv += stroke(
-      div(ptlist[i], 5).map((x) => [x[0] + xoff, x[1] + yoff]),
+  let svg = poly(polist, { x, y, str: 'none', fil: 'white' });
+
+  for (let i = 0; i < puntos.length; i++) {
+    svg += stroke(
+      div(puntos[i], 5).map((p) => [p[0] + x, p[1] + y]),
       {
         col: 'rgba(100,100,100,0.4)',
         noi: 1,
@@ -375,59 +332,52 @@ var pagroof = function (xoff, yoff, args) {
     );
   }
 
-  return canv;
+  return svg;
 };
 
-export function arch01(xoff: number, yoff: number, seed = 0, args) {
-  var args = args != undefined ? args : {};
-  var alto = args.alto != undefined ? args.alto : 70;
-  var ancho = args.ancho != undefined ? args.ancho : 180;
-  var per = args.per != undefined ? args.per : 5;
+export function arch01(x: number, y: number, seed = 0, args?: ArgsArco) {
+  const predeterminados = { alto: 70, ancho: 180, per: 5 };
+  const { alto, ancho, per } = { ...predeterminados, ...args };
+  const p = 0.4 + Math.random() * 0.2;
+  const h0 = alto * p;
+  const h1 = alto * (1 - p);
+  let svg = chozaTecho(x, y - alto, { alto: h0, ancho: ancho });
 
-  seed = seed != undefined ? seed : 0;
-
-  var p = 0.4 + Math.random() * 0.2;
-  var h0 = alto * p;
-  var h1 = alto * (1 - p);
-
-  var canv = '';
-
-  canv += chozaTecho(xoff, yoff - alto, { alto: h0, ancho: ancho });
-
-  canv += caja(xoff, yoff, {
+  svg += caja(x, y, {
     alto: h1,
     ancho: (ancho * 2) / 3,
     per: per,
     bot: false,
   });
 
-  canv += rail(xoff, yoff, seed, {
+  svg += rail(x, y, seed, {
     tra: true,
     fro: false,
     alto: 10,
-    ancho: ancho,
+    ancho,
     per: per * 2,
     seg: (3 + Math.random() * 3) | 0,
   });
 
-  var mcnt = randChoice([0, 1, 1, 2]);
+  const mcnt = randChoice<number>([0, 1, 1, 2]);
 
   if (mcnt == 1) {
-    canv += man(xoff + normRand(-ancho / 3, ancho / 3), yoff, {
+    svg += man(x + normRand(-ancho / 3, ancho / 3), y, {
       fli: randChoice([true, false]),
       sca: 0.42,
     });
   } else if (mcnt == 2) {
-    canv += man(xoff + normRand(-ancho / 4, -ancho / 5), yoff, {
+    svg += man(x + normRand(-ancho / 4, -ancho / 5), y, {
       fli: false,
       sca: 0.42,
     });
-    canv += man(xoff + normRand(ancho / 5, ancho / 4), yoff, {
+    svg += man(x + normRand(ancho / 5, ancho / 4), y, {
       fli: true,
       sca: 0.42,
     });
   }
-  canv += rail(xoff, yoff, seed, {
+
+  svg += rail(x, y, seed, {
     tra: false,
     fro: true,
     alto: 10,
@@ -436,43 +386,44 @@ export function arch01(xoff: number, yoff: number, seed = 0, args) {
     seg: (3 + Math.random() * 3) | 0,
   });
 
-  return canv;
+  return svg;
 }
 
-export function arch02(xoff, yoff, seed, args) {
-  var args = args != undefined ? args : {};
-  var alto = args.alto != undefined ? args.alto : 10;
-  var ancho = args.ancho != undefined ? args.ancho : 50;
-  var rot = args.rot != undefined ? args.rot : 0.3;
-  var per = args.per != undefined ? args.per : 5;
-  var sto = args.sto != undefined ? args.sto : 3;
-  var sty = args.sty != undefined ? args.sty : 1;
-  var rai = args.rai != undefined ? args.rai : false;
+export function arch02(x: number, y: number, seed = 0, args?: ArgsArco) {
+  const predeterminados = {
+    alto: 10,
+    ancho: 50,
+    rot: 0.3,
+    per: 5,
+    sto: 3,
+    sty: 1,
+    rai: false,
+  };
 
-  seed = seed != undefined ? seed : 0;
-  var canv = '';
+  const { alto, ancho, rot, per, sto, sty, rai } = { ...predeterminados, ...args };
+  let svg = '';
+  let hoff = 0;
 
-  var hoff = 0;
-  for (var i = 0; i < sto; i++) {
-    canv += caja(xoff, yoff - hoff, {
+  for (let i = 0; i < sto; i++) {
+    svg += caja(x, y - hoff, {
       tra: false,
       alto: alto,
       ancho: ancho * Math.pow(0.85, i),
       rot: rot,
       wei: 1.5,
       per: per,
-      dec: (a: number) => {
-        return deco(
-          sty,
-          Object.assign({}, a, {
-            hsp: [[], [1, 5], [1, 5], [1, 4]][sty],
-            vsp: [[], [1, 2], [1, 2], [1, 3]][sty],
-          })
-        );
+      dec: (opciones) => {
+        const argumentos: ArgsDeco = Object.assign({}, opciones, {
+          hsp: [[], [1, 5], [1, 5], [1, 4]][sty],
+          vsp: [[], [1, 2], [1, 2], [1, 3]][sty],
+        });
+
+        return deco(sty, argumentos);
       },
     });
-    canv += rai
-      ? rail(xoff, yoff - hoff, i * 0.2, {
+
+    svg += rai
+      ? rail(x, y - hoff, i * 0.2, {
           ancho: ancho * Math.pow(0.85, i) * 1.1,
           alto: alto / 2,
           per: per,
@@ -481,49 +432,39 @@ export function arch02(xoff, yoff, seed, args) {
           tra: false,
         })
       : [];
-    var pla = undefined;
-    if (sto == 1 && Math.random() < 1 / 3) {
-      pla = [1, 'Pizza Hut'];
-    }
-    canv += roof(xoff, yoff - hoff - alto, {
+
+    svg += techo(x, y - hoff - alto, {
       alto: alto,
       ancho: ancho * Math.pow(0.9, i),
       rot: rot,
       wei: 1.5,
       per: per,
-      pla: pla,
     });
 
     hoff += alto * 1.5;
   }
-  return canv;
+
+  return svg;
 }
 
-export function arch03(xoff, yoff, seed, args) {
-  var args = args != undefined ? args : {};
-  var alto = args.alto != undefined ? args.alto : 10;
-  var ancho = args.ancho != undefined ? args.ancho : 50;
-  var rot = args.rot != undefined ? args.rot : 0.7;
-  var per = args.per != undefined ? args.per : 5;
-  var sto = args.sto != undefined ? args.sto : 7;
+export function arch03(x: number, y: number, seed = 0, args?: ArgsArco) {
+  const predeterminados = { alto: 10, ancho: 50, rot: 0.7, per: 5, sto: 7 };
+  const { alto, ancho, rot, per, sto } = { ...predeterminados, ...args };
+  let svg = '';
+  let hoff = 0;
 
-  seed = seed != undefined ? seed : 0;
-  var canv = '';
-
-  var hoff = 0;
-  for (var i = 0; i < sto; i++) {
-    canv += caja(xoff, yoff - hoff, {
+  for (let i = 0; i < sto; i++) {
+    svg += caja(x, y - hoff, {
       tra: false,
-      alto: alto,
+      alto,
       ancho: ancho * Math.pow(0.85, i),
       rot: rot,
       wei: 1.5,
       per: per / 2,
-      dec: (a) => {
-        return deco(1, Object.assign({}, a, { hsp: [1, 4], vsp: [1, 2] }));
-      },
+      dec: (a) => deco(1, Object.assign({}, a, { hsp: [1, 4], vsp: [1, 2] })),
     });
-    canv += rail(xoff, yoff - hoff, i * 0.2, {
+
+    svg += rail(x, y - hoff, i * 0.2, {
       seg: 5,
       ancho: ancho * Math.pow(0.85, i) * 1.1,
       alto: alto / 2,
@@ -532,40 +473,37 @@ export function arch03(xoff, yoff, seed, args) {
       wei: 0.5,
       tra: false,
     });
-    canv += pagroof(xoff, yoff - hoff - alto, {
+
+    svg += pagroof(x, y - hoff - alto, {
       alto: alto * 1.5,
       ancho: ancho * Math.pow(0.9, i),
-      rot: rot,
       wei: 1.5,
       per: per,
     });
     hoff += alto * 1.5;
   }
-  return canv;
+
+  return svg;
 }
 
-export function arch04(xoff: number, yoff: number, seed = 0, args) {
-  var args = args != undefined ? args : {};
-  var alto = args.alto != undefined ? args.alto : 15;
-  var ancho = args.ancho != undefined ? args.ancho : 30;
-  var rot = args.rot != undefined ? args.rot : 0.7;
-  var per = args.per != undefined ? args.per : 5;
-  var sto = args.sto != undefined ? args.sto : 2;
+export function arch04(x: number, y: number, seed = 0, args?: ArgsArco) {
+  const predeterminados = { alto: 15, ancho: 30, rot: 0.7, per: 5, sto: 2 };
+  const { alto, ancho, rot, per, sto } = { ...predeterminados, ...args };
+  let svg = '';
+  let hoff = 0;
 
-  var canv = '';
-
-  var hoff = 0;
-  for (var i = 0; i < sto; i++) {
-    canv += caja(xoff, yoff - hoff, {
+  for (let i = 0; i < sto; i++) {
+    svg += caja(x, y - hoff, {
       tra: true,
-      alto: alto,
+      alto,
       ancho: ancho * Math.pow(0.85, i),
       rot: rot,
       wei: 1.5,
       per: per / 2,
       dec: () => [],
     });
-    canv += rail(xoff, yoff - hoff, i * 0.2, {
+
+    svg += rail(x, y - hoff, i * 0.2, {
       seg: 3,
       ancho: ancho * Math.pow(0.85, i) * 1.2,
       alto: alto / 3,
@@ -574,14 +512,15 @@ export function arch04(xoff: number, yoff: number, seed = 0, args) {
       wei: 0.5,
       tra: true,
     });
-    canv += pagroof(xoff, yoff - hoff - alto, {
+
+    svg += pagroof(x, y - hoff - alto, {
       alto: alto * 1,
       ancho: ancho * Math.pow(0.9, i),
-      rot: rot,
       wei: 1.5,
       per: per,
     });
     hoff += alto * 1.2;
   }
-  return canv;
+
+  return svg;
 }

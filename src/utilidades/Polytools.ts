@@ -6,7 +6,7 @@ type ArgsTriangulacion = {
   optimize: boolean;
 };
 
-export function centro(puntos: Punto[]) {
+export function buscarCentro(puntos: Punto[]) {
   return puntos.reduce(
     (acc: number[], v: number[]) => [v[0] / puntos.length + acc[0], v[1] / puntos.length + acc[1]],
     [0, 0]
@@ -66,17 +66,17 @@ export function triangulate(
     return scount % 2 == 1;
   }
 
-  function lnInPoly(ln: Punto[], plist: Punto[]) {
+  function lnInPoly(linea: [Punto, Punto], plist: Punto[]) {
     const lnc: [Punto, Punto] = [
       [0, 0],
       [0, 0],
     ];
     const ep = 0.01;
 
-    lnc[0][0] = ln[0][0] * (1 - ep) + ln[1][0] * ep;
-    lnc[0][1] = ln[0][1] * (1 - ep) + ln[1][1] * ep;
-    lnc[1][0] = ln[0][0] * ep + ln[1][0] * (1 - ep);
-    lnc[1][1] = ln[0][1] * ep + ln[1][1] * (1 - ep);
+    lnc[0][0] = linea[0][0] * (1 - ep) + linea[1][0] * ep;
+    lnc[0][1] = linea[0][1] * (1 - ep) + linea[1][1] * ep;
+    lnc[1][0] = linea[0][0] * ep + linea[1][0] * (1 - ep);
+    lnc[1][1] = linea[0][1] * ep + linea[1][1] * (1 - ep);
 
     for (let i = 0; i < plist.length; i++) {
       const pt = plist[i];
@@ -86,12 +86,9 @@ export function triangulate(
       }
     }
 
-    const mid = centro(ln);
+    const mid = buscarCentro(linea);
 
-    if (ptInPoly(mid, plist) == false) {
-      return false;
-    }
-    return true;
+    return ptInPoly(mid, plist);
   }
 
   function sidesOf(plist: Punto[]) {
@@ -166,7 +163,7 @@ export function triangulate(
       const lind = (ind + 2) % plist.length;
 
       try {
-        const mid = centro([plist[ind], plist[nind]]);
+        const mid = buscarCentro([plist[ind], plist[nind]]);
         return shatter([plist[ind], mid, plist[lind]], a).concat(shatter([plist[lind], plist[nind], mid], a));
       } catch (err) {
         console.log(plist);

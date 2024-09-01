@@ -25,7 +25,7 @@ export function calcViewBox(x: number, ancho: number, alto: number) {
   return `${x} 0 ${ancho / zoom} ${alto / zoom}`;
 }
 
-export const invertir = (puntos: Punto[] | Punto[][], axis = 0) => {
+export function invertir<Esquema>(puntos: Punto[] | Punto[][], axis = 0) {
   for (let i = 0; i < puntos.length; i++) {
     if (puntos[i].length > 0) {
       if (typeof puntos[i][0] == 'object') {
@@ -37,5 +37,5 @@ export const invertir = (puntos: Punto[] | Punto[][], axis = 0) => {
       }
     }
   }
-  return puntos;
-};
+  return puntos as Esquema;
+}

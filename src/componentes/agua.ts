@@ -1,28 +1,30 @@
+import type { Punto } from '@/tipos';
 import { stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 
-export default (xoff: number, yoff: number, args?: { alto?: number; len?: number; clu?: number }) => {
+export default (x: number, y: number, args?: { alto?: number; len?: number; clu?: number }) => {
   const predeterminados = { alto: 2, len: 800, clu: 10 };
   const { alto, len, clu } = { ...predeterminados, ...args };
-  let canv = '';
-  const ptlist: number[][][] = [];
+  const puntos: Punto[][] = [];
+  let svg = '';
   let yk = 0;
 
   for (let i = 0; i < clu; i++) {
-    ptlist.push([]);
+    puntos.push([]);
     const xk = (Math.random() - 0.5) * (len / 8);
-    yk += Math.random() * 5;
     const lk = len / 4 + Math.random() * (len / 4);
     const reso = 5;
 
+    yk += Math.random() * 5;
+
     for (let j = -lk; j < lk; j += reso) {
-      ptlist[ptlist.length - 1].push([j + xk, Math.sin(j * 0.2) * alto * noise(j * 0.1) - 20 + yk]);
+      puntos[puntos.length - 1].push([j + xk, Math.sin(j * 0.2) * alto * noise(j * 0.1) - 20 + yk]);
     }
   }
 
-  for (let j = 1; j < ptlist.length; j += 1) {
-    canv += stroke(
-      ptlist[j].map((x) => [x[0] + xoff, x[1] + yoff]),
+  for (let j = 1; j < puntos.length; j++) {
+    svg += stroke(
+      puntos[j].map((p) => [p[0] + x, p[1] + y]),
       {
         col: `rgba(100,100,100,${(0.3 + Math.random() * 0.3).toFixed(3)})`,
         ancho: 1,
@@ -30,5 +32,5 @@ export default (xoff: number, yoff: number, args?: { alto?: number; len?: number
     );
   }
 
-  return canv;
+  return svg;
 };
