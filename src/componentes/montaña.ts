@@ -6,6 +6,7 @@ import { arch02, arch03, arch04 } from '@/componentes/Arch';
 import roca from '@/componentes/roca';
 import torreLuz from '@/componentes/torreLuz';
 import { tree01, tree02, tree03 } from '@/componentes/Tree';
+import { PI } from '@/utilidades/constantes';
 
 export default function montaña(xoff: number, yoff: number, seed = 0, args?: OpcionesMontaña) {
   const predeterminados = {
@@ -29,32 +30,33 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
     puntos.push([]);
 
     for (let i = 0; i < reso[1]; i++) {
-      const x = (i / reso[1] - 0.5) * Math.PI;
-      let y = Math.cos(x);
-      y *= noise(x + 10, j * 0.15, seed);
+      const x = (i / reso[1] - 0.5) * PI;
+      const y = Math.cos(x) * noise(x + 10, j * 0.15, seed);
       const p = 1 - j / reso[0];
-      puntos[puntos.length - 1].push([(x / Math.PI) * w * p, -y * h * p + hoff]);
+      puntos[puntos.length - 1].push([(x / PI) * w * p, -y * h * p + hoff]);
     }
   }
 
   function vegetate(
     treeFunc: (x: number, y: number) => string,
     growthRule: (i: number, j: number) => boolean,
-    proofRule: (veglist: number[][], i: number) => boolean
+    proofRule: (veglist: Punto[], i: number) => boolean
   ) {
-    const veglist = [];
+    const veglist: Punto[] = [];
 
-    for (let i = 0; i < puntos.length; i += 1) {
-      for (let j = 0; j < puntos[i].length; j += 1) {
+    for (let i = 0; i < puntos.length; i++) {
+      for (let j = 0; j < puntos[i].length; j++) {
         if (growthRule(i, j)) {
-          veglist.push([puntos[i][j][0], puntos[i][j][1]]);
+          const p = puntos[i][j];
+          veglist.push(p);
         }
       }
     }
 
     for (let i = 0; i < veglist.length; i++) {
       if (proofRule(veglist, i)) {
-        svg += treeFunc(veglist[i][0], veglist[i][1]);
+        const [_x, _y] = veglist[i];
+        svg += treeFunc(_x, _y);
       }
     }
   }
@@ -84,12 +86,12 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
 
   /** Contorno pero sin piso o parte baja */
   svg += stroke(
-    puntos[0].map((x) => [x[0] + xoff, x[1] + yoff]),
+    puntos[0].map((p) => [p[0] + xoff, p[1] + yoff]),
     { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
 
   /** Contornos parte baja de la montaña, como deditos de pies */
-  svg += foot(puntos, { xof: xoff, yof: yoff });
+  svg += foot(puntos, { x: xoff, y: yoff });
 
   /** Textura interior */
   svg += texture(puntos, {
@@ -210,7 +212,7 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   vegetate(
     (x: number, y: number) => torreLuz(x + xoff, y + yoff),
     (i: number, j: number) => {
-      const ns = noise(i * 0.2, j * 0.05, seed + 20 * Math.PI);
+      const ns = noise(i * 0.2, j * 0.05, seed + 20 * PI);
       return i % 2 == 0 && (j == 1 || j == puntos[i].length - 2) && ns * ns * ns * ns < 0.002;
     },
     () => true

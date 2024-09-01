@@ -5,6 +5,7 @@ import roca from './roca';
 import { tree02, tree04, tree05, tree06, tree07, tree08 } from './Tree';
 import { arch01 } from './Arch';
 import type { Punto } from '@/tipos';
+import { PI } from '@/utilidades/constantes';
 
 export function flatMount(
   xoff: number,
@@ -34,10 +35,10 @@ export function flatMount(
     flat.push([]);
 
     for (let i = 0; i < reso[1]; i++) {
-      const x = (i / reso[1] - 0.5) * Math.PI;
+      const x = (i / reso[1] - 0.5) * PI;
       const y = (Math.cos(x * 2) + 1) * noise(x + 10, j * 0.1, seed);
       const p = 1 - (j / reso[0]) * 0.6;
-      const nx = (x / Math.PI) * ancho * p;
+      const nx = (x / PI) * ancho * p;
       let ny = -y * alto * p + hoff;
       const h = 100;
 
@@ -66,7 +67,7 @@ export function flatMount(
 
   //OUTLINE
   canv += stroke(
-    puntos[0].map((x) => [x[0] + xoff, x[1] + yoff]),
+    puntos[0].map((p) => [p[0] + xoff, p[1] + yoff]),
     { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
 
@@ -75,7 +76,7 @@ export function flatMount(
     yof: yoff,
     tex: tex,
     ancho: 2,
-    dis: function () {
+    dis: () => {
       if (Math.random() > 0.5) {
         return 0.1 + 0.4 * Math.random();
       } else {
@@ -137,7 +138,7 @@ export function flatMount(
   });
 
   canv += stroke(
-    grlist.map((x) => [x[0] + xoff, x[1] + yoff]),
+    grlist.map((p) => [p[0] + xoff, p[1] + yoff]),
     {
       ancho: 3,
       col: 'rgba(100,100,100,0.2)',
@@ -156,7 +157,7 @@ export function flatMount(
       if (y < ymin) ymin = y;
       if (y > ymax) ymax = y;
     });
-    console.log({ xmin, xmax, ymin, ymax });
+
     return { xmin, xmax, ymin, ymax };
   };
 

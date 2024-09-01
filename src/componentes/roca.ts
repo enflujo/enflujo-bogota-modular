@@ -1,4 +1,5 @@
 import type { Punto } from '@/tipos';
+import { DOS_PI, MEDIO_PI, PI } from '@/utilidades/constantes';
 import { stroke, texture } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 import { loopNoise, poly } from '@/utilidades/Util';
@@ -31,7 +32,7 @@ export default (
     loopNoise(nslist);
 
     for (let j = 0; j < reso[1]; j++) {
-      const a = (j / reso[1]) * Math.PI * 2 - Math.PI / 2;
+      const a = (j / reso[1]) * DOS_PI - MEDIO_PI;
       let l = (ancho * alto) / Math.sqrt(Math.pow(alto * Math.cos(a), 2) + Math.pow(ancho * Math.sin(a), 2));
       l *= 0.7 + 0.3 * nslist[j];
 
@@ -39,7 +40,7 @@ export default (
       const nx = Math.cos(a) * l * p;
       let ny = -Math.sin(a) * l * p;
 
-      if (Math.PI < a || a < 0) ny *= 0.2;
+      if (PI < a || a < 0) ny *= 0.2;
       ny += alto * (i / reso[0]) * 0.2;
       ptlist[ptlist.length - 1].push([nx, ny]);
     }
@@ -54,7 +55,7 @@ export default (
   });
   //OUTLINE
   canv += stroke(
-    ptlist[0].map((x) => [x[0] + xoff, x[1] + yoff]),
+    ptlist[0].map((p) => [p[0] + xoff, p[1] + yoff]),
     { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
   canv += texture(ptlist, {

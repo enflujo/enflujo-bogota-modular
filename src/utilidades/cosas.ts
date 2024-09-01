@@ -1,6 +1,7 @@
 import type { ArgsBolb, ArgsStroke, ArgsTexture, Punto } from '@/tipos';
 import { noise } from './Perlin';
 import { loopNoise, poly } from './Util';
+import { PI } from './constantes';
 
 console.log('************************************************');
 
@@ -12,7 +13,7 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
     col: 'rgba(200,200,200,0.9)',
     noi: 0.5,
     out: 1,
-    fun: (x: number) => Math.sin(x * Math.PI),
+    fun: (x: number) => Math.sin(x * PI),
   };
 
   const { xof, yof, ancho, col, noi, out, fun } = { ...predeterminados, ...args };
@@ -32,7 +33,7 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
     let a2 = Math.atan2(ptlist[i][1] - ptlist[i + 1][1], ptlist[i][0] - ptlist[i + 1][0]);
     let a = (a1 + a2) / 2;
     if (a < a2) {
-      a += Math.PI;
+      a += PI;
     }
     vtxlist0.push([ptlist[i][0] + w * Math.cos(a), ptlist[i][1] + w * Math.sin(a)]);
     vtxlist1.push([ptlist[i][0] - w * Math.cos(a), ptlist[i][1] - w * Math.sin(a)]);
@@ -43,7 +44,7 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
     .concat([ptlist[0]]);
 
   const canv = poly(
-    vtxlist.map((x) => [x[0] + xof, x[1] + yof]),
+    vtxlist.map((p) => [p[0] + xof, p[1] + yof]),
     { fil: col, str: col, ancho: out }
   );
 
@@ -59,7 +60,7 @@ export function blob(x: number, y: number, args: ArgsBolb) {
     noi: 0.5,
     ret: 0,
     fun: (x: number) => {
-      return x <= 1 ? Math.pow(Math.sin(x * Math.PI), 0.5) : -Math.pow(Math.sin((x + 1) * Math.PI), 0.5);
+      return x <= 1 ? Math.pow(Math.sin(x * PI), 0.5) : -Math.pow(Math.sin((x + 1) * PI), 0.5);
     },
   };
   const { len, ancho, ang, col, noi, ret, fun } = { ...predeterminados, ...args };

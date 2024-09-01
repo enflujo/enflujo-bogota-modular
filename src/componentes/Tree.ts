@@ -1,7 +1,8 @@
 import type { ArgsArbol1, ArgsArbol2, ArgsArbol3, ArgsTwig, Punto } from '@/tipos';
+import { DOS_PI, MEDIO_PI, PI, TRES_PI } from '@/utilidades/constantes';
 import { blob, div, stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
-import { centro, triangulate } from '@/utilidades/Polytools';
+import { buscarCentro, triangulate } from '@/utilidades/Polytools';
 import { distance, loopNoise, normRand, poly, randChoice, randGaussian } from '@/utilidades/Util';
 
 export function tree01(x: number, y: number, args: ArgsArbol1) {
@@ -43,7 +44,7 @@ export function tree01(x: number, y: number, args: ArgsArbol1) {
         canv += blob(nx + (Math.random() - 0.5) * ancho * 1.2 * (reso - i), ny + (Math.random() - 0.5) * ancho, {
           len: Math.random() * 20 * (reso - i) * 0.2 + 10,
           ancho: Math.random() * 6 + 3,
-          ang: ((Math.random() - 0.5) * Math.PI) / 6,
+          ang: ((Math.random() - 0.5) * PI) / 6,
           col: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(1)})`,
         });
       }
@@ -78,11 +79,9 @@ export function tree02(x: number, y: number, args?: ArgsArbol2) {
 
   for (let i = 0; i < clu; i++) {
     canv += blob(x + randGaussian() * clu * 4, y + randGaussian() * clu * 4, {
-      ang: Math.PI / 2,
+      ang: MEDIO_PI,
       fun: (x: number) => {
-        return x <= 1
-          ? Math.pow(Math.sin(x * Math.PI) * x, 0.5)
-          : -Math.pow(Math.sin((x - 2) * Math.PI * (x - 2)), 0.5);
+        return x <= 1 ? Math.pow(Math.sin(x * PI) * x, 0.5) : -Math.pow(Math.sin((x - 2) * PI * (x - 2)), 0.5);
       },
       ancho: Math.random() * ancho * 0.75 + ancho * 0.5,
       len: Math.random() * alto * 0.75 + alto * 0.5,
@@ -133,7 +132,7 @@ export function tree03(x: number, y: number, args: ArgsArbol3) {
         blobs += blob(nx + ox * randChoice<number>([-1, 1]), ny + (Math.random() - 0.5) * ancho * 2, {
           len: ox * 2,
           ancho: Math.random() * 6 + 3,
-          ang: ((Math.random() - 0.5) * Math.PI) / 6,
+          ang: ((Math.random() - 0.5) * PI) / 6,
           col: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(3)})`,
         });
       }
@@ -153,7 +152,7 @@ function branch(args: ArgsArbol1) {
     ancho: 6,
     ang: 0,
     det: 10,
-    ben: Math.PI * 0.2,
+    ben: PI * 0.2,
   };
   const { alto, ancho, ang, det, ben } = { ...predeterminadoRama, ...args };
 
@@ -203,14 +202,8 @@ function branch(args: ArgsArbol1) {
     }
 
     const nw = ancho * (((tl - i) / tl) * 0.5 + 0.5);
-    trlist1.push([
-      nx + Math.cos(ang + Math.PI / 2) * (nw + woff + b),
-      ny + Math.sin(ang + Math.PI / 2) * (nw + woff + b),
-    ]);
-    trlist2.push([
-      nx + Math.cos(ang - Math.PI / 2) * (nw - woff + b),
-      ny + Math.sin(ang - Math.PI / 2) * (nw - woff + b),
-    ]);
+    trlist1.push([nx + Math.cos(ang + MEDIO_PI) * (nw + woff + b), ny + Math.sin(ang + MEDIO_PI) * (nw + woff + b)]);
+    trlist2.push([nx + Math.cos(ang - MEDIO_PI) * (nw - woff + b), ny + Math.sin(ang - MEDIO_PI) * (nw - woff + b)]);
     lx = nx;
     ly = ny;
   }
@@ -230,7 +223,7 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
   const fun2 = (i: number) => -1 / Math.pow(i / tl + 1, 5) + 1;
 
   const tfun = randChoice([fun2]);
-  const a0 = ((Math.random() * Math.PI) / 6) * dir + ang;
+  const a0 = ((Math.random() * PI) / 6) * dir + ang;
   for (let i = 0; i < tl; i++) {
     const mx = dir * tfun(i / tl) * 50 * sca * hs;
     const my = -i * 5 * sca;
@@ -258,12 +251,10 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
           {
             ancho: (6 + 3 * Math.random()) * ancho,
             len: (15 + 12 * Math.random()) * ancho,
-            ang: ang / 2 + Math.PI / 2 + Math.PI * 0.2 * (Math.random() - 0.5),
+            ang: ang / 2 + MEDIO_PI + DOS_PI * (Math.random() - 0.5),
             col: 'rgba(100,100,100,' + (0.5 + dep * 0.2).toFixed(3) + ')',
             fun: (x: number) => {
-              return x <= 1
-                ? Math.pow(Math.sin(x * Math.PI) * x, 0.5)
-                : -Math.pow(Math.sin((x - 2) * Math.PI * (x - 2)), 0.5);
+              return x <= 1 ? Math.pow(Math.sin(x * PI) * x, 0.5) : -Math.pow(Math.sin((x - 2) * PI * (x - 2)), 0.5);
             },
           }
         );
@@ -272,7 +263,7 @@ function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
   }
   canv += stroke(twlist, {
     ancho: 1,
-    fun: (x) => Math.cos((x * Math.PI) / 2),
+    fun: (x) => Math.cos((x * PI) / 2),
     col: 'rgba(100,100,100,0.5)',
   });
   return canv;
@@ -282,9 +273,7 @@ function barkify(x, y, trlist) {
   function bark(x, y, ancho, ang) {
     var len = 10 + 10 * Math.random();
     var noi = 0.5;
-    var fun = function (x) {
-      return x <= 1 ? Math.pow(Math.sin(x * Math.PI), 0.5) : -Math.pow(Math.sin((x + 1) * Math.PI), 0.5);
-    };
+    var fun = (x) => (x <= 1 ? Math.pow(Math.sin(x * PI), 0.5) : -Math.pow(Math.sin((x + 1) * PI), 0.5));
     var reso = 20.0;
     var canv = '';
 
@@ -318,7 +307,7 @@ function barkify(x, y, trlist) {
       col: 'rgba(100,100,100,0.4)',
       out: 0,
       fun: function (x) {
-        return Math.sin((x + fr) * Math.PI * 3);
+        return Math.sin((x + fr) * TRES_PI);
       },
     });
 
@@ -357,7 +346,7 @@ function barkify(x, y, trlist) {
           {
             ancho: 4,
             len: 4 + 6 * Math.random(),
-            ang: a0 + Math.PI / 2,
+            ang: a0 + MEDIO_PI,
             col: 'rgba(100,100,100,0.6)',
           }
         );
@@ -399,7 +388,7 @@ export function tree04(x, y, args) {
   var txcanv = '';
   var twcanv = '';
 
-  var trlist = branch({ alto: alto, ancho: ancho, ang: -Math.PI / 2 });
+  var trlist = branch({ alto: alto, ancho: ancho, ang: -MEDIO_PI });
   txcanv += barkify(x, y, trlist);
   trlist = trlist[0].concat(trlist[1].reverse());
 
@@ -407,7 +396,7 @@ export function tree04(x, y, args) {
 
   for (var i = 0; i < trlist.length; i++) {
     if ((i >= trlist.length * 0.3 && i <= trlist.length * 0.7 && Math.random() < 0.1) || i == trlist.length / 2 - 1) {
-      var ba = Math.PI * 0.2 - Math.PI * 1.4 * (i > trlist.length / 2);
+      var ba = PI * 0.2 - PI * 1.4 * (i > trlist.length / 2);
       var brlist = branch({
         alto: alto * (Math.random() + 1) * 0.3,
         ancho: ancho * 0.5,
@@ -425,9 +414,9 @@ export function tree04(x, y, args) {
         if (Math.random() < 0.2 || j == brlist[0].length - 1) {
           twcanv += twig(brlist[0][j][0] + trlist[i][0] + x, brlist[0][j][1] + trlist[i][1] + y, 1, {
             ancho: alto / 300,
-            ang: ba > -Math.PI / 2 ? ba : ba + Math.PI,
+            ang: ba > -MEDIO_PI ? ba : ba + PI,
             sca: (0.5 * alto) / 300,
-            dir: ba > -Math.PI / 2 ? 1 : -1,
+            dir: ba > -MEDIO_PI ? 1 : -1,
           });
         }
       }
@@ -472,7 +461,7 @@ export function tree05(x, y, args) {
   var txcanv = '';
   var twcanv = '';
 
-  var trlist = branch({ alto: alto, ancho: ancho, ang: -Math.PI / 2, ben: 0 });
+  var trlist = branch({ alto: alto, ancho: ancho, ang: -MEDIO_PI, ben: 0 });
   txcanv += barkify(x, y, trlist);
   trlist = trlist[0].concat(trlist[1].reverse());
 
@@ -485,7 +474,7 @@ export function tree05(x, y, args) {
       i == trlist.length / 2 - 1
     ) {
       var bar = Math.random() * 0.2;
-      var ba = -bar * Math.PI - (1 - bar * 2) * Math.PI * (i > trlist.length / 2);
+      var ba = -bar * PI - (1 - bar * 2) * PI * (i > trlist.length / 2);
       var brlist = branch({
         alto: alto * (0.3 * p - Math.random() * 0.05),
         ancho: ancho * 0.5,
@@ -504,9 +493,9 @@ export function tree05(x, y, args) {
         if (j % 20 == 0 || j == brlist[0].length - 1) {
           twcanv += twig(brlist[0][j][0] + trlist[i][0] + x, brlist[0][j][1] + trlist[i][1] + y, 0, {
             ancho: alto / 300,
-            ang: ba > -Math.PI / 2 ? ba : ba + Math.PI,
+            ang: ba > -MEDIO_PI ? ba : ba + PI,
             sca: (0.2 * alto) / 300,
-            dir: ba > -Math.PI / 2 ? 1 : -1,
+            dir: ba > -MEDIO_PI ? 1 : -1,
             lea: [true, 5],
           });
         }
@@ -547,7 +536,6 @@ export function tree06(x, y, args) {
   var alto = args.alto != undefined ? args.alto : 100;
   var ancho = args.ancho != undefined ? args.ancho : 6;
   var col = args.col != undefined ? args.col : 'rgba(100,100,100,0.5)';
-  var noi = args.noi != undefined ? args.noi : 0.5;
 
   var canv = '';
   var txcanv = '';
@@ -558,7 +546,7 @@ export function tree06(x, y, args) {
     var alto = args.alto != undefined ? args.alto : 300;
     var ancho = args.ancho != undefined ? args.ancho : 5;
     var ang = args.ang != undefined ? args.ang : 0;
-    var ben = args.ben != undefined ? args.ben : Math.PI * 0.2;
+    var ben = args.ben != undefined ? args.ben : PI * 0.2;
 
     var trlist = branch({
       alto: alto,
@@ -581,7 +569,7 @@ export function tree06(x, y, args) {
         dep > 0
       ) {
         var bar = 0.02 + Math.random() * 0.08;
-        var ba = bar * Math.PI - bar * 2 * Math.PI * (i > trlist.length / 2);
+        var ba = bar * PI - bar * 2 * PI * (i > trlist.length / 2);
 
         var brlist = fracTree(trlist[i][0] + xoff, trlist[i][1] + yoff, dep - 1, {
           alto: alto * (0.7 + Math.random() * 0.2),
@@ -616,7 +604,7 @@ export function tree06(x, y, args) {
   var trmlist = fracTree(x, y, 3, {
     alto: alto,
     ancho: ancho,
-    ang: -Math.PI / 2,
+    ang: -MEDIO_PI,
     ben: 0,
   });
 
@@ -629,7 +617,7 @@ export function tree06(x, y, args) {
     {
       col: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
       ancho: 2.5,
-      fun: (x) => Math.sin(1),
+      fun: () => Math.sin(1),
       noi: 0.9,
       out: 0,
     }
@@ -668,6 +656,7 @@ export function tree07(x, y, args) {
   var line1 = [];
   var line2 = [];
   var T = [];
+
   for (var i = 0; i < reso; i++) {
     var nx = x + ben(i / reso) * 100;
     var ny = y - (i * alto) / reso;
@@ -679,7 +668,7 @@ export function tree07(x, y, args) {
           {
             len: Math.random() * 50 + 20,
             ancho: Math.random() * 12 + 12,
-            ang: (-Math.random() * Math.PI) / 6,
+            ang: (-Math.random() * PI) / 6,
             col:
               'rgba(' +
               leafcol[0] +
@@ -719,7 +708,7 @@ export function tree07(x, y, args) {
   }).concat(T);
 
   for (var k = 0; k < T.length; k++) {
-    var m = centro(T[k]);
+    var m = buscarCentro(T[k]);
     var c = (noise(m[0] * 0.02, m[1] * 0.02) * 200 + 50) | 0;
     var co = 'rgba(' + c + ',' + c + ',' + c + ',0.8)';
     canv += poly(T[k], { fil: co, str: co, ancho: 0 });
@@ -737,13 +726,13 @@ export function tree08(x: number, y: number, args) {
   var txcanv = '';
   var twcanv = '';
 
-  var ang = normRand(-1, 1) * Math.PI * 0.2;
+  var ang = normRand(-1, 1) * PI * 0.2;
 
   var trlist = branch({
     alto: alto,
     ancho: ancho,
-    ang: -Math.PI / 2 + ang,
-    ben: Math.PI * 0.2,
+    ang: -MEDIO_PI + ang,
+    ben: PI * 0.2,
     det: alto / 20,
   });
   //txcanv += barkify(x,y,trlist)
@@ -752,11 +741,11 @@ export function tree08(x: number, y: number, args) {
 
   function fracTree(xoff, yoff, dep, args) {
     var args = args != undefined ? args : {};
-    var ang = args.ang != undefined ? args.ang : -Math.PI / 2;
+    var ang = args.ang != undefined ? args.ang : -MEDIO_PI;
     var len = args.len != undefined ? args.len : 15;
     var ben = args.ben != undefined ? args.ben : 0;
 
-    const fun = dep == 0 ? (x: number) => Math.cos(0.5 * Math.PI * x) : () => 1;
+    const fun = dep == 0 ? (x: number) => Math.cos(0.5 * PI * x) : () => 1;
     var spt = [xoff, yoff];
     var ept = [xoff + Math.cos(ang) * len, yoff + Math.sin(ang) * len];
 
@@ -765,7 +754,7 @@ export function tree08(x: number, y: number, args) {
       [xoff + len, yoff],
     ];
 
-    const bfun = randChoice<(x: number) => number>([(x) => Math.sin(x * Math.PI), (x) => -Math.sin(x * Math.PI)]);
+    const bfun = randChoice<(x: number) => number>([(x) => Math.sin(x * PI), (x) => -Math.sin(x * PI)]);
 
     trmlist = div(trmlist, 10);
 
@@ -786,15 +775,15 @@ export function tree08(x: number, y: number, args) {
       col: 'rgba(100,100,100,0.5)',
     });
     if (dep != 0) {
-      var nben = ben + randChoice<number>([-1, 1]) * Math.PI * 0.001 * dep * dep;
+      var nben = ben + randChoice<number>([-1, 1]) * PI * 0.001 * dep * dep;
       if (Math.random() < 0.5) {
         tcanv += fracTree(ept[0], ept[1], dep - 1, {
-          ang: ang + ben + Math.PI * randChoice<number>([normRand(-1, 0.5), normRand(0.5, 1)]) * 0.2,
+          ang: ang + ben + PI * randChoice<number>([normRand(-1, 0.5), normRand(0.5, 1)]) * 0.2,
           len: len * normRand(0.8, 0.9),
           ben: nben,
         });
         tcanv += fracTree(ept[0], ept[1], dep - 1, {
-          ang: ang + ben + Math.PI * randChoice<number>([normRand(-1, -0.5), normRand(0.5, 1)]) * 0.2,
+          ang: ang + ben + PI * randChoice<number>([normRand(-1, -0.5), normRand(0.5, 1)]) * 0.2,
           len: len * normRand(0.8, 0.9),
           ben: nben,
         });
@@ -813,12 +802,12 @@ export function tree08(x: number, y: number, args) {
     if (Math.random() < 0.2) {
       twcanv += fracTree(x + trlist[i][0], y + trlist[i][1], Math.floor(4 * Math.random()), {
         alto: 20,
-        ang: -Math.PI / 2 - ang * Math.random(),
+        ang: -MEDIO_PI - ang * Math.random(),
       });
     } else if (i == Math.floor(trlist.length / 2)) {
       twcanv += fracTree(x + trlist[i][0], y + trlist[i][1], 3, {
         alto: 25,
-        ang: -Math.PI / 2 + ang,
+        ang: -MEDIO_PI + ang,
       });
     }
   }
