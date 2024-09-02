@@ -150,7 +150,7 @@ const rail = (x: number, y: number, seed = 0, args?: ArgsRail) => {
     svg += stroke(
       ptlist[i].map((p) => [p[0] + x, p[1] + y]),
       {
-        col: 'rgba(100,100,100,0.5)',
+        color: 'rgba(100,100,100,0.5)',
         noi: 0.5,
         ancho: wei,
         fun: () => 1,
@@ -257,7 +257,7 @@ const techo = (x: number, y: number, args: ArgsTecho) => {
     svg += stroke(
       puntos[i].map((p) => [p[0] + x, p[1] + y]),
       {
-        col: 'rgba(100,100,100,0.4)',
+        color: 'rgba(100,100,100,0.4)',
         noi: 1,
         ancho: wei,
         fun: () => 1,
@@ -324,7 +324,7 @@ const pagroof = (x: number, y: number, args?: ArgsPagRoof) => {
     svg += stroke(
       div(puntos[i], 5).map((p) => [p[0] + x, p[1] + y]),
       {
-        col: 'rgba(100,100,100,0.4)',
+        color: 'rgba(100,100,100,0.4)',
         noi: 1,
         ancho: wei,
         fun: () => 1,

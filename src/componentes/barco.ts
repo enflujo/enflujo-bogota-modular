@@ -4,7 +4,7 @@ import { poly } from '@/utilidades/Util';
 import { hat02, man, stick01 } from '@/componentes/Man';
 import { DOS_PI, PI } from '@/utilidades/constantes';
 
-export default (x: number, y: number, args?: ArgsBarco) => {
+export default function barco(x: number, y: number, args?: ArgsBarco) {
   const predeterminados = { len: 120, sca: 1, fli: false };
   const { len, sca, fli } = { ...predeterminados, ...args };
   const dir = fli ? -1 : 1;
@@ -17,7 +17,7 @@ export default (x: number, y: number, args?: ArgsBarco) => {
     fli: !fli,
     len: [0, 30, 20, 30, 10, 30, 30, 30, 30],
   });
-  if (svg.includes('NaN')) console.log(svg);
+  // if (svg.includes('NaN')) console.log(svg);
   const plist1: Punto[] = [];
   const plist2: Punto[] = [];
   const fun1 = (x: number) => Math.pow(Math.sin(x * PI), 0.5) * 7 * sca;
@@ -36,9 +36,9 @@ export default (x: number, y: number, args?: ArgsBarco) => {
     {
       ancho: 1,
       fun: (_x) => Math.sin(_x * DOS_PI),
-      col: 'rgba(100,100,100,0.4)',
+      color: 'rgba(100,100,100,0.4)',
     }
   );
 
   return svg;
-};
+}

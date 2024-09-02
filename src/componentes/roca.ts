@@ -4,12 +4,12 @@ import { stroke, texture } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 import { loopNoise, poly } from '@/utilidades/Util';
 
-export default (
+export default function roca(
   xoff: number,
   yoff: number,
   seed = 0,
   args?: { alto?: number; ancho?: number; tex?: number; sha?: number }
-) => {
+) {
   const predeterminados = {
     alto: 80,
     ancho: 100,
@@ -56,7 +56,7 @@ export default (
   //OUTLINE
   canv += stroke(
     ptlist[0].map((p) => [p[0] + xoff, p[1] + yoff]),
-    { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
+    { color: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
   canv += texture(ptlist, {
     xof: xoff,
@@ -64,7 +64,7 @@ export default (
     tex: tex,
     ancho: 3,
     sha: sha,
-    col: () => 'rgba(180,180,180,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
+    color: () => 'rgba(180,180,180,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
     dis: () => {
       if (Math.random() > 0.5) {
         return 0.15 + 0.15 * Math.random();
@@ -78,4 +78,4 @@ export default (
   //   canv += poly(ptlist[i], { x: xoff, y: yoff, fil: 'none', str: 'red', ancho: 2 });
   // }
   return canv;
-};
+}

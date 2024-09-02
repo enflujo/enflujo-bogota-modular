@@ -21,27 +21,19 @@ export function noise(x: number, y = 0, z = 0) {
     }
   }
 
-  if (x < 0) {
-    x = -x;
-  }
-  if (y < 0) {
-    y = -y;
-  }
-  if (z < 0) {
-    z = -z;
-  }
+  if (x < 0) x = -x;
+  if (y < 0) y = -y;
+  if (z < 0) z = -z;
 
-  let xi = Math.floor(x),
-    yi = Math.floor(y),
-    zi = Math.floor(z);
+  let xi = Math.floor(x);
+  let yi = Math.floor(y);
+  let zi = Math.floor(z);
   let xf = x - xi;
   let yf = y - yi;
   let zf = z - zi;
   let rxf, ryf;
-
   let r = 0;
   let ampl = 0.5;
-
   let n1, n2, n3;
 
   for (let o = 0; o < perlin_octaves; o++) {

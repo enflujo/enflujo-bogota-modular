@@ -2,7 +2,7 @@ import type { ArgsChoza, Punto } from '@/tipos';
 import { texture } from '@/utilidades/cosas';
 import { poly, wtrand } from '@/utilidades/Util';
 
-export default (x: number, y: number, args: ArgsChoza) => {
+export default function chozaTecho(x: number, y: number, args: ArgsChoza) {
   const predeterminados = { alto: 40, ancho: 180, tex: 300 };
   const { alto, ancho, tex } = { ...predeterminados, ...args };
   const reso = [10, 10];
@@ -57,7 +57,7 @@ export default (x: number, y: number, args: ArgsChoza) => {
     tex: tex,
     ancho: 1,
     len: 0.25,
-    col: () => 'rgba(120,120,120,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
+    color: () => 'rgba(120,120,120,' + (0.3 + Math.random() * 0.3).toFixed(3) + ')',
     dis: () => wtrand((a) => a * a),
     noi: () => 5,
   });
@@ -68,4 +68,4 @@ export default (x: number, y: number, args: ArgsChoza) => {
   // }
 
   return svg;
-};
+}

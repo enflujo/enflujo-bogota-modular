@@ -1,18 +1,15 @@
 import type { Punto } from '@/tipos';
 import { div, stroke } from '@/utilidades/cosas';
 
-export default (xoff: number, yoff: number, args?: { alto?: number; ancho?: number }) => {
+export default function torreLuz(x: number, y: number, args?: { alto?: number; ancho?: number }) {
   const predeterminados = { alto: 100, ancho: 20 };
   const { alto, ancho } = { ...predeterminados, ...args };
-
-  let svg = '';
-  const toGlobal = (v: Punto): Punto => [v[0] + xoff, v[1] + yoff];
-
+  const toGlobal = (v: Punto): Punto => [v[0] + x, v[1] + y];
   const quickstroke = (punto: Punto[]) => {
     return stroke(div(punto, 5).map(toGlobal), {
       ancho: 1,
       fun: () => 0.5,
-      col: 'rgba(100,100,100,0.4)',
+      color: 'rgba(100,100,100,0.4)',
     });
   };
 
@@ -29,6 +26,8 @@ export default (xoff: number, yoff: number, args?: { alto?: number; ancho?: numb
     [1, -0.675],
     [0.7, -0.5],
   ];
+
+  let svg = '';
 
   for (let i = 0; i < bch.length; i++) {
     svg += quickstroke([
@@ -69,4 +68,4 @@ export default (xoff: number, yoff: number, args?: { alto?: number; ancho?: numb
   svg += quickstroke([p01, p11, p21, p31]);
 
   return svg;
-};
+}

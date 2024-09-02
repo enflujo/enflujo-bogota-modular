@@ -2,7 +2,7 @@ import type { Punto } from '@/tipos';
 import { stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 
-export default (x: number, y: number, args?: { alto?: number; len?: number; clu?: number }) => {
+export default function agua(x: number, y: number, args?: { alto?: number; len?: number; clu?: number }) {
   const predeterminados = { alto: 2, len: 800, clu: 10 };
   const { alto, len, clu } = { ...predeterminados, ...args };
   const puntos: Punto[][] = [];
@@ -26,11 +26,11 @@ export default (x: number, y: number, args?: { alto?: number; len?: number; clu?
     svg += stroke(
       puntos[j].map((p) => [p[0] + x, p[1] + y]),
       {
-        col: `rgba(100,100,100,${(0.3 + Math.random() * 0.3).toFixed(3)})`,
+        color: `rgba(100,100,100,${(0.3 + Math.random() * 0.3).toFixed(3)})`,
         ancho: 1,
       }
     );
   }
 
   return svg;
-};
+}

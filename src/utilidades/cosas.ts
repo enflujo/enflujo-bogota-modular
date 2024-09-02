@@ -10,13 +10,13 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
     xof: 0,
     yof: 0,
     ancho: 2,
-    col: 'rgba(200,200,200,0.9)',
+    color: 'rgba(200,200,200,0.9)',
     noi: 0.5,
     out: 1,
     fun: (x: number) => Math.sin(x * PI),
   };
 
-  const { xof, yof, ancho, col, noi, out, fun } = { ...predeterminados, ...args };
+  const { xof, yof, ancho, color, noi, out, fun } = { ...predeterminados, ...args };
 
   if (ptlist.length == 0) return '';
 
@@ -45,7 +45,7 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
 
   const canv = poly(
     vtxlist.map((p) => [p[0] + xof, p[1] + yof]),
-    { fil: col, str: col, ancho: out }
+    { fil: color, str: color, ancho: out }
   );
 
   return canv;
@@ -56,14 +56,14 @@ export function blob(x: number, y: number, args: ArgsBolb) {
     len: 20,
     ancho: 5,
     ang: 0,
-    col: 'rgba(200,200,200,0.9)',
+    color: 'rgba(200,200,200,0.9)',
     noi: 0.5,
     ret: 0,
     fun: (x: number) => {
       return x <= 1 ? Math.pow(Math.sin(x * PI), 0.5) : -Math.pow(Math.sin((x + 1) * PI), 0.5);
     },
   };
-  const { len, ancho, ang, col, noi, ret, fun } = { ...predeterminados, ...args };
+  const { len, ancho, ang, color, noi, ret, fun } = { ...predeterminados, ...args };
 
   const reso = 20.0;
   const lalist = [];
@@ -93,7 +93,7 @@ export function blob(x: number, y: number, args: ArgsBolb) {
   }
 
   if (ret == 0) {
-    return poly(plist, { fil: col, str: col, ancho: 0 });
+    return poly(plist, { fil: color, str: color, ancho: 0 });
   } else {
     return plist;
   }
@@ -134,7 +134,7 @@ export function texture(ptlist: Punto[][], args: ArgsTexture) {
     sha: 0,
     ret: 0,
     noi: (x: number) => 30 / x,
-    col: () => 'rgba(100,100,100,' + (Math.random() * 0.3).toFixed(3) + ')',
+    color: () => 'rgba(100,100,100,' + (Math.random() * 0.3).toFixed(3) + ')',
     dis: () => {
       if (Math.random() > 0.5) {
         return (1 / 3) * Math.random();
@@ -143,7 +143,7 @@ export function texture(ptlist: Punto[][], args: ArgsTexture) {
       }
     },
   };
-  const { xof, yof, tex, ancho, len, sha, ret, noi, col, dis } = { ...predeterminados, ...args };
+  const { xof, yof, tex, ancho, len, sha, ret, noi, color, dis } = { ...predeterminados, ...args };
   const reso = [ptlist.length, ptlist[0].length];
   const texlist: Punto[][] = [];
 
@@ -173,7 +173,7 @@ export function texture(ptlist: Punto[][], args: ArgsTexture) {
     for (let j = 0; j < texlist.length; j += 1 + +(sha != 0)) {
       canv += stroke(
         texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
-        { col: 'rgba(100,100,100,0.1)', ancho: +sha }
+        { color: 'rgba(100,100,100,0.1)', ancho: +sha }
       );
     }
   }
@@ -181,7 +181,7 @@ export function texture(ptlist: Punto[][], args: ArgsTexture) {
   for (let j = 0 + +sha; j < texlist.length; j += 1 + +sha) {
     canv += stroke(
       texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
-      { col: col(j / texlist.length), ancho: ancho }
+      { color: color(j / texlist.length), ancho: ancho }
     );
   }
   return ret ? texlist : canv;

@@ -1,21 +1,37 @@
-export interface BaseArbol {
+export interface BaseElemento {
+  alto: number;
+  ancho: number;
+}
+
+export interface ArgsArbol {
   alto?: number;
   ancho?: number;
-  col?: string;
+  color?: string;
   noi?: number;
-}
-
-export interface ArgsArbol1 extends BaseArbol {}
-
-export interface ArgsArbol2 extends BaseArbol {
   clu?: number;
-}
-
-export interface ArgsArbol3 extends BaseArbol {
   ben?: (x: number) => number;
 }
 
-export interface ArgsBranch extends BaseArbol {
+export interface Arbol extends BaseElemento {
+  color: string;
+}
+
+export interface Arbol2 extends Arbol {
+  clu: number;
+}
+
+export interface Arbol3 extends Arbol {
+  ben: (x: number) => number;
+}
+
+export interface ArgsFrac extends BaseElemento {
+  ang: number;
+  ben: number;
+}
+
+export interface ArgsBranch {
+  alto?: number;
+  ancho?: number;
   ang?: number;
   det?: number;
   ben?: number;
@@ -33,7 +49,7 @@ export interface ArgsStroke {
   xof?: number;
   yof?: number;
   ancho?: number;
-  col?: string;
+  color?: string;
   noi?: number;
   out?: number;
   fun?: (x: number) => number;
@@ -50,8 +66,8 @@ export interface ArgsPoly {
 export interface ArgsBolb {
   len?: number;
   ancho?: number;
+  color?: string;
   ang?: number;
-  col?: string;
   noi?: number;
   ret?: number;
   fun?: (x: number) => number;
@@ -66,7 +82,7 @@ export interface ArgsTexture {
   sha?: number | boolean;
   ret?: number;
   noi?: (x: number) => number;
-  col?: (x: number) => string;
+  color?: (x: number) => string;
   dis?: () => number;
 }
 
@@ -76,7 +92,6 @@ export interface OpcionesMontaña {
   tex: number;
   veg: boolean;
   ret: number;
-  col: number;
 }
 
 export interface Chunk {

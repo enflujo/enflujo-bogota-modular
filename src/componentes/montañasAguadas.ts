@@ -4,7 +4,12 @@ import { noise } from '@/utilidades/Perlin';
 import { buscarCentro, triangulate } from '@/utilidades/Polytools';
 import { poly } from '@/utilidades/Util';
 
-export default (x: number, y: number, seed = 0, args?: { alto?: number; len?: number; seg?: number }) => {
+export default function montañasAguadas(
+  x: number,
+  y: number,
+  seed = 0,
+  args?: { alto?: number; len?: number; seg?: number }
+) {
   const predeterminados = { alto: 300, len: 2000, seg: 5 };
   const { alto, len, seg } = { ...predeterminados, ...args };
   let canv = '';
@@ -57,4 +62,4 @@ export default (x: number, y: number, seed = 0, args?: { alto?: number; len?: nu
     }
   }
   return canv;
-};
+}

@@ -5,8 +5,8 @@ import { normRand, poly, randChoice } from '@/utilidades/Util';
 import { arch02, arch03, arch04 } from '@/componentes/Arch';
 import roca from '@/componentes/roca';
 import torreLuz from '@/componentes/torreLuz';
-import { tree01, tree02, tree03 } from '@/componentes/Tree';
 import { PI } from '@/utilidades/constantes';
+import { arbol1, arbol2, arbol3 } from './arboles';
 
 export default function montaña(xoff: number, yoff: number, seed = 0, args?: OpcionesMontaña) {
   const predeterminados = {
@@ -14,7 +14,6 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
     ancho: 400 + Math.random() * 200,
     tex: 200,
     veg: true,
-    col: '',
   };
   const { alto, ancho, tex, veg } = { ...predeterminados, ...args };
 
@@ -64,8 +63,8 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   /** Arboles por contorno superior */
   vegetate(
     (x: number, y: number) => {
-      return tree02(x + xoff, y + yoff - 5, {
-        col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
+      return arbol2(x + xoff, y + yoff - 5, {
+        color: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
         clu: 2,
       });
     },
@@ -87,7 +86,7 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   /** Contorno pero sin piso o parte baja */
   svg += stroke(
     puntos[0].map((p) => [p[0] + xoff, p[1] + yoff]),
-    { col: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
+    { color: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
 
   /** Contornos parte baja de la montaña, como deditos de pies */
@@ -104,8 +103,8 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   /** Arboles punta */
   vegetate(
     (x: number, y: number) => {
-      return tree02(x + xoff, y + yoff, {
-        col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
+      return arbol2(x + xoff, y + yoff, {
+        color: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.5).toFixed(3) + ')',
       });
     },
     (i: number, j: number) => {
@@ -121,16 +120,19 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
       (x: number, y: number) => {
         let ht = ((h + y) / h) * 70;
         ht = ht * 0.3 + Math.random() * ht * 0.7;
-        return tree01(x + xoff, y + yoff, {
+
+        return arbol1(x + xoff, y + yoff, {
           alto: ht,
           ancho: Math.random() * 3 + 1,
-          col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
+          color: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
         });
       },
+
       (i: number, j: number) => {
         const ns = noise(i * 0.2, j * 0.05, seed);
         return !!(j % 2 && ns * ns * ns * ns < 0.012 && Math.abs(puntos[i][j][1]) / h < 0.3);
       },
+
       (veglist: number[][], i: number) => {
         let counter = 0;
         for (let j = 0; j < veglist.length; j++) {
@@ -140,10 +142,9 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
           ) {
             counter++;
           }
-          if (counter > 2) {
-            return true;
-          }
+          if (counter > 2) return true;
         }
+
         return false;
       }
     );
@@ -155,16 +156,19 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
         ht = ht * 0.5 + Math.random() * ht * 0.5;
         const bc = Math.random() * 0.1;
         const bp = 1;
-        return tree03(x + xoff, y + yoff, {
+
+        return arbol3(x + xoff, y + yoff, {
           alto: ht,
           ben: (x) => Math.pow(x * bc, bp),
-          col: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
+          color: 'rgba(100,100,100,' + (noise(0.01 * x, 0.01 * y) * 0.5 * 0.3 + 0.3).toFixed(3) + ')',
         });
       },
+
       (i: number, j: number) => {
         const ns = noise(i * 0.2, j * 0.05, seed);
         return (j == 0 || j == puntos[i].length - 1) && ns * ns * ns * ns < 0.012;
       },
+
       () => true
     );
   }
@@ -189,10 +193,12 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
         return '';
       }
     },
+
     (i: number, j: number) => {
       const ns = noise(i * 0.2, j * 0.05, seed + 10);
       return i != 0 && (j == 1 || j == puntos[i].length - 2) && ns * ns * ns * ns < 0.008;
     },
+
     () => true
   );
 
@@ -204,17 +210,21 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
         ancho: 40 + Math.random() * 20,
       });
     },
+
     (i: number, j: number) => i == 1 && Math.abs(j - puntos[i].length / 2) < 1 && Math.random() < 0.02,
+
     () => true
   );
 
   /** Torres de luz */
   vegetate(
     (x: number, y: number) => torreLuz(x + xoff, y + yoff),
+
     (i: number, j: number) => {
       const ns = noise(i * 0.2, j * 0.05, seed + 20 * PI);
       return i % 2 == 0 && (j == 1 || j == puntos[i].length - 2) && ns * ns * ns * ns < 0.002;
     },
+
     () => true
   );
 
@@ -227,7 +237,9 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
         sha: 2,
       });
     },
+
     (i: number, j: number) => (j == 0 || j == puntos[i].length - 1) && Math.random() < 0.1,
+
     () => true
   );
 
@@ -294,7 +306,7 @@ function foot(areaMontaña: Punto[][], args: { x?: number; y?: number }) {
     svg += stroke(
       lineas[j].map((punto) => [punto[0] + x, punto[1] + y]),
       {
-        col: 'rgba(100,100,100,' + (0.1 + Math.random() * 0.1).toFixed(3) + ')',
+        color: 'rgba(100,100,100,' + (0.1 + Math.random() * 0.1).toFixed(3) + ')',
         ancho: 1,
       }
     );

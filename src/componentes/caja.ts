@@ -2,7 +2,7 @@ import type { ArgsCaja, Punto } from '@/tipos';
 import { div, stroke } from '@/utilidades/cosas';
 import { poly } from '@/utilidades/Util';
 
-export default (xoff: number, yoff: number, args?: ArgsCaja) => {
+export default function caja(x: number, y: number, args?: ArgsCaja) {
   const predeterminados = {
     alto: 20,
     ancho: 120,
@@ -124,8 +124,8 @@ export default (xoff: number, yoff: number, args?: ArgsCaja) => {
 
   if (!tra) {
     canv += poly(polist, {
-      x: xoff,
-      y: yoff,
+      x,
+      y,
       str: 'none',
       fil: 'white',
     });
@@ -133,9 +133,9 @@ export default (xoff: number, yoff: number, args?: ArgsCaja) => {
 
   for (let i = 0; i < cajas.length; i++) {
     canv += stroke(
-      cajas[i].map((punto) => [punto[0] + xoff, punto[1] + yoff]),
+      cajas[i].map((punto) => [punto[0] + x, punto[1] + y]),
       {
-        col: 'rgba(100,100,100,0.4)',
+        color: 'rgba(100,100,100,0.4)',
         noi: 1,
         ancho: wei,
         fun: () => 1,
@@ -144,4 +144,4 @@ export default (xoff: number, yoff: number, args?: ArgsCaja) => {
   }
 
   return canv;
-};
+}

@@ -250,11 +250,11 @@ export function man(x: number, y: number, args?: ArgsMan) {
     });
     svg += stroke(tlist1.map(toGlobal), {
       ancho: 1,
-      col: 'rgba(100,100,100,0.5)',
+      color: 'rgba(100,100,100,0.5)',
     });
     svg += stroke(tlist2.map(toGlobal), {
       ancho: 1,
-      col: 'rgba(100,100,100,0.6)',
+      color: 'rgba(100,100,100,0.6)',
     });
 
     return svg;
