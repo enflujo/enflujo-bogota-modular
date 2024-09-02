@@ -3,7 +3,7 @@ import { MEDIO_PI, PI } from '@/utilidades/constantes';
 import { blob, stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
 import { poly, randChoice, randGaussian } from '@/utilidades/Util';
-import { barkify, branch, twig } from './partesArboles';
+import { branch, crearCorteza, twig } from './partesArboles';
 
 export function arbol1(x: number, y: number, args: ArgsArbol) {
   const predeterminados: Arbol = {
@@ -147,7 +147,7 @@ export function arbol4(x: number, y: number, args: ArgsArbol) {
 
   const { alto, ancho, color } = { ...predeterminados, ...args };
   const trlist = branch({ alto: alto, ancho: ancho, ang: -MEDIO_PI });
-  let txcanv = barkify(x, y, trlist);
+  let txcanv = crearCorteza(x, y, trlist);
   let twcanv = '';
   let trmlist: Punto[] = [];
   const rama1 = trlist[0].concat(trlist[1].reverse());
@@ -167,7 +167,7 @@ export function arbol4(x: number, y: number, args: ArgsArbol) {
 
       const foff = (v: Punto) => [v[0] + rama1[i][0], v[1] + rama1[i][1]];
 
-      txcanv += barkify(x, y, [brlist[0].map(foff), brlist[1].map(foff)]);
+      txcanv += crearCorteza(x, y, [brlist[0].map(foff), brlist[1].map(foff)]);
 
       for (let j = 0; j < brlist[0].length; j++) {
         if (Math.random() < 0.2 || j == brlist[0].length - 1) {
@@ -215,7 +215,7 @@ export function arbol5(x: number, y: number, args: ArgsArbol) {
   const predeterminados: Arbol = { alto: 300, ancho: 5, color: 'rgba(100,100,100,0.5)' };
   const { alto, ancho, color } = { ...predeterminados, ...args };
   const trlist = branch({ alto: alto, ancho: ancho, ang: -MEDIO_PI, ben: 0 });
-  const txcanv = barkify(x, y, trlist);
+  const txcanv = crearCorteza(x, y, trlist);
   const rama1 = trlist[0].concat(trlist[1].reverse());
   let trmlist: Punto[] = [];
   let twcanv = '';
@@ -289,9 +289,8 @@ export function arbol6(x: number, y: number, args: ArgsArbol) {
   const predeterminados: Arbol = { alto: 100, ancho: 6, color: 'rgba(100,100,100,0.5)' };
   const { alto, ancho, color } = { ...predeterminados, ...args };
 
-  var canv = '';
-  var txcanv = '';
-  var twcanv = '';
+  let corteza = '';
+  let ramita = '';
   var trmlist = fracTree(x, y, 3, {
     alto: alto,
     ancho: ancho,
@@ -299,11 +298,11 @@ export function arbol6(x: number, y: number, args: ArgsArbol) {
     ben: 0,
   });
 
-  canv += poly(trmlist, { x, y, fil: 'white', str: color, ancho: 0 });
+  let svg = poly(trmlist, { x, y, fil: 'white', str: color, ancho: 0 });
 
   trmlist.splice(0, 1);
   trmlist.splice(trmlist.length - 1, 1);
-  canv += stroke(
+  svg += stroke(
     trmlist.map((v) => [v[0] + x, v[1] + y]),
     {
       color: 'rgba(100,100,100,' + (0.4 + Math.random() * 0.1).toFixed(3) + ')',
@@ -314,27 +313,30 @@ export function arbol6(x: number, y: number, args: ArgsArbol) {
     }
   );
 
-  canv += txcanv;
-  canv += twcanv;
+  svg += corteza;
+  svg += ramita;
 
   function fracTree(_x: number, _y: number, dep: number, args?: ArgsFrac) {
+    const predeterminados = { alto: 300, ancho: 5, ang: 0, ben: PI * 0.2 };
     const { alto, ancho, ang, ben } = { ...predeterminados, ...args };
-    const trlist = branch({ alto, ancho, ang, ben, det: alto / 20 });
+    const ramas = branch({ alto, ancho, ang, ben, det: alto / 20 });
 
-    txcanv += barkify(_x, _y, trlist);
+    corteza += crearCorteza(_x, _y, ramas);
 
-    const rama = trlist[0].concat(trlist[1].reverse());
-    var trmlist = [];
+    const rama = ramas[0].concat(ramas[1].reverse());
+    let arbol: Punto[] = [];
+    const totalPuntos = rama.length;
+    const centro = totalPuntos / 2;
 
-    for (let i = 0; i < rama.length; i++) {
+    for (let i = 0; i < totalPuntos; i++) {
       if (
-        ((Math.random() < 0.025 && i >= rama.length * 0.2 && i <= rama.length * 0.8) ||
-          i == ((rama.length / 2) | 0) - 1 ||
-          i == ((rama.length / 2) | 0) + 1) &&
+        ((Math.random() < 0.025 && i >= totalPuntos * 0.2 && i <= totalPuntos * 0.8) ||
+          i == (centro | 0) - 1 ||
+          i == (centro | 0) + 1) &&
         dep > 0
       ) {
         const bar = 0.02 + Math.random() * 0.08;
-        const ba = bar * PI - bar * 2 * PI * +(i > rama.length / 2);
+        const ba = bar * PI - bar * 2 * PI * +(i > centro);
         const brlist = fracTree(rama[i][0] + _x, rama[i][1] + _y, dep - 1, {
           alto: alto * (0.7 + Math.random() * 0.2),
           ancho: ancho * 0.6,
@@ -344,7 +346,7 @@ export function arbol6(x: number, y: number, args: ArgsArbol) {
 
         for (let j = 0; j < brlist.length; j++) {
           if (Math.random() < 0.03) {
-            twcanv += twig(brlist[j][0] + rama[i][0] + _x, brlist[j][1] + rama[i][1] + _y, 2, {
+            ramita += twig(brlist[j][0] + rama[i][0] + _x, brlist[j][1] + rama[i][1] + _y, 2, {
               ang: ba * (Math.random() * 0.5 + 0.75),
               sca: 0.3,
               dir: ba > 0 ? 1 : -1,
@@ -353,14 +355,14 @@ export function arbol6(x: number, y: number, args: ArgsArbol) {
           }
         }
 
-        trmlist = trmlist.concat(brlist.map((v) => [v[0] + rama[i][0], v[1] + rama[i][1]]));
+        arbol = arbol.concat(brlist.map((v) => [v[0] + rama[i][0], v[1] + rama[i][1]]));
       } else {
-        trmlist.push(rama[i]);
+        arbol.push(rama[i]);
       }
     }
 
-    return trmlist;
+    return arbol;
   }
 
-  return canv;
+  return svg;
 }

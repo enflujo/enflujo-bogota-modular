@@ -32,7 +32,7 @@ export function loopNoise(nslist: number[]) {
   }
 }
 
-export function randChoice<Tipo>(arr: (number | boolean | ((x: number) => number))[]) {
+export function randChoice<Tipo>(arr: (number | number[] | boolean | ((x: number) => number))[]) {
   return arr[Math.floor(arr.length * Math.random())] as Tipo;
 }
 

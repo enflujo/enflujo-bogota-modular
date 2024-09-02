@@ -78,7 +78,7 @@ export function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
   const hs = Math.random() * 0.5 + 0.5;
   const fun1 = (x: number) => Math.pow(x, 0.5);
   const fun2 = (i: number) => -1 / Math.pow(i / tl + 1, 5) + 1;
-  const tfun = randChoice([fun2]);
+  const tfun = randChoice<(x: number) => number>([fun2]);
   const a0 = ((Math.random() * PI) / 6) * dir + ang;
 
   let svg = '';
@@ -127,62 +127,69 @@ export function twig(tx: number, ty: number, dep: number, args: ArgsTwig) {
   return svg;
 }
 
-export function barkify(x, y, trlist) {
-  function bark(x, y, ancho, ang) {
-    var len = 10 + 10 * Math.random();
-    var noi = 0.5;
-    var fun = (x) => (x <= 1 ? Math.pow(Math.sin(x * PI), 0.5) : -Math.pow(Math.sin((x + 1) * PI), 0.5));
-    var reso = 20.0;
-    var canv = '';
+function pedazoCorteza(x: number, y: number, ancho: number, angulo: number) {
+  const len = 10 + 10 * Math.random();
+  const noi = 0.5;
+  const fun = (v: number) => (v <= 1 ? Math.pow(Math.sin(v * PI), 0.5) : -Math.pow(Math.sin((v + 1) * PI), 0.5));
+  const reso = 20.0;
+  const puntos: Punto[] = [];
+  let svg = '';
 
-    var lalist = [];
-    for (var i = 0; i < reso + 1; i++) {
-      var p = (i / reso) * 2;
-      var xo = len / 2 - Math.abs(p - 1) * len;
-      var yo = (fun(p) * ancho) / 2;
-      var a = Math.atan2(yo, xo);
-      var l = Math.sqrt(xo * xo + yo * yo);
-      lalist.push([l, a]);
-    }
-    var nslist = [];
-    var n0 = Math.random() * 10;
-    for (var i = 0; i < reso + 1; i++) {
-      nslist.push(noise(i * 0.05, n0));
-    }
-
-    loopNoise(nslist);
-    const brklist: Punto[] = [];
-
-    for (let i = 0; i < lalist.length; i++) {
-      var ns = nslist[i] * noi + (1 - noi);
-      var nx = x + Math.cos(lalist[i][1] + ang) * lalist[i][0] * ns;
-      var ny = y + Math.sin(lalist[i][1] + ang) * lalist[i][0] * ns;
-      brklist.push([nx, ny]);
-    }
-    var fr = Math.random();
-    canv += stroke(brklist, {
-      ancho: 0.8,
-      noi: 0,
-      color: 'rgba(100,100,100,0.4)',
-      out: 0,
-      fun: function (x) {
-        return Math.sin((x + fr) * TRES_PI);
-      },
-    });
-
-    return canv;
+  for (let i = 0; i < reso + 1; i++) {
+    const p = (i / reso) * 2;
+    const xo = len / 2 - Math.abs(p - 1) * len;
+    const yo = (fun(p) * ancho) / 2;
+    const a = Math.atan2(yo, xo);
+    const l = Math.sqrt(xo * xo + yo * yo);
+    puntos.push([l, a]);
   }
 
-  var canv = '';
+  const ruidos = [];
+  const ruido1 = Math.random() * 10;
 
-  for (var i = 2; i < trlist[0].length - 1; i++) {
-    var a0 = Math.atan2(trlist[0][i][1] - trlist[0][i - 1][1], trlist[0][i][0] - trlist[0][i - 1][0]);
-    var a1 = Math.atan2(trlist[1][i][1] - trlist[1][i - 1][1], trlist[1][i][0] - trlist[1][i - 1][0]);
-    var p = Math.random();
-    var nx = trlist[0][i][0] * (1 - p) + trlist[1][i][0] * p;
-    var ny = trlist[0][i][1] * (1 - p) + trlist[1][i][1] * p;
+  for (let i = 0; i < reso + 1; i++) {
+    ruidos.push(noise(i * 0.05, ruido1));
+  }
+
+  loopNoise(ruidos);
+  const cortezas: Punto[] = [];
+
+  for (let i = 0; i < puntos.length; i++) {
+    const ns = ruidos[i] * noi + (1 - noi);
+    const nx = x + Math.cos(puntos[i][1] + angulo) * puntos[i][0] * ns;
+    const ny = y + Math.sin(puntos[i][1] + angulo) * puntos[i][0] * ns;
+    cortezas.push([nx, ny]);
+  }
+
+  svg += stroke(cortezas, {
+    ancho: 0.8,
+    noi: 0,
+    color: 'rgba(100,100,100,0.4)',
+    out: 0,
+    fun: (x) => Math.sin((x + Math.random()) * TRES_PI),
+  });
+
+  return svg;
+}
+
+export function crearCorteza(x: number, y: number, area: Punto[][]) {
+  let svg = '';
+  const punto1 = area[0];
+  const punto2 = area[1];
+
+  for (let i = 2; i < punto1.length - 1; i++) {
+    const [x1, y1] = punto1[i];
+    const [x2, y2] = punto2[i];
+    const [x3, y3] = punto1[i - 1];
+    const [x4, y4] = punto2[i - 1];
+    const a0 = Math.atan2(y1 - y3, x1 - x3);
+    const a1 = Math.atan2(y2 - y4, x2 - x4);
+    const p = Math.random();
+    const nx = x1 * (1 - p) + x2 * p;
+    const ny = y1 * (1 - p) + y2 * p;
+
     if (Math.random() < 0.2) {
-      canv += blob(nx + x, ny + y, {
+      svg += blob(nx + x, ny + y, {
         noi: 1,
         len: 15,
         ancho: 6 - Math.abs(p - 0.5) * 10,
@@ -190,17 +197,18 @@ export function barkify(x, y, trlist) {
         color: 'rgba(100,100,100,0.6)',
       });
     } else {
-      canv += bark(nx + x, ny + y, 5 - Math.abs(p - 0.5) * 10, (a0 + a1) / 2);
+      svg += pedazoCorteza(nx + x, ny + y, 5 - Math.abs(p - 0.5) * 10, (a0 + a1) / 2);
     }
 
     if (Math.random() < 0.05) {
-      var jl = Math.random() * 2 + 2;
-      var xya = randChoice([
-        [trlist[0][i][0], trlist[0][i][1], a0],
-        [trlist[1][i][0], trlist[1][i][1], a1],
+      const jl = Math.random() * 2 + 2;
+      const xya = randChoice<number[]>([
+        [x1, y1, a0],
+        [x2, y2, a1],
       ]);
-      for (var j = 0; j < jl; j++) {
-        canv += blob(
+
+      for (let j = 0; j < jl; j++) {
+        svg += blob(
           xya[0] + x + Math.cos(xya[2]) * (j - jl / 2) * 4,
           xya[1] + y + Math.sin(xya[2]) * (j - jl / 2) * 4,
           {
@@ -214,10 +222,10 @@ export function barkify(x, y, trlist) {
     }
   }
 
-  var trflist = trlist[0].concat(trlist[1].slice().reverse());
-  var rglist = [[]];
+  const trflist = punto1.concat(area[1].slice().reverse());
+  const rglist: Punto[][] = [[]];
 
-  for (var i = 0; i < trflist.length; i++) {
+  for (let i = 0; i < trflist.length; i++) {
     if (Math.random() < 0.5) {
       rglist.push([]);
     } else {
@@ -225,20 +233,21 @@ export function barkify(x, y, trlist) {
     }
   }
 
-  for (var i = 0; i < rglist.length; i++) {
+  for (let i = 0; i < rglist.length; i++) {
     rglist[i] = div(rglist[i], 4);
 
-    for (var j = 0; j < rglist[i].length; j++) {
+    for (let j = 0; j < rglist[i].length; j++) {
       rglist[i][j][0] += (noise(i, j * 0.1, 1) - 0.5) * (15 + 5 * randGaussian());
       rglist[i][j][1] += (noise(i, j * 0.1, 2) - 0.5) * (15 + 5 * randGaussian());
     }
 
-    canv += stroke(
+    svg += stroke(
       rglist[i].map((v) => [v[0] + x, v[1] + y]),
       { ancho: 1.5, color: 'rgba(100,100,100,0.7)', out: 0 }
     );
   }
-  return canv;
+
+  return svg;
 }
 
 export function tree07(x, y, args) {
@@ -346,7 +355,6 @@ export function tree08(x: number, y: number, args) {
     ben: PI * 0.2,
     det: alto / 20,
   });
-  //txcanv += barkify(x,y,trlist)
 
   trlist = trlist[0].concat(trlist[1].reverse());
 
@@ -438,6 +446,6 @@ export function tree08(x: number, y: number, args) {
 
   canv += txcanv;
   canv += twcanv;
-  //console.log(canv)
+
   return canv;
 }
