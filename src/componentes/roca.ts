@@ -18,7 +18,7 @@ export default function roca(
   };
 
   const { alto, ancho, tex, sha } = { ...predeterminados, ...args };
-  let canv = '';
+  let svg = '';
   const reso = [10, 50];
   const ptlist: Punto[][] = [];
 
@@ -47,18 +47,18 @@ export default function roca(
   }
 
   //WHITE BG
-  canv += poly(ptlist[0].concat([[0, 0]]), {
+  svg += poly(ptlist[0].concat([[0, 0]]), {
     x: xoff,
     y: yoff,
     fil: 'white',
     str: 'none',
   });
   //OUTLINE
-  canv += stroke(
+  svg += stroke(
     ptlist[0].map((p) => [p[0] + xoff, p[1] + yoff]),
     { color: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
-  canv += texture(ptlist, {
+  svg += texture(ptlist, {
     xof: xoff,
     yof: yoff,
     tex: tex,
@@ -75,7 +75,7 @@ export default function roca(
   });
 
   // for (let i = 0; i < reso[0]; i++) {
-  //   canv += poly(ptlist[i], { x: xoff, y: yoff, fil: 'none', str: 'red', ancho: 2 });
+  //   svg += poly(ptlist[i], { x: xoff, y: yoff, fil: 'none', str: 'red', ancho: 2 });
   // }
-  return canv;
+  return svg;
 }

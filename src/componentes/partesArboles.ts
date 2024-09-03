@@ -274,7 +274,7 @@ export function tree07(x, y, args) {
   } else {
     leafcol = ['100', '100', '100', '1'];
   }
-  var canv = '';
+  var svg = '';
   var line1 = [];
   var line2 = [];
   var T = [];
@@ -331,9 +331,9 @@ export function tree07(x, y, args) {
     var m = buscarCentro(T[k]);
     var c = (noise(m[0] * 0.02, m[1] * 0.02) * 200 + 50) | 0;
     var co = 'rgba(' + c + ',' + c + ',' + c + ',0.8)';
-    canv += poly(T[k], { fil: co, str: co, ancho: 0 });
+    svg += poly(T[k], { fil: co, str: co, ancho: 0 });
   }
-  return canv;
+  return svg;
 }
 
 export function tree08(x: number, y: number, args) {
@@ -342,7 +342,7 @@ export function tree08(x: number, y: number, args) {
   var ancho = args.ancho != undefined ? args.ancho : 1;
   var color = args.color != undefined ? args.color : 'rgba(100,100,100,0.5)';
 
-  var canv = '';
+  var svg = '';
   var txcanv = '';
   var twcanv = '';
 
@@ -431,9 +431,9 @@ export function tree08(x: number, y: number, args) {
     }
   }
 
-  canv += poly(trlist, { x, y, fil: 'white', str: color, ancho: 0 });
+  svg += poly(trlist, { x, y, fil: 'white', str: color, ancho: 0 });
 
-  canv += stroke(
+  svg += stroke(
     trlist.map((v) => [v[0] + x, v[1] + y]),
     {
       color: 'rgba(100,100,100,' + (0.6 + Math.random() * 0.1).toFixed(3) + ')',
@@ -444,8 +444,8 @@ export function tree08(x: number, y: number, args) {
     }
   );
 
-  canv += txcanv;
-  canv += twcanv;
+  svg += txcanv;
+  svg += twcanv;
 
-  return canv;
+  return svg;
 }

@@ -120,10 +120,10 @@ export default function caja(x: number, y: number, args?: ArgsCaja) {
     [-ancho * 0.5, 0],
   ];
 
-  let canv = '';
+  let svg = '';
 
   if (!tra) {
-    canv += poly(polist, {
+    svg += poly(polist, {
       x,
       y,
       str: 'none',
@@ -132,7 +132,7 @@ export default function caja(x: number, y: number, args?: ArgsCaja) {
   }
 
   for (let i = 0; i < cajas.length; i++) {
-    canv += stroke(
+    svg += stroke(
       cajas[i].map((punto) => [punto[0] + x, punto[1] + y]),
       {
         color: 'rgba(100,100,100,0.4)',
@@ -143,5 +143,5 @@ export default function caja(x: number, y: number, args?: ArgsCaja) {
     );
   }
 
-  return canv;
+  return svg;
 }

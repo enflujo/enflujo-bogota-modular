@@ -12,7 +12,7 @@ export default function montañasAguadas(
 ) {
   const predeterminados = { alto: 300, len: 2000, seg: 5 };
   const { alto, len, seg } = { ...predeterminados, ...args };
-  let canv = '';
+  let svg = '';
   const span = 10;
   const ptlist: Punto[][] = [];
 
@@ -43,7 +43,7 @@ export default function montañasAguadas(
       return `rgb(${c},${c},${c})`;
     };
 
-    canv += poly(ptlist[i], {
+    svg += poly(ptlist[i], {
       fil: getCol(...ptlist[i][ptlist[i].length - 1]),
       str: 'none',
       ancho: 1,
@@ -58,8 +58,8 @@ export default function montañasAguadas(
     for (let k = 0; k < T.length; k++) {
       const m = buscarCentro(T[k]);
       const co = getCol(m[0], m[1]);
-      canv += poly(T[k], { fil: co, str: co, ancho: 1 });
+      svg += poly(T[k], { fil: co, str: co, ancho: 1 });
     }
   }
-  return canv;
+  return svg;
 }

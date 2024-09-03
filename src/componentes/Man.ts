@@ -1,4 +1,4 @@
-import type { ArgsMan, Punto } from '@/tipos';
+import type { ArgsMan, Punto, Sct } from '@/tipos';
 import { CUARTO_PI, MEDIO_PI, PI, TRES_PI } from '@/utilidades/constantes';
 import { div, stroke } from '@/utilidades/cosas';
 import { noise } from '@/utilidades/Perlin';
@@ -91,9 +91,9 @@ function hat01(p0: Punto, p1: Punto, args?: { fli?: boolean }) {
   return svg;
 }
 
-export function hat02(p0: Punto, p1: Punto, args) {
-  var args = args != undefined ? args : {};
-  var fli = args.fli != undefined ? args.fli : false;
+export function sombrero2(p0: Punto, p1: Punto, args?: { fli?: boolean }) {
+  const predeterminados = { fli: false };
+  const { fli } = { ...predeterminados, ...args };
   let svg = '';
   const f = fli ? flipper : (x: Punto[]) => x;
 
@@ -175,32 +175,16 @@ export function man(x: number, y: number, args?: ArgsMan) {
     0: { 1: { 2: {}, 5: { 6: {} }, 7: { 8: {} } }, 3: { 4: {} } },
   };
   const toGlobal = (v: Punto): Punto => [(fli ? -1 : 1) * v[0] + x, v[1] + y];
-  type Sct = {
-    0: {
-      1: {
-        2: {};
-        5: {
-          6: {};
-        };
-        7: {
-          8: {};
-        };
-      };
-      3: {
-        4: {};
-      };
-    };
-  };
 
   function gpar(sct: Sct, ind: number) {
-    const keys = Object.keys(sct).map((x) => +x);
+    const llaves = Object.keys(sct).map((x) => +x);
 
-    for (let i = 0; i < keys.length; i++) {
-      if (keys[i] == ind) {
+    for (let i = 0; i < llaves.length; i++) {
+      if (llaves[i] == ind) {
         return [ind];
       } else {
-        const r = gpar(sct[keys[i]], ind);
-        if (r != false) return [keys[i]].concat(r);
+        const r = gpar(sct[llaves[i]], ind);
+        if (r != false) return [llaves[i]].concat(r);
       }
     }
     return false;
@@ -241,21 +225,13 @@ export function man(x: number, y: number, args?: ArgsMan) {
     svg += stroke(s.map(toGlobal));
   }
 
-  const cloth = (plist: Punto[], fun: (x: number) => number) => {
+  const ropa = (plist: Punto[], fun: (x: number) => number) => {
     let svg = '';
     const tlist = bezmh(plist, 2);
     const [tlist1, tlist2] = expand(tlist, fun);
-    svg += poly(tlist1.concat(tlist2.reverse()).map(toGlobal), {
-      fil: 'white',
-    });
-    svg += stroke(tlist1.map(toGlobal), {
-      ancho: 1,
-      color: 'rgba(100,100,100,0.5)',
-    });
-    svg += stroke(tlist2.map(toGlobal), {
-      ancho: 1,
-      color: 'rgba(100,100,100,0.6)',
-    });
+    svg += poly(tlist1.concat(tlist2.reverse()).map(toGlobal), { fil: 'white' });
+    svg += stroke(tlist1.map(toGlobal), { ancho: 1, color: 'rgba(100,100,100,0.5)' });
+    svg += stroke(tlist2.map(toGlobal), { ancho: 1, color: 'rgba(100,100,100,0.6)' });
 
     return svg;
   };
@@ -265,22 +241,17 @@ export function man(x: number, y: number, args?: ArgsMan) {
   const fhead = (x: number) => sca * 7 * Math.pow(0.25 - Math.pow(x - 0.5, 2), 0.3);
 
   svg += ite(toGlobal(pts[8]), toGlobal(pts[6]), { invertir: fli });
-
-  svg += cloth([pts[1], pts[7], pts[8]], fsleeve);
-
-  svg += cloth([pts[1], pts[0], pts[3], pts[4]], fbody);
-
-  svg += cloth([pts[1], pts[5], pts[6]], fsleeve);
-  svg += cloth([pts[1], pts[2]], fhead);
+  svg += ropa([pts[1], pts[7], pts[8]], fsleeve);
+  svg += ropa([pts[1], pts[0], pts[3], pts[4]], fbody);
+  svg += ropa([pts[1], pts[5], pts[6]], fsleeve);
+  svg += ropa([pts[1], pts[2]], fhead);
 
   const hlist = bezmh([pts[1], pts[2]], 2);
   const [hlist1, hlist2] = expand(hlist, fhead);
+
   hlist1.splice(0, Math.floor(hlist1.length * 0.1));
   hlist2.splice(0, Math.floor(hlist2.length * 0.95));
-  svg += poly(hlist1.concat(hlist2.reverse()).map(toGlobal), {
-    fil: 'rgba(100,100,100,0.6)',
-  });
-
+  svg += poly(hlist1.concat(hlist2.reverse()).map(toGlobal), { fil: 'rgba(100,100,100,0.6)' });
   svg += hat(toGlobal(pts[1]), toGlobal(pts[2]), { fli: fli });
 
   return svg;

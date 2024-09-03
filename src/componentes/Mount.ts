@@ -159,11 +159,11 @@ export function flatMount(
 }
 
 export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number; ymin: number; ymax: number }) {
-  let canv = '';
+  let svg = '';
   const tt = randChoice([0, 0, 1, 2, 3, 4]);
 
   for (let j = 0; j < Math.random() * 5; j++) {
-    canv += roca(
+    svg += roca(
       x + normRand(grbd.xmin, grbd.xmax),
       y + (grbd.ymin + grbd.ymax) / 2 + normRand(-10, 10) + 10,
       Math.random() * 100,
@@ -180,7 +180,7 @@ export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number
     const yr = y + (grbd.ymin + grbd.ymax) / 2 + normRand(-5, 5) + 20;
 
     for (let k = 0; k < 2 + Math.random() * 3; k++) {
-      canv += tree08(xr + Math.min(Math.max(normRand(-30, 30), grbd.xmin), grbd.xmax), yr, {
+      svg += tree08(xr + Math.min(Math.max(normRand(-30, 30), grbd.xmin), grbd.xmax), yr, {
         alto: 60 + Math.random() * 40,
       });
     }
@@ -188,7 +188,7 @@ export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number
 
   if (tt == 0) {
     for (let j = 0; j < Math.random() * 3; j++) {
-      canv += roca(
+      svg += roca(
         x + normRand(grbd.xmin, grbd.xmax),
         y + (grbd.ymin + grbd.ymax) / 2 + normRand(-5, 5) + 20,
         Math.random() * 100,
@@ -208,13 +208,13 @@ export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number
     const xmax = grbd.xmin * (1 - pmax) + grbd.xmax * pmax;
 
     for (let i = xmin; i < xmax; i += 30) {
-      canv += arbol5(x + i + 20 * normRand(-1, 1), y + (grbd.ymin + grbd.ymax) / 2 + 20, {
+      svg += arbol5(x + i + 20 * normRand(-1, 1), y + (grbd.ymin + grbd.ymax) / 2 + 20, {
         alto: 100 + Math.random() * 200,
       });
     }
 
     for (let j = 0; j < Math.random() * 4; j++) {
-      canv += roca(
+      svg += roca(
         x + normRand(grbd.xmin, grbd.xmax),
         y + (grbd.ymin + grbd.ymax) / 2 + normRand(-5, 5) + 20,
         Math.random() * 100,
@@ -229,10 +229,10 @@ export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number
     for (let i = 0; i < randChoice<number>([1, 1, 1, 1, 2, 2, 3]); i++) {
       const xr = normRand(grbd.xmin, grbd.xmax);
       const yr = (grbd.ymin + grbd.ymax) / 2;
-      canv += arbol4(x + xr, y + yr + 20, {});
+      svg += arbol4(x + xr, y + yr + 20, {});
 
       for (let j = 0; j < Math.random() * 2; j++) {
-        canv += roca(
+        svg += roca(
           x + Math.max(grbd.xmin, Math.min(grbd.xmax, xr + normRand(-50, 50))),
           y + yr + normRand(-5, 5) + 20,
           j * i * Math.random() * 100,
@@ -246,7 +246,7 @@ export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number
     }
   } else if (tt == 3) {
     for (let i = 0; i < randChoice<number>([1, 1, 1, 1, 2, 2, 3]); i++) {
-      canv += arbol6(x + normRand(grbd.xmin, grbd.xmax), y + (grbd.ymin + grbd.ymax) / 2, {
+      svg += arbol6(x + normRand(grbd.xmin, grbd.xmax), y + (grbd.ymin + grbd.ymax) / 2, {
         alto: 60 + Math.random() * 60,
       });
     }
@@ -256,24 +256,24 @@ export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number
     const xmin = grbd.xmin * (1 - pmin) + grbd.xmax * pmin;
     const xmax = grbd.xmin * (1 - pmax) + grbd.xmax * pmax;
     for (let i = xmin; i < xmax; i += 20) {
-      canv += tree07(x + i + 20 * normRand(-1, 1), y + (grbd.ymin + grbd.ymax) / 2 + normRand(-1, 1) + 0, {
+      svg += tree07(x + i + 20 * normRand(-1, 1), y + (grbd.ymin + grbd.ymax) / 2 + normRand(-1, 1) + 0, {
         alto: normRand(40, 80),
       });
     }
   }
 
   for (let i = 0; i < 50 * Math.random(); i++) {
-    canv += arbol2(x + normRand(grbd.xmin, grbd.xmax), y + normRand(grbd.ymin, grbd.ymax));
+    svg += arbol2(x + normRand(grbd.xmin, grbd.xmax), y + normRand(grbd.ymin, grbd.ymax));
   }
   const ts = randChoice([0, 0, 0, 0, 1]);
 
   if (ts == 1 && tt != 4) {
-    canv += arch01(x + normRand(grbd.xmin, grbd.xmax), y + (grbd.ymin + grbd.ymax) / 2 + 20, Math.random(), {
+    svg += arch01(x + normRand(grbd.xmin, grbd.xmax), y + (grbd.ymin + grbd.ymax) / 2 + 20, Math.random(), {
       ancho: normRand(160, 200),
       alto: normRand(80, 100),
       per: Math.random(),
     });
   }
 
-  return canv;
+  return svg;
 }

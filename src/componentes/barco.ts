@@ -1,7 +1,7 @@
 import type { ArgsBarco, Punto } from '@/tipos';
 import { stroke } from '@/utilidades/cosas';
 import { poly } from '@/utilidades/Util';
-import { hat02, man, stick01 } from '@/componentes/Man';
+import { man, sombrero2, stick01 } from '@/componentes/Man';
 import { DOS_PI, PI } from '@/utilidades/constantes';
 
 export default function barco(x: number, y: number, args?: ArgsBarco) {
@@ -12,7 +12,7 @@ export default function barco(x: number, y: number, args?: ArgsBarco) {
 
   svg += man(x + 20 * sca * dir, y, {
     ite: stick01,
-    hat: hat02,
+    hat: sombrero2,
     sca: 0.5 * sca,
     fli: !fli,
     len: [0, 30, 20, 30, 10, 30, 30, 30, 30],

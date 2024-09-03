@@ -97,7 +97,7 @@ export interface OpcionesMontaña {
 export interface Chunk {
   x: number;
   y: number;
-  canv?: string;
+  svg?: string;
   tag: string;
 }
 
@@ -202,3 +202,20 @@ export interface ArgsArco {
   sty?: number;
   rai?: boolean;
 }
+
+export type Sct = {
+  0: {
+    1: {
+      2: {};
+      5: {
+        6: {};
+      };
+      7: {
+        8: {};
+      };
+    };
+    3: {
+      4: {};
+    };
+  };
+};

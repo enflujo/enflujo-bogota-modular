@@ -26,7 +26,7 @@ const L = document.getElementById('L') as HTMLDivElement;
 const R = document.getElementById('R') as HTMLDivElement;
 const SVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-let canv = '';
+let svg = '';
 const chunks: Chunk[] = [];
 const planmtx: number[] = [];
 
@@ -152,26 +152,27 @@ function update() {
   SVG.setAttribute('height', `${MEM.windy}`);
   SVG.setAttribute('viewBox', `${calcViewBox(MEM.cursx, MEM.windx, MEM.windy)}`);
 
-  GRUPO.innerHTML = canv;
+  GRUPO.innerHTML = svg;
 }
 
 function chunkrender(xmin: number, xmax: number) {
-  canv = '';
+  svg = '';
 
   for (let i = 0; i < chunks.length; i++) {
     if (xmin - MEM.cwid < chunks[i].x && chunks[i].x < xmax + MEM.cwid) {
-      canv += chunks[i].canv;
+      svg += chunks[i].svg;
     }
   }
 }
 
 function chunkloader(xmin: number, xmax: number) {
   const add = (nch: Chunk) => {
-    if (nch.canv?.includes('NaN')) {
+    if (nch.svg?.includes('NaN')) {
       console.log('gotcha:');
       console.log(nch.tag);
-      nch.canv = nch.canv.replace(/NaN/g, '-1000');
+      nch.svg = nch.svg.replace(/NaN/g, '-1000');
     }
+
     if (chunks.length == 0) {
       chunks.push(nch);
       return;
@@ -197,8 +198,6 @@ function chunkloader(xmin: number, xmax: number) {
   };
 
   while (xmax > MEM.xmax - MEM.cwid || xmin < MEM.xmin + MEM.cwid) {
-    // console.log('generating new chunk...');
-
     let plan;
 
     if (xmax > MEM.xmax - MEM.cwid) {
@@ -215,21 +214,21 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: montaña(plan[i].x, plan[i].y, i * 2 * Math.random()),
+          svg: montaña(plan[i].x, plan[i].y, i * 2 * Math.random()),
         });
 
         add({
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y - 10000,
-          canv: agua(plan[i].x, plan[i].y),
+          svg: agua(plan[i].x, plan[i].y),
         });
       } else if (plan[i].tag == 'flatmount') {
         add({
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: flatMount(plan[i].x, plan[i].y, 2 * Math.random() * PI, {
+          svg: flatMount(plan[i].x, plan[i].y, 2 * Math.random() * PI, {
             ancho: 600 + Math.random() * 400,
             alto: 100,
             cho: 0.5 + Math.random() * 0.2,
@@ -240,17 +239,17 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: montañasAguadas(plan[i].x, plan[i].y, Math.random() * 100, {
+          svg: montañasAguadas(plan[i].x, plan[i].y, Math.random() * 100, {
             alto: 150,
             len: randChoice([500, 1000, 1500]),
           }),
         });
-      } else if (plan[i].tag == 'boat') {
+      } else if (plan[i].tag == 'barco') {
         add({
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: barco(plan[i].x, plan[i].y, {
+          svg: barco(plan[i].x, plan[i].y, {
             sca: plan[i].y / 800,
             fli: randChoice([true, false]),
           }),
@@ -260,14 +259,14 @@ function chunkloader(xmin: number, xmax: number) {
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: `<circle cx="${plan[i].x}" cy="${plan[i].y}" r='20' stroke='black' fill='red' />`,
+          svg: `<circle cx="${plan[i].x}" cy="${plan[i].y}" r='20' stroke='black' fill='red' />`,
         });
       } else if (plan[i].tag == 'greencirc') {
         add({
           tag: plan[i].tag,
           x: plan[i].x,
           y: plan[i].y,
-          canv: `<circle cx="${plan[i].x}" cy="${plan[i].y}" r='20' stroke='black' fill='green' />`,
+          svg: `<circle cx="${plan[i].x}" cy="${plan[i].y}" r='20' stroke='black' fill='green' />`,
         });
       }
     }
@@ -356,7 +355,7 @@ function mountplanner(xmin: number, xmax: number) {
 
   for (let i = xmin; i < xmax; i += xstep) {
     if (Math.random() < 0.2) {
-      const r = { tag: 'boat', x: i, y: 300 + Math.random() * 390 };
+      const r = { tag: 'barco', x: i, y: 300 + Math.random() * 390 };
       chadd(r, 400);
     }
   }
@@ -377,24 +376,13 @@ function xcroll(v: number) {
 function rstyle(id: string, b: boolean) {
   const a = b ? 0.1 : 0.0;
 
-  document.getElementById(id)?.setAttribute(
-    'style',
-    '\
-  width: 32px; \
-  text-align: center;\
-  top: 0px;\
-  color:rgba(0,0,0,0.4);\
-  display:table;\
-  cursor: pointer;\
-  border: 1px solid rgba(0,0,0,0.4);\
-  background-color:rgba(0,0,0,' +
-      a +
-      ');\
-' +
-      'height:' +
-      MEM.windy +
-      'px'
-  );
+  document
+    .getElementById(id)
+    ?.setAttribute(
+      'style',
+      'width: 32px;text-align:center;top:0px;color:rgba(0,0,0,0.4);display:table;cursor: pointer;border: 1px solid rgba(0,0,0,0.4);' +
+        `background-color:rgba(0,0,0,${a});height:${MEM.windy}px`
+    );
 
   document.getElementById(id + '.t')?.setAttribute('style', 'vertical-align:middle; display:table-cell');
 }

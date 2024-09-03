@@ -104,12 +104,12 @@ export function poly(puntos: Punto[], args: ArgsPoly) {
 
   const { x, y, fil, str, ancho } = { ...predeterminados, ...args };
 
-  let canv = "<polyline points='";
+  let svg = "<polyline points='";
 
   puntos.forEach((punto) => {
-    canv += ` ${(punto[0] + x).toFixed(1)},${(punto[1] + y).toFixed(1)}`;
+    svg += ` ${(punto[0] + x).toFixed(1)},${(punto[1] + y).toFixed(1)}`;
   });
 
-  canv += `' style='fill:${fil};stroke:${str};stroke-width:${ancho}'/>`;
-  return canv;
+  svg += `' style='fill:${fil};stroke:${str};stroke-width:${ancho}'/>`;
+  return svg;
 }

@@ -43,12 +43,12 @@ export function stroke(ptlist: Punto[], args?: ArgsStroke) {
     .concat(vtxlist0.concat(vtxlist1.concat([ptlist[ptlist.length - 1]]).reverse()))
     .concat([ptlist[0]]);
 
-  const canv = poly(
+  const svg = poly(
     vtxlist.map((p) => [p[0] + xof, p[1] + yof]),
     { fil: color, str: color, ancho: out }
   );
 
-  return canv;
+  return svg;
 }
 
 export function blob(x: number, y: number, args: ArgsBolb) {
@@ -167,11 +167,11 @@ export function texture(ptlist: Punto[][], args: ArgsTexture) {
       texlist[texlist.length - 1].push([x + ns[0], y + ns[1]]);
     }
   }
-  let canv = '';
+  let svg = '';
   //SHADE
   if (sha) {
     for (let j = 0; j < texlist.length; j += 1 + +(sha != 0)) {
-      canv += stroke(
+      svg += stroke(
         texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
         { color: 'rgba(100,100,100,0.1)', ancho: +sha }
       );
@@ -179,10 +179,10 @@ export function texture(ptlist: Punto[][], args: ArgsTexture) {
   }
   //TEXTURE
   for (let j = 0 + +sha; j < texlist.length; j += 1 + +sha) {
-    canv += stroke(
+    svg += stroke(
       texlist[j].map((x: number[]) => [x[0] + xof, x[1] + yof]),
       { color: color(j / texlist.length), ancho: ancho }
     );
   }
-  return ret ? texlist : canv;
+  return ret ? texlist : svg;
 }
