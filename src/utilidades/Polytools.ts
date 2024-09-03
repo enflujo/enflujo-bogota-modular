@@ -6,11 +6,9 @@ type ArgsTriangulacion = {
   optimize: boolean;
 };
 
-export function buscarCentro(puntos: Punto[]) {
-  return puntos.reduce(
-    (acc: number[], v: number[]) => [v[0] / puntos.length + acc[0], v[1] / puntos.length + acc[1]],
-    [0, 0]
-  );
+export function buscarCentro(...puntos: Punto[][]): Punto {
+  var plist = arguments.length == 1 ? arguments[0] : Array.apply(null, puntos);
+  return plist.reduce((acc: Punto, v: Punto) => [v[0] / plist.length + acc[0], v[1] / plist.length + acc[1]], [0, 0]);
 }
 
 export function triangulate(

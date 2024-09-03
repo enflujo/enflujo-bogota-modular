@@ -265,8 +265,11 @@ export function man(x: number, y: number, args?: ArgsMan) {
   const fhead = (x: number) => sca * 7 * Math.pow(0.25 - Math.pow(x - 0.5, 2), 0.3);
 
   svg += ite(toGlobal(pts[8]), toGlobal(pts[6]), { invertir: fli });
+
   svg += cloth([pts[1], pts[7], pts[8]], fsleeve);
+
   svg += cloth([pts[1], pts[0], pts[3], pts[4]], fbody);
+
   svg += cloth([pts[1], pts[5], pts[6]], fsleeve);
   svg += cloth([pts[1], pts[2]], fhead);
 

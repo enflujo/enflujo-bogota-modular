@@ -115,7 +115,7 @@ export default function montaña(xoff: number, yoff: number, seed = 0, args?: Op
   );
 
   if (veg) {
-    // /** Arboles parte media */
+    /** Arboles parte media */
     vegetate(
       (x: number, y: number) => {
         let ht = ((h + y) / h) * 70;

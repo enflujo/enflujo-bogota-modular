@@ -6,14 +6,8 @@ import { poly, randChoice, randGaussian } from '@/utilidades/Util';
 import { branch, crearCorteza, twig } from './partesArboles';
 
 export function arbol1(x: number, y: number, args: ArgsArbol) {
-  const predeterminados: Arbol = {
-    alto: 50,
-    ancho: 3,
-    color: 'rgba(100,100,100,0.5)',
-  };
-
+  const predeterminados: Arbol = { alto: 50, ancho: 3, color: 'rgba(100,100,100,0.5)' };
   const { alto, ancho, color } = { ...predeterminados, ...args };
-
   let reso = 10;
   const nslist = [];
 
@@ -21,12 +15,12 @@ export function arbol1(x: number, y: number, args: ArgsArbol) {
     nslist.push([noise(i * 0.5), noise(i * 0.5, 0.5)]);
   }
 
-  let leafcol;
+  let colorHoja;
 
   if (color.includes('rgba(')) {
-    leafcol = color.replace('rgba(', '').replace(')', '').split(',');
+    colorHoja = color.replace('rgba(', '').replace(')', '').split(',');
   } else {
-    leafcol = ['100', '100', '100', '0.5'];
+    colorHoja = ['100', '100', '100', '0.5'];
   }
 
   let svg = '';
@@ -39,12 +33,12 @@ export function arbol1(x: number, y: number, args: ArgsArbol) {
 
     if (i >= reso / 4) {
       for (let j = 0; j < (reso - i) / 5; j++) {
-        const [r, g, b] = leafcol;
+        const [r, g, b, a] = colorHoja;
         svg += blob(nx + (Math.random() - 0.5) * ancho * 1.2 * (reso - i), ny + (Math.random() - 0.5) * ancho, {
           len: Math.random() * 20 * (reso - i) * 0.2 + 10,
           ancho: Math.random() * 6 + 3,
           ang: ((Math.random() - 0.5) * PI) / 6,
-          color: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(leafcol[3])).toFixed(1)})`,
+          color: `rgba(${r},${g},${b},${(Math.random() * 0.2 + parseFloat(a)).toFixed(1)})`,
         });
       }
     }
@@ -57,15 +51,8 @@ export function arbol1(x: number, y: number, args: ArgsArbol) {
 }
 
 export function arbol2(x: number, y: number, args?: ArgsArbol) {
-  const predeterminados: Arbol2 = {
-    alto: 16,
-    ancho: 8,
-    clu: 5,
-    color: 'rgba(100,100,100,0.5)',
-  };
-
+  const predeterminados: Arbol2 = { alto: 16, ancho: 8, clu: 5, color: 'rgba(100,100,100,0.5)' };
   const { alto, ancho, clu, color } = { ...predeterminados, ...args };
-
   let svg = '';
 
   for (let i = 0; i < clu; i++) {
@@ -83,12 +70,7 @@ export function arbol2(x: number, y: number, args?: ArgsArbol) {
 }
 
 export function arbol3(x: number, y: number, args: ArgsArbol) {
-  const predeterminados: Arbol3 = {
-    alto: 50,
-    ancho: 5,
-    color: 'rgba(100,100,100,0.5)',
-    ben: () => 0,
-  };
+  const predeterminados: Arbol3 = { alto: 50, ancho: 5, color: 'rgba(100,100,100,0.5)', ben: () => 0 };
 
   const { alto, ancho, color, ben } = { ...predeterminados, ...args };
   const reso = 10;
@@ -139,41 +121,31 @@ export function arbol3(x: number, y: number, args: ArgsArbol) {
 }
 
 export function arbol4(x: number, y: number, args: ArgsArbol) {
-  const predeterminados: Arbol = {
-    alto: 300,
-    ancho: 6,
-    color: 'rgba(100,100,100,0.5)',
-  };
-
+  const predeterminados: Arbol = { alto: 300, ancho: 6, color: 'rgba(100,100,100,0.5)' };
   const { alto, ancho, color } = { ...predeterminados, ...args };
   const trlist = branch({ alto: alto, ancho: ancho, ang: -MEDIO_PI });
-  let txcanv = crearCorteza(x, y, trlist);
-  let twcanv = '';
+  let corteza = crearCorteza(x, y, trlist);
+  let ramita = '';
   let trmlist: Punto[] = [];
   const rama1 = trlist[0].concat(trlist[1].reverse());
 
   for (let i = 0; i < rama1.length; i++) {
     if ((i >= rama1.length * 0.3 && i <= rama1.length * 0.7 && Math.random() < 0.1) || i == rama1.length / 2 - 1) {
       const ba = PI * 0.2 - PI * 1.4 * +(i > rama1.length / 2);
+      const ramas = branch({ alto: alto * (Math.random() + 1) * 0.3, ancho: ancho * 0.5, ang: ba });
 
-      let brlist = branch({
-        alto: alto * (Math.random() + 1) * 0.3,
-        ancho: ancho * 0.5,
-        ang: ba,
-      });
+      ramas[0].splice(0, 1);
+      ramas[1].splice(0, 1);
 
-      brlist[0].splice(0, 1);
-      brlist[1].splice(0, 1);
+      const foff = (v: Punto): Punto => [v[0] + rama1[i][0], v[1] + rama1[i][1]];
 
-      const foff = (v: Punto) => [v[0] + rama1[i][0], v[1] + rama1[i][1]];
+      corteza += crearCorteza(x, y, [ramas[0].map(foff), ramas[1].map(foff)]);
 
-      txcanv += crearCorteza(x, y, [brlist[0].map(foff), brlist[1].map(foff)]);
-
-      for (let j = 0; j < brlist[0].length; j++) {
-        if (Math.random() < 0.2 || j == brlist[0].length - 1) {
-          const [x1, y1] = brlist[0][j];
+      for (let j = 0; j < ramas[0].length; j++) {
+        if (Math.random() < 0.2 || j == ramas[0].length - 1) {
+          const [x1, y1] = ramas[0][j];
           const [x2, y2] = rama1[i];
-          twcanv += twig(x1 + x2 + x, y1 + y2 + y, 1, {
+          ramita += twig(x1 + x2 + x, y1 + y2 + y, 1, {
             ancho: alto / 300,
             ang: ba > -MEDIO_PI ? ba : ba + PI,
             sca: (0.5 * alto) / 300,
@@ -182,7 +154,7 @@ export function arbol4(x: number, y: number, args: ArgsArbol) {
         }
       }
 
-      const rama2 = brlist[0].concat(brlist[1].reverse());
+      const rama2 = ramas[0].concat(ramas[1].reverse());
       trmlist = trmlist.concat(rama2.map((v) => [v[0] + rama1[i][0], v[1] + rama1[i][1]]));
     } else {
       trmlist.push(rama1[i]);
@@ -205,8 +177,8 @@ export function arbol4(x: number, y: number, args: ArgsArbol) {
     }
   );
 
-  svg += txcanv;
-  svg += twcanv;
+  svg += corteza;
+  svg += ramita;
 
   return svg;
 }
@@ -215,7 +187,7 @@ export function arbol5(x: number, y: number, args: ArgsArbol) {
   const predeterminados: Arbol = { alto: 300, ancho: 5, color: 'rgba(100,100,100,0.5)' };
   const { alto, ancho, color } = { ...predeterminados, ...args };
   const trlist = branch({ alto: alto, ancho: ancho, ang: -MEDIO_PI, ben: 0 });
-  const txcanv = crearCorteza(x, y, trlist);
+  const corteza = crearCorteza(x, y, trlist);
   const rama1 = trlist[0].concat(trlist[1].reverse());
   let trmlist: Punto[] = [];
   let twcanv = '';
@@ -279,7 +251,7 @@ export function arbol5(x: number, y: number, args: ArgsArbol) {
     }
   );
 
-  svg += txcanv;
+  svg += corteza;
   svg += twcanv;
 
   return svg;

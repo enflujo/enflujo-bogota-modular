@@ -24,7 +24,7 @@ export function flatMount(
 
   const { alto, ancho, tex, cho } = { ...predeterminados, ...args };
 
-  let canv = '';
+  let svg = '';
   const puntos: Punto[][] = [];
   const reso = [5, 50];
   let hoff = 0;
@@ -59,15 +59,15 @@ export function flatMount(
   }
 
   //WHITE BG
-  canv += poly(puntos[0].concat([[0, reso[0] * 4]]), { x, y, fil: 'white', str: 'none' });
+  svg += poly(puntos[0].concat([[0, reso[0] * 4]]), { x, y, fil: 'white', str: 'none' });
 
   //OUTLINE
-  canv += stroke(
+  svg += stroke(
     puntos[0].map((p) => [p[0] + x, p[1] + y]),
     { color: 'rgba(100,100,100,0.3)', noi: 1, ancho: 3 }
   );
 
-  canv += texture(puntos, {
+  svg += texture(puntos, {
     xof: x,
     yof: y,
     tex: tex,
@@ -92,7 +92,7 @@ export function flatMount(
   }
 
   if (grlist1.length == 0) {
-    return canv;
+    return svg;
   }
 
   let wb = [grlist1[0][0], grlist2[0][0]];
@@ -122,7 +122,7 @@ export function flatMount(
     grlist[i][0] *= 1 - v + noise(grlist[i][1] * 0.5) * v;
   }
 
-  canv += poly(grlist, {
+  svg += poly(grlist, {
     x,
     y,
     str: 'none',
@@ -130,7 +130,7 @@ export function flatMount(
     ancho: 2,
   });
 
-  canv += stroke(
+  svg += stroke(
     grlist.map((p) => [p[0] + x, p[1] + y]),
     {
       ancho: 3,
@@ -154,9 +154,8 @@ export function flatMount(
     return { xmin, xmax, ymin, ymax };
   };
 
-  const svg = flatDec(x, y, bound(grlist));
-  canv += svg;
-  return canv;
+  svg += flatDec(x, y, bound(grlist));
+  return svg;
 }
 
 export function flatDec(x: number, y: number, grbd: { xmin: number; xmax: number; ymin: number; ymax: number }) {

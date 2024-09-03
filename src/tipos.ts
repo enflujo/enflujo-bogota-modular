@@ -139,7 +139,7 @@ export interface ArgsBarco {
 export interface ArgsMan {
   sca?: number;
   hat?: (p0: Punto, p1: Punto, args?: { fli?: boolean }) => string;
-  ite?: () => string;
+  ite?: (p0: Punto, p1: Punto, args?: { invertir: boolean }) => string;
   fli?: boolean;
   ang?: number[];
   len?: number[];
